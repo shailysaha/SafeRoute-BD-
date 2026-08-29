@@ -1,0 +1,281 @@
+/* =========================================================
+   VOICE REPORT
+========================================================= */
+
+.voice-report {
+  width: 100%;
+  margin: 14px 0;
+  padding: 16px;
+
+  box-sizing: border-box;
+
+  background: #111827;
+  border: 1px solid #2d3a50;
+  border-radius: 16px;
+
+  color: #f1f5f9;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.voice-header {
+  margin-bottom: 14px;
+}
+
+.voice-header h3 {
+  margin: 0 0 6px;
+
+  font-size: 17px;
+  font-weight: 700;
+
+  color: #f8fafc;
+}
+
+.voice-header p {
+  margin: 0;
+
+  font-size: 12px;
+  line-height: 1.5;
+
+  color: #94a3b8;
+}
+
+
+/* =========================================================
+   MICROPHONE BUTTON
+========================================================= */
+
+.voice-mic-button {
+  width: 100%;
+  min-height: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  padding: 11px 14px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #f1f1f1;
+  color: #111827;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+}
+
+.voice-mic-button:hover {
+  background: #e2e2e2;
+}
+
+.voice-mic-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* Microphone icon */
+
+.voice-mic-icon {
+  font-size: 20px;
+}
+
+
+/* =========================================================
+   LISTENING STATE
+========================================================= */
+
+.voice-mic-button.voice-listening {
+  background: #3f1d25;
+  color: #ff6b6b;
+
+  border: 1px solid #ef4444;
+}
+
+
+/* =========================================================
+   LISTENING STATUS
+========================================================= */
+
+.voice-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  margin-top: 10px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  color: #f87171;
+}
+
+
+/* Red dot */
+
+.voice-dot {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: #ef4444;
+}
+
+
+/* =========================================================
+   INSTRUCTION
+========================================================= */
+
+.voice-instruction {
+  margin-top: 10px;
+  padding: 9px 10px;
+
+  border-radius: 8px;
+
+  background: #1a2537;
+  border: 1px solid #29364b;
+
+  text-align: center;
+
+  font-size: 12px;
+  line-height: 1.5;
+
+  color: #94a3b8;
+}
+
+
+/* =========================================================
+   TRANSCRIPT
+========================================================= */
+
+.voice-transcript {
+  margin-top: 12px;
+  padding: 11px;
+
+  background: #172235;
+  border: 1px solid #29364b;
+  border-radius: 10px;
+}
+
+
+/* Transcript header */
+
+.transcript-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 8px;
+}
+
+.transcript-header strong,
+.transcript-header span {
+  font-size: 12px;
+  font-weight: 600;
+
+  color: #cbd5e1;
+}
+
+
+/* Transcript text */
+
+.voice-transcript p {
+  margin: 0;
+  padding: 9px;
+
+  background: #0f172a;
+  border: 1px solid #26344a;
+  border-radius: 7px;
+
+  color: #e2e8f0;
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  word-break: break-word;
+}
+
+
+/* =========================================================
+   CLEAR BUTTON
+========================================================= */
+
+.voice-clear-button {
+  padding: 4px 8px;
+
+  border: 1px solid #334155;
+  border-radius: 6px;
+
+  background: #1e293b;
+  color: #94a3b8;
+
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.voice-clear-button:hover {
+  background: #2a3548;
+  color: #f8fafc;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.voice-error {
+  margin-top: 9px;
+  padding: 9px 10px;
+
+  border-radius: 7px;
+
+  background: #351b22;
+  border: 1px solid #6b2b36;
+
+  color: #fca5a5;
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+  .voice-report {
+    padding: 13px;
+    border-radius: 14px;
+  }
+
+  .voice-header h3 {
+    font-size: 16px;
+  }
+
+  .voice-header p {
+    font-size: 12px;
+  }
+
+  .voice-mic-button {
+    min-height: 48px;
+    font-size: 13px;
+  }
+
+  .voice-transcript p {
+    font-size: 12px;
+  }
+}

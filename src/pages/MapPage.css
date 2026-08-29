@@ -1,0 +1,947 @@
+/* =========================================
+   MAP / REPORT PAGE
+========================================= */
+
+.page-layout {
+  display: flex;
+
+  width: 100%;
+  min-width: 0;
+
+  height: calc(100vh - 110px);
+
+  gap: 20px;
+  padding: 18px;
+
+  background: #0f172a;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+}
+
+
+/* =========================================
+   MAP SECTION
+========================================= */
+
+.map-section {
+  position: relative;
+
+  /*
+    Map takes remaining space.
+    Report panel has fixed width below.
+  */
+  flex: 1 1 auto;
+
+  min-width: 0;
+
+  height: 100%;
+
+  overflow: hidden;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.32);
+}
+
+
+/* =========================================
+   FULL WIDTH MAP
+========================================= */
+
+.map-full-width {
+  flex: 1 1 100%;
+
+  width: 100%;
+}
+
+
+/* =========================================
+   ACTUAL LEAFLET MAP
+========================================= */
+
+.main-leaflet-map {
+  width: 100% !important;
+  height: 100% !important;
+
+  border-radius: 18px;
+
+  overflow: hidden;
+}
+
+
+/* =========================================
+   REPORT PANEL
+========================================= */
+
+.report-panel {
+  /*
+    Desktop:
+    Report panel is around 40% of available area,
+    but never becomes excessively wide.
+  */
+  flex: 0 0 40%;
+
+  width: 40%;
+
+  min-width: 380px;
+  max-width: 620px;
+
+  height: 100%;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  background: #ffffff;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.22);
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================
+   MAP POPUP
+========================================= */
+
+.report-popup {
+  min-width: 200px;
+}
+
+.report-popup h3 {
+  margin: 0 0 8px;
+}
+
+.report-popup p {
+  margin: 5px 0;
+}
+
+
+/* =========================================
+   MAP CONTROLS
+========================================= */
+
+.map-section {
+  position: relative;
+}
+
+
+/* My Location container */
+
+.map-my-location {
+  position: absolute;
+
+  right: 22px;
+  bottom: 22px;
+
+  z-index: 1000;
+}
+
+
+/* My Location button */
+
+.map-my-location .my-location-btn,
+.map-location-button {
+  position: static !important;
+
+  background: #2563eb !important;
+
+  color: #ffffff;
+
+  border: none;
+
+  border-radius: 30px;
+
+  padding: 13px 20px;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 6px 18px rgba(37, 99, 235, 0.35);
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.map-my-location .my-location-btn:hover,
+.map-location-button:hover {
+  background: #1d4ed8 !important;
+
+  transform: translateY(-2px);
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1100px) {
+
+  .page-layout {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .map-section {
+    flex: 1 1 auto;
+  }
+
+  .report-panel {
+    flex: 0 0 360px;
+
+    width: 360px;
+
+    min-width: 360px;
+    max-width: 360px;
+  }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .page-layout {
+    display: flex;
+
+    flex-direction: column;
+
+    width: 100%;
+
+    height: auto;
+
+    min-height: 100vh;
+
+    padding: 8px;
+
+    gap: 12px;
+
+    overflow: visible;
+  }
+
+
+  /* ==============================
+     MAP ON TOP
+  ============================== */
+
+  .map-section {
+    flex: none;
+
+    width: 100%;
+
+    height: 55vh;
+
+    min-height: 360px;
+
+    border-radius: 14px;
+  }
+
+
+  .main-leaflet-map {
+    width: 100% !important;
+
+    height: 100% !important;
+
+    border-radius: 14px;
+  }
+
+
+  /* ==============================
+     REPORT FORM UNDER MAP
+  ============================== */
+
+  .report-panel {
+    flex: none;
+
+    width: 100%;
+
+    min-width: 0;
+
+    max-width: none;
+
+    height: auto;
+
+    min-height: auto;
+
+    overflow: visible;
+
+    border-radius: 14px;
+  }
+
+
+  /* ==============================
+     MAP ONLY PAGE
+  ============================== */
+
+  .map-only-layout {
+    min-height: auto;
+  }
+
+  .map-only-layout .map-section {
+    width: 100%;
+
+    height: calc(100vh - 100px);
+
+    min-height: 500px;
+  }
+
+
+  /* ==============================
+     MOBILE LOCATION BUTTON
+  ============================== */
+
+  .map-my-location {
+    right: 14px;
+
+    bottom: 18px;
+  }
+}
+
+
+/* =========================================
+   SMALL PHONES
+========================================= */
+
+@media (max-width: 480px) {
+
+  .page-layout {
+    padding: 6px;
+
+    gap: 10px;
+  }
+
+
+  .map-section {
+    height: 50vh;
+
+    min-height: 330px;
+  }
+
+
+  .map-only-layout .map-section {
+    height: calc(100vh - 90px);
+
+    min-height: 450px;
+  }
+
+
+  .report-panel {
+    width: 100%;
+
+    min-width: 0;
+  }
+
+
+  .map-my-location {
+    right: 12px;
+
+    bottom: 16px;
+  }
+
+
+  .map-my-location .my-location-btn,
+  .map-location-button {
+    padding: 10px 16px;
+
+    font-size: 13px;
+  }
+}
+
+
+/* =========================================
+   DARK MODE
+========================================= */
+
+body.dark-mode .page-layout {
+  background: #0f172a;
+}
+
+body.dark-mode .report-panel {
+  background: #111827;
+}
+
+
+/* =========================================
+   MARKER VARIANTS & FILTERS
+========================================= */
+
+.marker-red {
+  filter: hue-rotate(140deg) saturate(5);
+}
+
+.marker-orange {
+  filter: hue-rotate(175deg) saturate(4);
+}
+
+.marker-green {
+  filter: hue-rotate(240deg) saturate(3);
+}
+
+.marker-blue {
+  filter: none;
+}
+
+.marker-police {
+  filter: hue-rotate(0deg) saturate(3) brightness(0.8);
+}
+
+.marker-hospital {
+  filter: hue-rotate(240deg) saturate(4) brightness(1.1);
+}
+
+
+/* =========================================
+   REPORTS PAGE
+========================================= */
+
+.reports-page {
+  min-height: 100vh;
+
+  padding: 32px;
+
+  background: #f4f7fb;
+
+  color: #0f172a;
+
+  box-sizing: border-box;
+}
+
+
+.reports-header {
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 25px;
+}
+
+
+.reports-header h1 {
+  margin: 0;
+
+  font-size: 32px;
+}
+
+
+.reports-header p {
+  margin: 8px 0 0;
+
+  color: #64748b;
+}
+
+
+/* =========================================
+   REFRESH BUTTON
+========================================= */
+
+.refresh-reports-btn {
+  padding: 12px 18px;
+
+  color: white;
+
+  background: #2563eb;
+
+  border: none;
+
+  border-radius: 11px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* =========================================
+   REPORT SEARCH
+========================================= */
+
+.report-search-section {
+  position: relative;
+
+  max-width: 650px;
+
+  margin-bottom: 14px;
+}
+
+
+.report-search-section input {
+  width: 100%;
+
+  height: 52px;
+
+  padding: 0 50px 0 46px;
+
+  border: 1px solid #d5deea;
+
+  border-radius: 14px;
+
+  background: white;
+
+  font-size: 15px;
+
+  outline: none;
+
+  box-sizing: border-box;
+}
+
+
+.report-search-section input:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+
+.report-search-icon {
+  position: absolute;
+
+  top: 50%;
+
+  left: 16px;
+
+  transform: translateY(-50%);
+}
+
+
+.clear-report-search {
+  position: absolute;
+
+  top: 50%;
+
+  right: 12px;
+
+  transform: translateY(-50%);
+
+  width: 30px;
+
+  height: 30px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: #eef2f7;
+
+  cursor: pointer;
+}
+
+
+/* =========================================
+   REPORT RESULT SUMMARY
+========================================= */
+
+.report-result-summary {
+  display: flex;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 22px;
+
+  color: #64748b;
+
+  font-size: 14px;
+}
+
+
+/* =========================================
+   REPORT GRID
+========================================= */
+
+.reports-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(300px, 1fr));
+
+  gap: 20px;
+}
+
+
+/* =========================================
+   REPORT CARD
+========================================= */
+
+.report-card {
+  padding: 22px;
+
+  background: white;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 9px 25px rgba(15, 23, 42, 0.07);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.report-card:hover {
+  transform: translateY(-4px);
+
+  box-shadow:
+    0 16px 35px rgba(15, 23, 42, 0.12);
+}
+
+
+.report-card-top {
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 15px;
+}
+
+
+.report-card h3 {
+  margin: 0;
+
+  font-size: 20px;
+}
+
+
+.report-district {
+  margin: 5px 0 0;
+
+  color: #64748b;
+
+  font-size: 14px;
+}
+
+
+/* =========================================
+   SEVERITY
+========================================= */
+
+.severity-badge {
+  flex-shrink: 0;
+
+  padding: 6px 10px;
+
+  border-radius: 999px;
+
+  font-size: 12px;
+
+  font-weight: 800;
+}
+
+
+.severity-high {
+  color: #b91c1c;
+
+  background: #fee2e2;
+}
+
+
+.severity-medium {
+  color: #b45309;
+
+  background: #fef3c7;
+}
+
+
+.severity-low {
+  color: #15803d;
+
+  background: #dcfce7;
+}
+
+
+.severity-unknown {
+  color: #475569;
+
+  background: #e2e8f0;
+}
+
+
+/* =========================================
+   DANGER TYPE
+========================================= */
+
+.report-danger-type {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin: 20px 0 14px;
+
+  padding: 12px;
+
+  background: #f8fafc;
+
+  border-radius: 12px;
+}
+
+
+.report-danger-type div {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+
+.report-danger-type small {
+  color: #64748b;
+}
+
+
+/* =========================================
+   DESCRIPTION
+========================================= */
+
+.report-description {
+  min-height: 44px;
+
+  color: #475569;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================
+   TIME
+========================================= */
+
+.report-time {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 18px;
+
+  padding-top: 15px;
+
+  border-top: 1px solid #e2e8f0;
+}
+
+
+.report-time div {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+
+.report-time strong {
+  color: #2563eb;
+
+  font-size: 13px;
+}
+
+
+.report-time small {
+  color: #64748b;
+
+  font-size: 11px;
+}
+
+
+/* =========================================
+   REPORT MESSAGE
+========================================= */
+
+.reports-message {
+  padding: 60px 20px;
+
+  text-align: center;
+
+  background: white;
+
+  border-radius: 18px;
+}
+
+
+.reports-message span {
+  font-size: 40px;
+}
+
+
+/* =========================================
+   REPORTS MOBILE
+========================================= */
+
+@media (max-width: 700px) {
+
+  .reports-page {
+    padding: 18px 12px;
+  }
+
+
+  .reports-header {
+    flex-direction: column;
+  }
+
+
+  .refresh-reports-btn {
+    width: 100%;
+  }
+
+
+  .report-result-summary {
+    flex-direction: column;
+
+    gap: 5px;
+  }
+
+
+  .reports-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* =========================================
+   DARK MODE - REPORTS PAGE
+========================================= */
+
+body.dark-mode .reports-page {
+  background: #0f172a;
+
+  color: #f8fafc;
+}
+
+
+body.dark-mode .reports-header h1 {
+  color: #f8fafc;
+}
+
+
+body.dark-mode .reports-header p,
+body.dark-mode .report-result-summary {
+  color: #94a3b8;
+}
+
+
+/* Search field */
+
+body.dark-mode .report-search-section input {
+  background: #1e293b;
+
+  color: #f8fafc;
+
+  border-color: #475569;
+}
+
+
+body.dark-mode .report-search-section input::placeholder {
+  color: #94a3b8;
+}
+
+
+body.dark-mode .clear-report-search {
+  background: #334155;
+
+  color: #f8fafc;
+}
+
+
+/* Report cards */
+
+body.dark-mode .report-card {
+  background: #1e293b;
+
+  border-color: #334155;
+
+  color: #f8fafc;
+
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.3);
+}
+
+
+body.dark-mode .report-card h3 {
+  color: #f8fafc;
+}
+
+
+body.dark-mode .report-district,
+body.dark-mode .report-description {
+  color: #cbd5e1;
+}
+
+
+/* Danger information */
+
+body.dark-mode .report-danger-type {
+  background: #111827;
+
+  color: #f8fafc;
+}
+
+
+body.dark-mode .report-danger-type small {
+  color: #94a3b8;
+}
+
+
+body.dark-mode .report-danger-type strong {
+  color: #f8fafc;
+}
+
+
+/* Time section */
+
+body.dark-mode .report-time {
+  border-top-color: #334155;
+}
+
+
+body.dark-mode .report-time strong {
+  color: #60a5fa;
+}
+
+
+body.dark-mode .report-time small {
+  color: #94a3b8;
+}
+
+
+/* Empty/loading message */
+
+body.dark-mode .reports-message {
+  background: #1e293b;
+
+  color: #f8fafc;
+}
+
+
+body.dark-mode .reports-message h3 {
+  color: #f8fafc;
+}
+
+
+body.dark-mode .reports-message p {
+  color: #94a3b8;
+}

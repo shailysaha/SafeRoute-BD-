@@ -1,0 +1,256 @@
+/* =========================================
+   THEME DESIGN TOKENS
+========================================= */
+:root {
+  --bg-primary: #f1f5f9;
+  --bg-tertiary: #f8fafc;
+  --card-bg: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --border-color: rgba(148, 163, 184, 0.2);
+  --shadow: 0 10px 28px rgba(0, 0, 0, 0.15);
+}
+
+body.dark,
+.dark {
+  --bg-primary: #0f172a;
+  --bg-tertiary: #1e293b;
+  --card-bg: #111c2e;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border-color: #22314a;
+  --shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+}
+
+/* =========================================
+   EMERGENCY PAGE
+========================================= */
+.emergency-page {
+  min-height: 100vh;
+  padding: 34px 40px 60px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.emergency-heading {
+  margin-bottom: 28px;
+}
+
+.emergency-heading h1 {
+  margin: 0 0 8px;
+  color: var(--text-primary);
+  font-size: 38px;
+}
+
+.emergency-heading p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.emergency-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  margin-bottom: 24px;
+}
+
+/* Cards */
+.emergency-info-card,
+.emergency-map-card,
+.emergency-contacts-card {
+  position: relative;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  padding: 24px;
+  border-radius: 18px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.emergency-info-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, #10b981, #2563eb);
+}
+
+.sos-card::before {
+  background: linear-gradient(90deg, #ef4444, #f97316);
+}
+
+.emergency-info-card h3,
+.emergency-map-heading h2 {
+  margin: 0 0 16px;
+  color: var(--text-primary);
+  font-size: 22px;
+}
+
+.emergency-info-card p,
+.emergency-map-heading p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.emergency-location-btn {
+  position: static !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  padding: 12px 20px !important;
+  border: none !important;
+  border-radius: 10px !important;
+  font-weight: 700;
+}
+
+.emergency-location-details {
+  margin-top: 18px;
+  padding: 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+}
+
+.emergency-location-details p {
+  margin: 6px 0;
+  color: var(--text-primary);
+}
+
+.emergency-help-text {
+  margin-top: 14px;
+}
+
+.sending-sos {
+  margin-top: 12px;
+  color: #dc2626 !important;
+  font-weight: 700;
+}
+
+/* Map Section */
+.emergency-map-card {
+  padding: 20px;
+}
+
+.emergency-map-heading {
+  margin-bottom: 16px;
+}
+
+.emergency-map-heading h2 {
+  margin: 0 0 5px;
+}
+
+.emergency-map-heading p {
+  margin: 0;
+}
+
+.emergency-map {
+  width: 100%;
+  height: 520px;
+  border-radius: 14px;
+}
+
+.emergency-map-empty {
+  min-height: 320px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  color: var(--text-secondary);
+}
+
+.emergency-map-empty h3 {
+  color: var(--text-primary);
+}
+
+/* Contacts & Legend */
+.emergency-contacts-section {
+  margin-bottom: 24px;
+}
+
+.emergency-service-legend {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* Nearest Services Grid */
+.nearest-services-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin: 20px 0;
+}
+
+.nearest-service-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.nearest-service-icon {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  font-size: 26px;
+}
+
+.nearest-label,
+.service-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.nearest-service-card h3 {
+  margin: 3px 0;
+  font-size: 17px;
+  color: var(--text-primary);
+}
+
+.nearest-service-card p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* =========================================
+   MEDIA QUERIES
+========================================= */
+@media (max-width: 900px) {
+  .emergency-page {
+    padding: 24px 18px;
+  }
+
+  .emergency-action-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .emergency-map {
+    height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .nearest-services-grid {
+    grid-template-columns: 1fr;
+  }
+}

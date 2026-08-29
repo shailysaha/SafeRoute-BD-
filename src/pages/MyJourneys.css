@@ -1,0 +1,895 @@
+/* =====================================================
+   MY JOURNEYS PAGE
+===================================================== */
+
+.my-journeys-page {
+  min-height: 100vh;
+  padding: 32px;
+  background: #f4f7fb;
+  color: #0f172a;
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.journeys-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 26px;
+}
+
+.journey-label {
+  display: inline-block;
+  margin-bottom: 5px;
+  color: #2563eb;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+}
+
+.journeys-header h1 {
+  margin: 0 0 7px;
+  font-size: 30px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.journeys-header p {
+  max-width: 620px;
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.new-journey-btn {
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+
+  background: #2563eb;
+  color: white;
+
+  font-size: 12px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 5px 14px rgba(37, 99, 235, 0.2);
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.new-journey-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* =====================================================
+   SUMMARY CARDS
+===================================================== */
+
+.journey-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.journey-summary-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 19px;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 15px;
+
+  box-shadow:
+    0 4px 15px rgba(15, 23, 42, 0.04);
+}
+
+.journey-summary-icon {
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  background: #eff6ff;
+  border-radius: 12px;
+
+  font-size: 20px;
+}
+
+.journey-summary-card:nth-child(2)
+  .journey-summary-icon {
+  background: #fff7ed;
+}
+
+.journey-summary-card h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 27px;
+  font-weight: 800;
+}
+
+.journey-summary-card p {
+  margin: 3px 0 0;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+.journey-search-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+
+  margin-bottom: 20px;
+  padding: 14px 16px;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+}
+
+.journey-search-panel input {
+  width: min(500px, 100%);
+  height: 42px;
+
+  padding: 0 14px;
+
+  background: #f8fafc;
+
+  border: 1px solid #dbe3ee;
+  border-radius: 9px;
+
+  color: #334155;
+
+  font-size: 12px;
+  outline: none;
+
+  transition:
+    border 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.journey-search-panel input:focus {
+  border-color: #3b82f6;
+
+  box-shadow:
+    0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.journey-search-panel span {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* =====================================================
+   JOURNEY LIST
+===================================================== */
+
+.journey-list {
+  display: grid;
+  grid-template-columns: repeat(
+    2,
+    minmax(0, 1fr)
+  );
+
+  gap: 18px;
+}
+
+/* =====================================================
+   JOURNEY CARD
+===================================================== */
+
+.journey-card {
+  padding: 20px;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 17px;
+
+  box-shadow:
+    0 5px 18px rgba(15, 23, 42, 0.05);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.journey-card:hover {
+  transform: translateY(-2px);
+
+  border-color: #bfdbfe;
+
+  box-shadow:
+    0 10px 28px rgba(15, 23, 42, 0.08);
+}
+
+/* =====================================================
+   CARD HEADER
+===================================================== */
+
+.journey-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+
+  padding-bottom: 16px;
+
+  border-bottom: 1px solid #edf2f7;
+}
+
+.journey-route-heading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.route-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  background: #eff6ff;
+  border-radius: 11px;
+
+  font-size: 19px;
+}
+
+.journey-route-heading h2 {
+  margin: 0 0 3px;
+
+  color: #0f172a;
+
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.journey-route-heading small {
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+/* =====================================================
+   JOURNEY STATUS
+===================================================== */
+
+.journey-status {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 6px 10px;
+
+  border-radius: 20px;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  white-space: nowrap;
+}
+
+.journey-status.safe {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.journey-status.warning {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* =====================================================
+   START → DESTINATION
+===================================================== */
+
+.journey-route {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 0;
+
+  padding: 20px 4px 18px;
+}
+
+.route-point {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.point-marker {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  color: white;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.point-marker.start {
+  background: #2563eb;
+}
+
+.point-marker.destination {
+  background: #16a34a;
+}
+
+.route-point > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.route-point small {
+  color: #94a3b8;
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.route-point strong {
+  color: #334155;
+  font-size: 11px;
+  font-weight: 750;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  max-width: 380px;
+}
+
+/* Connecting line */
+
+.route-line {
+  width: 30px;
+  height: 25px;
+
+  display: flex;
+  justify-content: center;
+}
+
+.route-line span {
+  width: 2px;
+  height: 100%;
+
+  background: #cbd5e1;
+
+  border-radius: 10px;
+}
+
+/* =====================================================
+   JOURNEY INFORMATION
+===================================================== */
+
+.journey-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 8px;
+
+  margin-bottom: 16px;
+}
+
+.journey-meta-grid > div {
+  padding: 11px 10px;
+
+  background: #f8fafc;
+
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
+
+  text-align: center;
+}
+
+.journey-meta-grid span {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #94a3b8;
+
+  font-size: 8px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.journey-meta-grid strong {
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.journey-meta-grid .alert-number {
+  color: #dc2626;
+}
+
+/* =====================================================
+   ACTIVE ROUTE ALERTS
+===================================================== */
+
+.journey-alert-box {
+  margin-bottom: 16px;
+  padding: 13px;
+
+  background: #fff7ed;
+
+  border: 1px solid #fed7aa;
+  border-radius: 11px;
+}
+
+.journey-alert-title {
+  margin-bottom: 9px;
+
+  color: #c2410c;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.journey-alert-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 8px 0;
+
+  border-bottom:
+    1px solid rgba(251, 146, 60, 0.18);
+}
+
+.journey-alert-item:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.journey-alert-item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.journey-alert-item strong {
+  color: #7c2d12;
+  font-size: 10px;
+}
+
+.journey-alert-item small {
+  color: #9a3412;
+  font-size: 9px;
+}
+
+.journey-alert-item > span {
+  padding: 4px 7px;
+
+  background: #ffffff;
+
+  border-radius: 15px;
+
+  color: #c2410c;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  white-space: nowrap;
+}
+
+/* =====================================================
+   ACTION BUTTONS
+===================================================== */
+
+.journey-card-actions {
+  display: flex;
+  gap: 9px;
+}
+
+.journey-card-actions button {
+  min-height: 39px;
+
+  border-radius: 9px;
+
+  font-size: 10px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.open-journey-btn {
+  flex: 1;
+
+  border: none;
+
+  background: #2563eb;
+  color: white;
+}
+
+.open-journey-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.remove-journey-btn {
+  padding: 0 15px;
+
+  background: #ffffff;
+
+  border: 1px solid #fecaca;
+
+  color: #dc2626;
+}
+
+.remove-journey-btn:hover {
+  background: #fef2f2;
+}
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.no-saved-journeys {
+  padding: 70px 25px;
+
+  background: #ffffff;
+
+  border: 1px dashed #cbd5e1;
+  border-radius: 18px;
+
+  text-align: center;
+}
+
+.empty-route-icon {
+  width: 65px;
+  height: 65px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 auto 15px;
+
+  background: #eff6ff;
+  border-radius: 50%;
+
+  font-size: 27px;
+}
+
+.no-saved-journeys h2 {
+  margin: 0 0 7px;
+
+  color: #0f172a;
+
+  font-size: 19px;
+}
+
+.no-saved-journeys p {
+  max-width: 440px;
+
+  margin: 0 auto 18px;
+
+  color: #64748b;
+
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.no-saved-journeys button {
+  padding: 11px 18px;
+
+  background: #2563eb;
+  color: white;
+
+  border: none;
+  border-radius: 9px;
+
+  font-size: 11px;
+  font-weight: 750;
+
+  cursor: pointer;
+}
+
+.no-saved-journeys button:hover {
+  background: #1d4ed8;
+}
+
+/* =====================================================
+   LOADING
+===================================================== */
+
+.journey-loading {
+  min-height: 70vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f4f7fb;
+
+  color: #64748b;
+
+  font-size: 13px;
+  font-weight: 650;
+}
+
+/* =====================================================
+   DARK MODE
+===================================================== */
+
+.dark .my-journeys-page,
+.dark .journey-loading {
+  background: #0b1220;
+  color: #f8fafc;
+}
+
+.dark .journeys-header h1,
+.dark .journey-summary-card h2,
+.dark .journey-route-heading h2,
+.dark .journey-meta-grid strong,
+.dark .no-saved-journeys h2 {
+  color: #f8fafc;
+}
+
+.dark .journeys-header p,
+.dark .journey-summary-card p,
+.dark .journey-search-panel span,
+.dark .route-point small,
+.dark .journey-route-heading small,
+.dark .no-saved-journeys p {
+  color: #94a3b8;
+}
+
+.dark .journey-summary-card,
+.dark .journey-search-panel,
+.dark .journey-card,
+.dark .no-saved-journeys {
+  background: #111c2e;
+  border-color: #22314a;
+}
+
+.dark .journey-card-top {
+  border-color: #22314a;
+}
+
+.dark .journey-card:hover {
+  border-color: #3b82f6;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.22);
+}
+
+.dark .journey-search-panel input {
+  background: #0f1a2c;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+.dark .journey-search-panel input::placeholder {
+  color: #64748b;
+}
+
+.dark .route-point strong {
+  color: #e2e8f0;
+}
+
+.dark .route-line span {
+  background: #475569;
+}
+
+.dark .journey-meta-grid > div {
+  background: #0f1a2c;
+  border-color: #22314a;
+}
+
+.dark .journey-alert-box {
+  background: rgba(249, 115, 22, 0.08);
+  border-color: rgba(249, 115, 22, 0.22);
+}
+
+.dark .journey-alert-title {
+  color: #fb923c;
+}
+
+.dark .journey-alert-item {
+  border-color: rgba(249, 115, 22, 0.15);
+}
+
+.dark .journey-alert-item strong {
+  color: #fdba74;
+}
+
+.dark .journey-alert-item small {
+  color: #fb923c;
+}
+
+.dark .journey-alert-item > span {
+  background: #1e293b;
+  color: #fdba74;
+}
+
+.dark .remove-journey-btn {
+  background: transparent;
+  border-color: #7f1d1d;
+  color: #f87171;
+}
+
+.dark .remove-journey-btn:hover {
+  background: rgba(220, 38, 38, 0.1);
+}
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 1000px) {
+  .journey-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 650px) {
+  .my-journeys-page {
+    padding: 20px 12px;
+  }
+
+  .journeys-header {
+    flex-direction: column;
+  }
+
+  .new-journey-btn {
+    width: 100%;
+  }
+
+  .journey-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .journey-search-panel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .journey-search-panel input {
+    width: 100%;
+  }
+
+  .journey-search-panel span {
+    text-align: right;
+  }
+
+  .journey-card-top {
+    flex-direction: column;
+  }
+
+  .journey-meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .journey-card-actions {
+    flex-direction: column;
+  }
+
+  .remove-journey-btn {
+    min-height: 39px;
+  }
+
+  .route-point strong {
+    max-width: 240px;
+  }
+}
+/* =========================================
+SAVED ROUTE ALERT SEVERITY
+========================================= */
+
+.saved-route-severity {
+display: inline-flex;
+
+padding: 5px 9px;
+
+border-radius: 20px;
+
+font-size: 9px;
+font-weight: 800;
+
+white-space: nowrap;
+}
+
+.saved-route-severity.high {
+background: #fee2e2;
+color: #b91c1c;
+}
+
+.saved-route-severity.medium {
+background: #fef3c7;
+color: #b45309;
+}
+
+.saved-route-severity.low {
+background: #dcfce7;
+color: #15803d;
+}
+
+.more-route-alerts {
+margin: 10px 0 0;
+
+color: #c2410c;
+
+font-size: 10px;
+font-weight: 700;
+}
+
+
+/* DARK MODE */
+
+.dark .saved-route-severity.high {
+background: rgba(239, 68, 68, 0.14);
+color: #fca5a5;
+}
+
+.dark .saved-route-severity.medium {
+background: rgba(245, 158, 11, 0.14);
+color: #fcd34d;
+}
+
+.dark .saved-route-severity.low {
+background: rgba(34, 197, 94, 0.14);
+color: #86efac;
+}

@@ -1,0 +1,400 @@
+/* =========================================
+   THEME DESIGN TOKENS
+========================================= */
+:root {
+  --bg-primary: #f1f5f9;
+  --card-bg: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --border-color: rgba(148, 163, 184, 0.2);
+  --shadow: 0 14px 35px rgba(0, 0, 0, 0.12);
+  
+  --input-bg: #111827;
+  --input-text: #ffffff;
+  --input-border: #334155;
+  --hover-bg: #f8fafc;
+}
+
+body.dark,
+.dark {
+  --bg-primary: #0f172a;
+  --card-bg: #111c2e;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border-color: #22314a;
+  --shadow: 0 14px 35px rgba(0, 0, 0, 0.4);
+  
+  --input-bg: #0b1120;
+  --input-text: #f8fafc;
+  --input-border: #1e293b;
+  --hover-bg: #1e293b;
+}
+
+/* =========================================
+   PLAN JOURNEY PAGE
+========================================= */
+.plan-journey-page {
+  min-height: 100vh;
+  padding: 34px 40px 60px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.plan-journey-page h1 {
+  margin: 0 0 28px;
+  color: var(--text-primary);
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.journey-page-heading p {
+  color: var(--text-secondary);
+}
+
+.journey-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+/* Field Card */
+.journey-field {
+  position: relative;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  padding: 26px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+  overflow: visible;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.journey-field::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, #10b981, #2563eb);
+}
+
+.journey-field h3 {
+  margin: 0 0 18px;
+  color: var(--text-primary);
+  font-size: 23px;
+  font-weight: 700;
+}
+
+.journey-field p {
+  display: flex;
+  align-items: center;
+  margin: 14px 0 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.journey-my-location-btn {
+  position: static !important;
+  width: 100%;
+  max-width: 260px;
+  margin-top: 2px;
+  padding: 13px 20px !important;
+  background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 12px !important;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.journey-my-location-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.35) !important;
+}
+
+/* Search Box */
+.journey-field .search-box {
+  width: 100%;
+}
+
+.journey-field .search-input-wrapper {
+  width: 100%;
+}
+
+.journey-field .search-input-wrapper input {
+  width: 100%;
+  padding: 15px 18px 15px 44px;
+  background: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--input-border);
+  border-radius: 12px;
+  outline: none;
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.journey-field .search-input-wrapper input:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.14);
+}
+
+.journey-field .search-input-wrapper input::placeholder {
+  color: var(--text-secondary);
+}
+
+.journey-field .search-location-icon {
+  left: 15px;
+}
+
+/* Search Dropdown */
+.journey-field .search-results {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 3000;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.journey-field .search-item {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.journey-field .search-item:hover {
+  background: var(--hover-bg);
+}
+
+.journey-field .search-result-text strong {
+  display: block;
+  color: var(--text-primary);
+}
+
+.journey-field .search-result-text small {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-secondary);
+}
+
+/* Generate Route Button */
+.generate-route-btn {
+  width: 100%;
+  margin: 8px 0 26px;
+  padding: 16px 22px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(16, 185, 129, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.generate-route-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(16, 185, 129, 0.32);
+}
+
+/* Route Map */
+.route-map-wrapper {
+  width: 100%;
+  margin-top: 10px;
+  padding: 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+}
+
+.journey-map {
+  width: 100%;
+  height: 520px;
+  border-radius: 15px;
+}
+
+/* Summary Cards */
+.route-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.route-summary > div {
+  position: relative;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  padding: 22px;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.route-summary > div::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #10b981, #2563eb);
+}
+
+.route-summary strong {
+  color: var(--text-secondary);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.route-summary p {
+  margin: 8px 0 0;
+  color: var(--text-primary);
+  font-size: 27px;
+  font-weight: 800;
+}
+
+/* Alerts */
+.route-alert-section {
+  margin-top: 28px;
+}
+
+.route-alert-section h2 {
+  margin-bottom: 16px;
+  color: var(--text-primary);
+  font-size: 26px;
+}
+
+.route-alert-card {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-color);
+  border-left: 5px solid #f59e0b;
+  box-shadow: var(--shadow);
+}
+
+.route-alert-card h3 {
+  margin: 0 0 8px;
+  color: #dc2626;
+}
+
+.route-alert-card p {
+  margin: 5px 0;
+  color: var(--text-secondary);
+}
+
+.route-safe-message {
+  padding: 20px;
+  background: #ecfdf5;
+  color: #166534;
+  border: 1px solid #a7f3d0;
+  border-radius: 14px;
+  font-weight: 700;
+}
+
+/* Save Journey Section */
+.save-journey-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 16px 18px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+}
+
+.save-journey-section p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.save-journey-btn {
+  min-width: 165px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 10px;
+  background: #16a34a;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(22, 163, 74, 0.2);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.save-journey-btn:hover:not(:disabled) {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+.save-journey-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   MEDIA QUERIES
+========================================= */
+@media (max-width: 900px) {
+  .plan-journey-page {
+    padding: 24px 18px 50px;
+  }
+
+  .plan-journey-page h1 {
+    font-size: 32px;
+  }
+
+  .journey-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .route-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .journey-map {
+    height: 400px;
+  }
+}
+
+@media (max-width: 650px) {
+  .save-journey-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .save-journey-btn {
+    width: 100%;
+  }
+}

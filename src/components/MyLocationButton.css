@@ -1,0 +1,28 @@
+.my-location-btn {
+  background: #2563eb;
+  color: #ffffff;
+
+  border: none;
+
+  padding: 12px 20px;
+
+  border-radius: 10px;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.my-location-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.my-location-btn:active {
+  transform: translateY(0);
+}

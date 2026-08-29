@@ -1,0 +1,328 @@
+/* =========================================
+   REPORT SIDEBAR
+========================================= */
+
+.report-sidebar {
+  width: 100%;
+  max-width: 620px;
+  height: 100%;
+
+  padding: 20px;
+
+  background: #ffffff;
+  color: #0f172a;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  box-sizing: border-box;
+
+  /* Keep form content clean and compact */
+  margin: 0 auto;
+}
+
+
+/* =========================================
+   HEADING
+========================================= */
+
+.report-sidebar h2 {
+  margin: 0 0 16px;
+
+  color: #0f172a;
+
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+
+/* =========================================
+   FORM ELEMENTS
+========================================= */
+
+.report-sidebar input,
+.report-sidebar select,
+.report-sidebar textarea {
+  width: 100%;
+
+  margin-bottom: 10px;
+  padding: 10px 12px;
+
+  color: #0f172a;
+  background: #ffffff;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+
+  font-size: 14px;
+  font-family: inherit;
+
+  outline: none;
+
+  box-sizing: border-box;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+/* Input & Select */
+
+.report-sidebar input,
+.report-sidebar select {
+  min-height: 44px;
+}
+
+
+/* Textarea */
+
+.report-sidebar textarea {
+  min-height: 90px;
+
+  resize: vertical;
+}
+
+
+/* =========================================
+   FOCUS
+========================================= */
+
+.report-sidebar input:focus,
+.report-sidebar select:focus,
+.report-sidebar textarea:focus {
+  border-color: #10b981;
+
+  box-shadow:
+    0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+
+/* =========================================
+   DISABLED LOCATION INFORMATION
+========================================= */
+
+.report-sidebar input:disabled {
+  color: #475569;
+
+  background: #f8fafc;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================
+   COORDINATE TEXT
+========================================= */
+
+.report-sidebar p {
+  margin: 3px 0 7px;
+
+  color: #64748b;
+
+  font-size: 11px;
+}
+
+
+/* =========================================
+   DIVIDER
+========================================= */
+
+.report-sidebar hr {
+  margin: 12px 0 !important;
+
+  border: none !important;
+  border-top: 1px solid #e2e8f0 !important;
+}
+
+
+/* =========================================
+   SUBMIT BUTTON
+========================================= */
+
+.report-sidebar > button {
+  width: 100%;
+
+  min-height: 46px;
+
+  margin-top: 3px;
+
+  padding: 11px 15px;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ef4444,
+      #dc2626
+    );
+
+  border: none;
+  border-radius: 10px;
+
+  font-size: 14px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 7px 18px rgba(239, 68, 68, 0.20);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.report-sidebar > button:hover {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 10px 22px rgba(239, 68, 68, 0.28);
+}
+
+
+/* =========================================
+   DARK MODE
+========================================= */
+
+body.dark-mode .report-sidebar {
+  color: #f8fafc;
+  background: #111827;
+}
+
+body.dark-mode .report-sidebar h2 {
+  color: #f8fafc;
+}
+
+body.dark-mode .report-sidebar input,
+body.dark-mode .report-sidebar select,
+body.dark-mode .report-sidebar textarea {
+  color: #f8fafc;
+
+  background: #1e293b;
+
+  border-color: #475569;
+}
+
+body.dark-mode .report-sidebar input::placeholder,
+body.dark-mode .report-sidebar textarea::placeholder {
+  color: #94a3b8;
+}
+
+body.dark-mode .report-sidebar input:disabled {
+  color: #cbd5e1;
+
+  background: #172033;
+}
+
+body.dark-mode .report-sidebar select option {
+  color: #f8fafc;
+
+  background: #111827;
+}
+
+body.dark-mode .report-sidebar p {
+  color: #94a3b8;
+}
+
+body.dark-mode .report-sidebar hr {
+  border-top-color: #334155 !important;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1100px) {
+
+  .report-sidebar {
+    max-width: 100%;
+    padding: 18px;
+  }
+
+  .report-sidebar h2 {
+    font-size: 22px;
+  }
+
+  .report-sidebar input,
+  .report-sidebar select,
+  .report-sidebar textarea {
+    font-size: 13px;
+  }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .report-sidebar {
+    width: 100%;
+    max-width: 100%;
+
+    height: auto;
+
+    padding: 18px;
+
+    overflow: visible;
+  }
+
+  .report-sidebar h2 {
+    margin-bottom: 16px;
+
+    font-size: 22px;
+  }
+
+  .report-sidebar input,
+  .report-sidebar select,
+  .report-sidebar textarea {
+    width: 100%;
+
+    margin-bottom: 10px;
+  }
+
+  .report-sidebar textarea {
+    min-height: 105px;
+  }
+
+  .report-sidebar > button {
+    width: 100%;
+
+    min-height: 48px;
+  }
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 480px) {
+
+  .report-sidebar {
+    padding: 14px;
+  }
+
+  .report-sidebar h2 {
+    font-size: 20px;
+  }
+
+  .report-sidebar input,
+  .report-sidebar select,
+  .report-sidebar textarea {
+    min-height: 43px;
+
+    padding: 9px 10px;
+
+    font-size: 13px;
+  }
+
+  .report-sidebar textarea {
+    min-height: 95px;
+  }
+}
