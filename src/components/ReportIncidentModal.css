@@ -1,0 +1,189 @@
+.moderation-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(5px);
+}
+
+.moderation-modal {
+  width: 100%;
+  max-width: 520px;
+
+  background: #ffffff;
+  border-radius: 18px;
+
+  padding: 24px;
+
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.moderation-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+
+  margin-bottom: 22px;
+}
+
+.moderation-header h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+}
+
+.moderation-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.moderation-close {
+  width: 34px;
+  height: 34px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #f1f5f9;
+  color: #334155;
+
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.moderation-modal form > label {
+  display: block;
+
+  margin-bottom: 10px;
+
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.moderation-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  margin-bottom: 20px;
+}
+
+.moderation-option {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+
+  padding: 13px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.moderation-option:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.moderation-option input {
+  margin-top: 4px;
+}
+
+.moderation-option span {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.moderation-option strong {
+  color: #111827;
+}
+
+.moderation-option small {
+  color: #6b7280;
+}
+
+.moderation-modal textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 12px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+
+  resize: vertical;
+
+  font-family: inherit;
+
+  margin-bottom: 20px;
+}
+
+.moderation-modal textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.moderation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.moderation-cancel,
+.moderation-submit {
+  border: none;
+
+  padding: 11px 18px;
+
+  border-radius: 10px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.moderation-cancel {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.moderation-submit {
+  background: #dc2626;
+  color: white;
+}
+
+.moderation-submit:disabled,
+.moderation-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .moderation-modal {
+    padding: 18px;
+  }
+
+  .moderation-actions {
+    flex-direction: column;
+  }
+
+  .moderation-cancel,
+  .moderation-submit {
+    width: 100%;
+  }
+}
