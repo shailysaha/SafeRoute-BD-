@@ -1,400 +1,1157 @@
-/* =========================================
-   THEME DESIGN TOKENS
-========================================= */
-:root {
-  --bg-primary: #f1f5f9;
-  --card-bg: #ffffff;
-  --text-primary: #0f172a;
-  --text-secondary: #64748b;
-  --border-color: rgba(148, 163, 184, 0.2);
-  --shadow: 0 14px 35px rgba(0, 0, 0, 0.12);
-  
-  --input-bg: #111827;
-  --input-text: #ffffff;
-  --input-border: #334155;
-  --hover-bg: #f8fafc;
-}
-
-body.dark,
-.dark {
-  --bg-primary: #0f172a;
-  --card-bg: #111c2e;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --border-color: #22314a;
-  --shadow: 0 14px 35px rgba(0, 0, 0, 0.4);
-  
-  --input-bg: #0b1120;
-  --input-text: #f8fafc;
-  --input-border: #1e293b;
-  --hover-bg: #1e293b;
-}
-
-/* =========================================
+/* =========================================================
    PLAN JOURNEY PAGE
-========================================= */
+========================================================= */
+
 .plan-journey-page {
-  min-height: 100vh;
-  padding: 34px 40px 60px;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  transition: background 0.25s ease, color 0.25s ease;
+  width: 100%;
+  max-width: 1450px;
+  margin: 0 auto;
+  padding: 28px 30px 50px;
+  box-sizing: border-box;
 }
 
-.plan-journey-page h1 {
-  margin: 0 0 28px;
-  color: var(--text-primary);
-  font-size: 42px;
-  font-weight: 700;
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.journey-page-heading {
+  margin-bottom: 28px;
+}
+
+.journey-page-heading h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 800;
+  color: #172033;
   letter-spacing: -0.5px;
 }
 
 .journey-page-heading p {
-  color: var(--text-secondary);
+  margin: 0;
+  color: #667085;
+  font-size: 15px;
+  line-height: 1.6;
 }
+
+/* =========================================================
+   JOURNEY CONTROLS
+========================================================= */
 
 .journey-controls {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
-  margin-bottom: 24px;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-bottom: 22px;
 }
 
-/* Field Card */
 .journey-field {
-  position: relative;
-  background: var(--card-bg);
-  color: var(--text-primary);
-  padding: 26px;
-  border-radius: 20px;
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow);
-  overflow: visible;
-  transition: background 0.25s ease, border-color 0.25s ease;
-}
-
-.journey-field::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 5px;
-  background: linear-gradient(90deg, #10b981, #2563eb);
+  background: #ffffff;
+  border: 1px solid #e4e7ec;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 8px 25px rgba(16, 24, 40, 0.06);
 }
 
 .journey-field h3 {
-  margin: 0 0 18px;
-  color: var(--text-primary);
-  font-size: 23px;
-  font-weight: 700;
-}
-
-.journey-field p {
-  display: flex;
-  align-items: center;
-  margin: 14px 0 0;
-  color: var(--text-secondary);
-  font-size: 15px;
-  font-weight: 500;
-}
-
-.journey-my-location-btn {
-  position: static !important;
-  width: 100%;
-  max-width: 260px;
-  margin-top: 2px;
-  padding: 13px 20px !important;
-  background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
-  color: #ffffff !important;
-  border: none !important;
-  border-radius: 12px !important;
-  font-size: 15px;
-  font-weight: 700;
-  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28) !important;
-  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-}
-
-.journey-my-location-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.35) !important;
-}
-
-/* Search Box */
-.journey-field .search-box {
-  width: 100%;
-}
-
-.journey-field .search-input-wrapper {
-  width: 100%;
-}
-
-.journey-field .search-input-wrapper input {
-  width: 100%;
-  padding: 15px 18px 15px 44px;
-  background: var(--input-bg);
-  color: var(--input-text);
-  border: 1px solid var(--input-border);
-  border-radius: 12px;
-  outline: none;
-  font-size: 14px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.journey-field .search-input-wrapper input:focus {
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.14);
-}
-
-.journey-field .search-input-wrapper input::placeholder {
-  color: var(--text-secondary);
-}
-
-.journey-field .search-location-icon {
-  left: 15px;
-}
-
-/* Search Dropdown */
-.journey-field .search-results {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  right: 0;
-  z-index: 3000;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
-
-.journey-field .search-item {
-  width: 100%;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
-  border: none;
-  border-bottom: 1px solid var(--border-color);
-  background: var(--card-bg);
-  color: var(--text-primary);
-  text-align: left;
-  cursor: pointer;
-}
-
-.journey-field .search-item:hover {
-  background: var(--hover-bg);
-}
-
-.journey-field .search-result-text strong {
-  display: block;
-  color: var(--text-primary);
-}
-
-.journey-field .search-result-text small {
-  display: block;
-  margin-top: 3px;
-  color: var(--text-secondary);
-}
-
-/* Generate Route Button */
-.generate-route-btn {
-  width: 100%;
-  margin: 8px 0 26px;
-  padding: 16px 22px;
-  border: none;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #10b981, #059669);
-  color: #ffffff;
+  margin: 0 0 14px;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 750;
+  color: #1d2939;
+}
+
+.journey-field > p {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #475467;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   MY LOCATION BUTTON
+========================================================= */
+
+.journey-location-button {
+  width: 100%;
+}
+
+/* =========================================================
+   GENERATE ROUTE BUTTON
+========================================================= */
+
+.generate-route-btn {
+  display: block;
+  width: 100%;
+  max-width: 430px;
+  margin: 4px auto 28px;
+  padding: 15px 24px;
+  border: none;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 750;
   cursor: pointer;
-  box-shadow: 0 10px 24px rgba(16, 185, 129, 0.25);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.24);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .generate-route-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 28px rgba(16, 185, 129, 0.32);
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.3);
 }
 
-/* Route Map */
+.generate-route-btn:active {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   MAP WRAPPER
+========================================================= */
+
 .route-map-wrapper {
+  position: relative;
   width: 100%;
-  margin-top: 10px;
-  padding: 14px;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  box-shadow: var(--shadow);
+  height: 570px;
+  margin-bottom: 30px;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid #dfe3ea;
+  background: #eef2f6;
+  box-shadow: 0 15px 40px rgba(16, 24, 40, 0.1);
 }
 
 .journey-map {
   width: 100%;
-  height: 520px;
-  border-radius: 15px;
+  height: 100%;
+  min-height: 570px;
+  z-index: 1;
 }
 
-/* Summary Cards */
-.route-summary {
+/* =========================================================
+   ROUTE LOADING
+========================================================= */
+
+.route-loading {
+  position: absolute;
+  z-index: 1000;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(90%, 390px);
+  padding: 18px 20px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #e4e7ec;
+  box-shadow: 0 12px 35px rgba(16, 24, 40, 0.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 7px;
+}
+
+.route-loading strong {
+  color: #172033;
+  font-size: 15px;
+}
+
+.route-loading span {
+  color: #667085;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.route-loading-spinner {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 3px solid #dbeafe;
+  border-top-color: #2563eb;
+  animation: routeSpinner 0.8s linear infinite;
+}
+
+@keyframes routeSpinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   LEAFLET POPUP
+========================================================= */
+
+.leaflet-popup-content {
+  margin: 13px 15px;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.leaflet-popup-content strong {
+  color: #172033;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+}
+
+/* =========================================================
+   ROUTE OPTIONS SECTION
+========================================================= */
+
+.route-options-section {
+  margin-top: 28px;
+  margin-bottom: 28px;
+}
+
+.section-heading-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.section-heading-row h2 {
+  margin: 0 0 7px;
+  font-size: 23px;
+  font-weight: 800;
+  color: #172033;
+}
+
+.section-heading-row p {
+  margin: 0;
+  color: #667085;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   ALTERNATIVE ROUTE INFO
+========================================================= */
+
+.route-alternative-info {
+  margin-bottom: 20px;
+  padding: 13px 16px;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #1e40af;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   ROUTE OPTIONS GRID
+========================================================= */
+
+.route-options-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
-  margin-top: 22px;
 }
 
-.route-summary > div {
+/* =========================================================
+   ROUTE CARD
+========================================================= */
+
+.route-option-card {
   position: relative;
-  background: var(--card-bg);
-  color: var(--text-primary);
-  padding: 22px;
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  text-align: center;
-  box-shadow: var(--shadow);
-  overflow: hidden;
+  background: #ffffff;
+  border: 2px solid #e4e7ec;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 7px 22px rgba(16, 24, 40, 0.06);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.route-summary > div::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 4px;
-  background: linear-gradient(90deg, #10b981, #2563eb);
+.route-option-card:hover {
+  transform: translateY(-3px);
+  border-color: #cbd5e1;
+  box-shadow: 0 13px 30px rgba(16, 24, 40, 0.1);
 }
 
-.route-summary strong {
-  color: var(--text-secondary);
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+/* =========================================================
+   SELECTED ROUTE
+========================================================= */
+
+.route-option-card.selected-route {
+  border-color: #10b981;
+  box-shadow:
+    0 0 0 3px rgba(16, 185, 129, 0.1),
+    0 15px 32px rgba(16, 24, 40, 0.1);
 }
 
-.route-summary p {
-  margin: 8px 0 0;
-  color: var(--text-primary);
-  font-size: 27px;
+/* =========================================================
+   ROUTE CARD TOP
+========================================================= */
+
+.route-option-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.route-option-top h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  line-height: 1.4;
+  color: #172033;
   font-weight: 800;
 }
 
-/* Alerts */
-.route-alert-section {
-  margin-top: 28px;
-}
+/* =========================================================
+   RECOMMENDED BADGE
+========================================================= */
 
-.route-alert-section h2 {
-  margin-bottom: 16px;
-  color: var(--text-primary);
-  font-size: 26px;
-}
-
-.route-alert-card {
-  background: var(--card-bg);
-  color: var(--text-primary);
-  border-radius: 16px;
-  padding: 18px 20px;
-  margin-bottom: 12px;
-  border: 1px solid var(--border-color);
-  border-left: 5px solid #f59e0b;
-  box-shadow: var(--shadow);
-}
-
-.route-alert-card h3 {
-  margin: 0 0 8px;
-  color: #dc2626;
-}
-
-.route-alert-card p {
-  margin: 5px 0;
-  color: var(--text-secondary);
-}
-
-.route-safe-message {
-  padding: 20px;
-  background: #ecfdf5;
-  color: #166534;
+.recommended-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #ecfdf3;
   border: 1px solid #a7f3d0;
-  border-radius: 14px;
-  font-weight: 700;
+  color: #047857;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
 }
 
-/* Save Journey Section */
+/* =========================================================
+   RISK BADGE
+========================================================= */
+
+.risk-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 65px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* =========================================================
+   RISK COLORS
+========================================================= */
+
+.risk-safe {
+  background: #ecfdf3;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
+.risk-low {
+  background: #f0fdf4;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+
+.risk-medium {
+  background: #fffbeb;
+  color: #b45309;
+  border-color: #fde68a;
+}
+
+.risk-high {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+/* =========================================================
+   ROUTE STATS
+========================================================= */
+
+.route-option-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.route-option-stats > div {
+  padding: 11px 12px;
+  border-radius: 11px;
+  background: #f8fafc;
+  border: 1px solid #eef2f6;
+}
+
+.route-option-stats span {
+  display: block;
+  margin-bottom: 4px;
+  color: #667085;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.route-option-stats strong {
+  display: block;
+  color: #172033;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* =========================================================
+   ROUTE WARNING
+========================================================= */
+
+.route-option-warning {
+  margin-bottom: 14px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #c2410c;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.route-option-safe {
+  margin-bottom: 14px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  background: #ecfdf3;
+  border: 1px solid #bbf7d0;
+  color: #047857;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   USE ROUTE BUTTON
+========================================================= */
+
+.use-route-btn {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #344054;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.use-route-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.use-route-btn.active {
+  background: #10b981;
+  border-color: #10b981;
+  color: #ffffff;
+}
+
+.use-route-btn.active:hover {
+  background: #059669;
+  border-color: #059669;
+}
+
+/* =========================================================
+   ROUTE SUMMARY
+========================================================= */
+
+.route-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin: 25px 0;
+  padding: 20px;
+  border-radius: 17px;
+  background: #ffffff;
+  border: 1px solid #e4e7ec;
+  box-shadow: 0 8px 25px rgba(16, 24, 40, 0.06);
+}
+
+.route-summary > div {
+  padding: 8px 15px;
+  border-right: 1px solid #eaecf0;
+}
+
+.route-summary > div:last-child {
+  border-right: none;
+}
+
+.route-summary strong {
+  display: block;
+  margin-bottom: 7px;
+  color: #667085;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.route-summary p {
+  margin: 0;
+  color: #172033;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.route-summary p.risk-safe,
+.route-summary p.risk-low,
+.route-summary p.risk-medium,
+.route-summary p.risk-high {
+  display: inline-block;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+/* =========================================================
+   ROUTE WARNING PANEL
+========================================================= */
+
+.route-warning-panel {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 25px 0;
+  padding: 20px;
+  border: 1px solid;
+  border-radius: 17px;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.05);
+}
+
+.route-warning-panel.risk-safe {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.route-warning-panel.risk-low {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.route-warning-panel.risk-medium {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.route-warning-panel.risk-high {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.route-warning-icon {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 25px;
+}
+
+.route-warning-content {
+  flex: 1;
+}
+
+.route-warning-content h2 {
+  margin: 0 0 5px;
+  color: #172033;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.route-warning-content p {
+  margin: 0 0 5px;
+  color: #475467;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.route-warning-content strong {
+  color: #344054;
+  font-size: 13px;
+}
+
+.alternative-action-btn {
+  flex-shrink: 0;
+  padding: 11px 15px;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.alternative-action-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   SAVE JOURNEY
+========================================================= */
+
 .save-journey-section {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin-top: 18px;
-  padding: 16px 18px;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 14px;
+  gap: 20px;
+  margin: 25px 0;
+  padding: 21px 22px;
+  border-radius: 17px;
+  background: #ffffff;
+  border: 1px solid #e4e7ec;
+  box-shadow: 0 8px 25px rgba(16, 24, 40, 0.05);
+}
+
+.save-journey-section h3 {
+  margin: 0 0 5px;
+  color: #172033;
+  font-size: 16px;
+  font-weight: 800;
 }
 
 .save-journey-section p {
   margin: 0;
-  color: var(--text-secondary);
-  font-size: 12px;
+  color: #667085;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .save-journey-btn {
-  min-width: 165px;
+  flex-shrink: 0;
+  min-width: 170px;
   padding: 12px 18px;
   border: none;
-  border-radius: 10px;
-  background: #16a34a;
+  border-radius: 11px;
+  background: #172033;
   color: #ffffff;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 750;
   cursor: pointer;
-  box-shadow: 0 6px 16px rgba(22, 163, 74, 0.2);
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
-.save-journey-btn:hover:not(:disabled) {
-  background: #15803d;
+.save-journey-btn:hover {
+  background: #101828;
   transform: translateY(-1px);
 }
 
 .save-journey-btn:disabled {
-  opacity: 0.6;
   cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
 }
 
-/* =========================================
-   MEDIA QUERIES
-========================================= */
-@media (max-width: 900px) {
-  .plan-journey-page {
-    padding: 24px 18px 50px;
+/* =========================================================
+   ROUTE SAFETY ALERTS
+========================================================= */
+
+.route-alert-section {
+  margin-top: 30px;
+}
+
+.route-alert-section > h2 {
+  margin: 0 0 16px;
+  color: #172033;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* =========================================================
+   SAFE MESSAGE
+========================================================= */
+
+.route-safe-message {
+  padding: 17px 18px;
+  border-radius: 13px;
+  background: #ecfdf3;
+  border: 1px solid #bbf7d0;
+  color: #047857;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+/* =========================================================
+   ALERT CARD
+========================================================= */
+
+.route-alert-card {
+  margin-bottom: 14px;
+  padding: 18px;
+  border: 1px solid;
+  border-radius: 15px;
+  background: #ffffff;
+}
+
+.route-alert-card.risk-low {
+  border-color: #bbf7d0;
+  background: #f7fff9;
+}
+
+.route-alert-card.risk-medium {
+  border-color: #fde68a;
+  background: #fffdf5;
+}
+
+.route-alert-card.risk-high {
+  border-color: #fecaca;
+  background: #fffafa;
+}
+
+.alert-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 12px;
+}
+
+.alert-card-header h3 {
+  margin: 0;
+  color: #172033;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.route-alert-card p {
+  margin: 7px 0 0;
+  color: #475467;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.route-alert-card p strong {
+  color: #344054;
+}
+
+/* =========================================================
+   PLAN AGAIN
+========================================================= */
+
+.plan-again-btn {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 30px auto 0;
+  padding: 13px 20px;
+  border: 1px solid #cbd5e1;
+  border-radius: 11px;
+  background: #ffffff;
+  color: #344054;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.plan-again-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   WEATHER WARNING SUPPORT
+   Works with WeatherWarning component/classes
+========================================================= */
+
+.weather-warning {
+  margin: 20px 0;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  box-shadow: 0 8px 22px rgba(16, 24, 40, 0.05);
+}
+
+.weather-warning.high,
+.weather-warning.risk-high {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.weather-warning.medium,
+.weather-warning.risk-medium {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.weather-warning.low,
+.weather-warning.risk-low {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.weather-warning.safe,
+.weather-warning.risk-safe {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.weather-warning h3 {
+  margin: 0 0 7px;
+  color: #172033;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.weather-warning p {
+  margin: 0;
+  color: #475467;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   WEATHER CARD
+========================================================= */
+
+.weather-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 15px;
+  align-items: center;
+  margin: 20px 0;
+  padding: 18px;
+  border: 1px solid #e4e7ec;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 8px 22px rgba(16, 24, 40, 0.05);
+}
+
+.weather-icon {
+  width: 55px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: #eff6ff;
+  font-size: 27px;
+}
+
+.weather-card h3 {
+  margin: 0 0 4px;
+  color: #172033;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.weather-card p {
+  margin: 0;
+  color: #667085;
+  font-size: 13px;
+}
+
+/* =========================================================
+   ROUTE RISK CARD SUPPORT
+========================================================= */
+
+.route-risk-card {
+  margin: 20px 0;
+  padding: 20px;
+  border: 1px solid #e4e7ec;
+  border-radius: 17px;
+  background: #ffffff;
+  box-shadow: 0 8px 25px rgba(16, 24, 40, 0.06);
+}
+
+.route-risk-card h3 {
+  margin: 0 0 12px;
+  color: #172033;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.route-risk-card p {
+  margin: 6px 0;
+  color: #475467;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   FLOOD / HEAVY RAIN / WEATHER HAZARD
+========================================================= */
+
+.weather-hazard {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 11px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #c2410c;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.weather-hazard.flood {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.weather-hazard.heavy-rain {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+/* =========================================================
+   COMBINED WEATHER + INCIDENT WARNING
+========================================================= */
+
+.combined-risk-warning {
+  margin: 18px 0;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+}
+
+.combined-risk-warning h3 {
+  margin: 0 0 7px;
+  color: #991b1b;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.combined-risk-warning p {
+  margin: 0;
+  color: #7f1d1d;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 1100px) {
+  .route-options-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .plan-journey-page h1 {
-    font-size: 32px;
+  .route-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .route-summary > div:nth-child(2) {
+    border-right: none;
+  }
+
+  .route-summary > div:nth-child(1),
+  .route-summary > div:nth-child(2) {
+    border-bottom: 1px solid #eaecf0;
+    padding-bottom: 15px;
+  }
+}
+
+@media (max-width: 850px) {
+  .plan-journey-page {
+    padding: 22px 18px 40px;
   }
 
   .journey-controls {
     grid-template-columns: 1fr;
   }
 
-  .route-summary {
-    grid-template-columns: 1fr;
+  .route-map-wrapper {
+    height: 500px;
   }
 
   .journey-map {
-    height: 400px;
+    min-height: 500px;
   }
-}
 
-@media (max-width: 650px) {
+  .route-warning-panel {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .alternative-action-btn {
+    width: 100%;
+  }
+
   .save-journey-section {
+    align-items: flex-start;
     flex-direction: column;
-    align-items: stretch;
   }
 
   .save-journey-btn {
     width: 100%;
+  }
+}
+
+@media (max-width: 650px) {
+  .plan-journey-page {
+    padding: 18px 12px 35px;
+  }
+
+  .journey-page-heading h1 {
+    font-size: 25px;
+  }
+
+  .journey-page-heading p {
+    font-size: 13px;
+  }
+
+  .journey-field {
+    padding: 17px;
+    border-radius: 15px;
+  }
+
+  .generate-route-btn {
+    max-width: none;
+    margin-bottom: 20px;
+  }
+
+  .route-map-wrapper {
+    height: 430px;
+    border-radius: 16px;
+  }
+
+  .journey-map {
+    min-height: 430px;
+  }
+
+  .route-loading {
+    top: 12px;
+    padding: 14px;
+  }
+
+  .route-options-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .route-option-card {
+    padding: 17px;
+  }
+
+  .route-option-top {
+    gap: 8px;
+  }
+
+  .route-option-top h3 {
+    font-size: 15px;
+  }
+
+  .route-summary {
+    grid-template-columns: 1fr 1fr;
+    padding: 15px;
+    gap: 0;
+  }
+
+  .route-summary > div {
+    padding: 12px 10px;
+    border-right: none;
+  }
+
+  .route-summary > div:nth-child(odd) {
+    border-right: 1px solid #eaecf0;
+  }
+
+  .route-summary > div:nth-child(1),
+  .route-summary > div:nth-child(2) {
+    border-bottom: 1px solid #eaecf0;
+  }
+
+  .route-summary p {
+    font-size: 16px;
+  }
+
+  .route-warning-panel {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .route-warning-icon {
+    width: 43px;
+    height: 43px;
+    font-size: 21px;
+  }
+
+  .route-warning-content {
+    width: calc(100% - 55px);
+  }
+
+  .route-warning-content h2 {
+    font-size: 16px;
+  }
+
+  .route-alert-card {
+    padding: 15px;
+  }
+
+  .alert-card-header {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 430px) {
+  .journey-page-heading h1 {
+    font-size: 22px;
+  }
+
+  .route-option-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .route-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .route-summary > div:nth-child(odd) {
+    border-right: none;
+  }
+
+  .route-summary > div {
+    border-bottom: 1px solid #eaecf0;
+  }
+
+  .route-summary > div:last-child {
+    border-bottom: none;
+  }
+
+  .route-warning-panel {
+    display: grid;
+    grid-template-columns: auto 1fr;
+  }
+
+  .alternative-action-btn {
+    grid-column: 1 / -1;
+  }
+
+  .weather-card {
+    grid-template-columns: 1fr;
   }
 }
