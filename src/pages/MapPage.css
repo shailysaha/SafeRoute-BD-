@@ -945,3 +945,304 @@ body.dark-mode .reports-message h3 {
 body.dark-mode .reports-message p {
   color: #94a3b8;
 }
+/* =========================================================
+   INCIDENT POPUP - RESPONSIVE / USABLE
+   ========================================================= */
+
+/* Main popup wrapper */
+.incident-popup .leaflet-popup-content-wrapper {
+  border-radius: 14px;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Popup close button */
+.incident-popup .leaflet-popup-close-button {
+  z-index: 20;
+  top: 8px !important;
+  right: 8px !important;
+  width: 28px !important;
+  height: 28px !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.95);
+
+  color: #334155 !important;
+
+  font-size: 20px !important;
+  font-weight: 700;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Actual scrollable popup content */
+.incident-popup .leaflet-popup-content {
+  width: 320px !important;
+
+  max-width: calc(100vw - 70px);
+
+  max-height: 62vh;
+
+  margin: 14px !important;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  box-sizing: border-box;
+
+  scrollbar-width: thin;
+}
+
+/* Better scrollbar */
+.incident-popup .leaflet-popup-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.incident-popup .leaflet-popup-content::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.incident-popup .leaflet-popup-content::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 10px;
+}
+
+.incident-popup .leaflet-popup-content::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+
+/* =========================================================
+   REPORT POPUP CONTENT
+   ========================================================= */
+
+.report-popup {
+  width: 100%;
+
+  min-width: 0;
+
+  box-sizing: border-box;
+
+  color: #1e293b;
+
+  font-size: 14px;
+
+  line-height: 1.45;
+}
+
+.report-popup h3 {
+  margin: 0 28px 12px 0;
+
+  font-size: 18px;
+
+  line-height: 1.3;
+
+  color: #0f172a;
+
+  word-break: break-word;
+}
+
+.report-popup p {
+  margin: 6px 0;
+
+  word-break: break-word;
+}
+
+.report-popup strong {
+  color: #334155;
+}
+
+
+/* =========================================================
+   EVIDENCE
+   ========================================================= */
+
+.report-popup img,
+.report-popup video {
+  display: block;
+
+  width: 100% !important;
+
+  max-width: 100% !important;
+
+  height: auto;
+
+  max-height: 170px !important;
+
+  object-fit: cover;
+
+  border-radius: 9px;
+
+  box-sizing: border-box;
+}
+
+
+/* Evidence container */
+.report-popup > div {
+  max-width: 100%;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   COMMUNITY VERIFICATION
+   ========================================================= */
+
+.report-popup .community-verification,
+.report-popup [class*="verification"] {
+  max-width: 100%;
+
+  box-sizing: border-box;
+
+  overflow-wrap: break-word;
+}
+
+
+/* =========================================================
+   LINKS / LONG TEXT
+   ========================================================= */
+
+.report-popup a {
+  max-width: 100%;
+
+  overflow-wrap: anywhere;
+
+  word-break: break-word;
+}
+
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+body.dark-mode .incident-popup .leaflet-popup-content-wrapper {
+  background: #111827;
+
+  color: #f8fafc;
+}
+
+body.dark-mode .incident-popup .leaflet-popup-tip {
+  background: #111827;
+}
+
+body.dark-mode .incident-popup .leaflet-popup-content {
+  color: #f8fafc;
+}
+
+body.dark-mode .report-popup {
+  color: #e5e7eb;
+}
+
+body.dark-mode .report-popup h3 {
+  color: #f8fafc;
+}
+
+body.dark-mode .report-popup strong {
+  color: #e2e8f0;
+}
+
+body.dark-mode .incident-popup .leaflet-popup-close-button {
+  background: #1e293b;
+
+  color: #f8fafc !important;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+  .incident-popup .leaflet-popup-content {
+    width: 300px !important;
+
+    max-width: calc(100vw - 60px);
+
+    max-height: 58vh;
+  }
+
+  .report-popup img,
+  .report-popup video {
+    max-height: 150px !important;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  .incident-popup .leaflet-popup-content {
+    width: 270px !important;
+
+    max-width: calc(100vw - 45px);
+
+    max-height: 52vh;
+
+    margin: 12px !important;
+  }
+
+  .report-popup {
+    font-size: 13px;
+  }
+
+  .report-popup h3 {
+    font-size: 16px;
+
+    margin-bottom: 10px;
+  }
+
+  .report-popup img,
+  .report-popup video {
+    max-height: 140px !important;
+  }
+
+  .incident-popup .leaflet-popup-close-button {
+    width: 26px !important;
+
+    height: 26px !important;
+
+    font-size: 18px !important;
+  }
+}
+
+
+/* =========================================================
+   SMALL PHONE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+  .incident-popup .leaflet-popup-content {
+    width: 245px !important;
+
+    max-width: calc(100vw - 35px);
+
+    max-height: 48vh;
+
+    margin: 10px !important;
+  }
+
+  .report-popup {
+    font-size: 12px;
+  }
+
+  .report-popup h3 {
+    font-size: 15px;
+  }
+
+  .report-popup img,
+  .report-popup video {
+    max-height: 120px !important;
+  }
+}
