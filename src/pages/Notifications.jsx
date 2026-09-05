@@ -13,7 +13,7 @@ import {
 
 import { auth, db } from "../firebase/firebase";
 import DashboardLayout from "../layout/DashboardLayout";
-
+import { notify } from "../utils/notify";
 import "./Notifications.css";
 
 function Notifications() {
@@ -22,6 +22,7 @@ function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [sosNotifications, setSosNotifications] = useState([]);
   const [routeNotifications, setRouteNotifications] = useState([]);
+  const [deleteNotificationId, setDeleteNotificationId] = useState(null);
 
   // IDs of road incidents hidden by this user/browser
   const [hiddenIncidentIds, setHiddenIncidentIds] = useState(() => {
@@ -138,18 +139,31 @@ function Notifications() {
      ========================================================= */
 
   const handleDeleteNotification = async (notificationId) => {
-    const confirmed = window.confirm("Delete this notification?");
+    if (!notificationId) {
+      notify("Invalid notification.");
+      return;
+    }
 
-    if (!confirmed) return;
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      notify("Please log in first.");
+      return;
+    }
 
     try {
       await deleteDoc(doc(db, "notifications", notificationId));
 
-      console.log("Notification deleted:", notificationId);
+      setDeleteNotificationId(null);
+      //notify("Notification deleted.");
     } catch (error) {
       console.error("Failed to delete notification:", error);
 
-      alert("❌ Failed to delete notification.");
+      if (error?.code === "permission-denied") {
+        notify("You can only delete your own notifications.");
+      } else {
+        notify("❌ Failed to delete notification.");
+      }
     }
   };
 
@@ -290,7 +304,7 @@ function Notifications() {
                   type="button"
                   className="notification-delete-btn"
                   title="Delete notification"
-                  onClick={() => handleDeleteNotification(notification.id)}
+                  onClick={() => setDeleteNotificationId(notification.id)}
                 >
                   🗑️
                 </button>
@@ -364,7 +378,7 @@ function Notifications() {
                     type="button"
                     className="notification-delete-btn route-delete-btn"
                     title="Delete notification"
-                    onClick={() => handleDeleteNotification(notification.id)}
+                    onClick={() => setDeleteNotificationId(notification.id)}
                   >
                     🗑️
                   </button>
@@ -536,6 +550,39 @@ function Notifications() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* CONFIRMATION MODAL */}
+        {deleteNotificationId && (
+          <div className="notification-confirm-overlay">
+            <div className="notification-confirm-modal">
+              <div className="notification-confirm-icon">🗑️</div>
+
+              <h3>Delete Notification?</h3>
+
+              <p>Are you sure you want to delete this notification?</p>
+
+              <div className="notification-confirm-actions">
+                <button
+                  type="button"
+                  className="notification-cancel-btn"
+                  onClick={() => setDeleteNotificationId(null)}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  className="notification-confirm-delete-btn"
+                  onClick={() =>
+                    handleDeleteNotification(deleteNotificationId)
+                  }
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
