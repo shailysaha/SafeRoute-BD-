@@ -1,3 +1,4 @@
+
 function MyLocationButton({
   onLocate,
   className = "",
@@ -5,7 +6,7 @@ function MyLocationButton({
 }) {
   const getLocation = () => {
     if (!navigator.geolocation) {
-      alert(
+      notify(
         "Geolocation is not supported by your browser."
       );
       return;
@@ -36,19 +37,19 @@ function MyLocationButton({
         );
 
         if (error.code === 1) {
-          alert(
+          notify(
             "Location permission denied. Please allow location access."
           );
         } else if (error.code === 2) {
-          alert(
+          notify(
             "Your location is currently unavailable."
           );
         } else if (error.code === 3) {
-          alert(
+          notify(
             "Location request timed out. Please try again."
           );
         } else {
-          alert(
+          notify(
             "Unable to get your location."
           );
         }
