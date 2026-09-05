@@ -8,6 +8,10 @@ import "./AIAssistant.css";
 function AIAssistant() {
   const navigate = useNavigate();
 
+  // =========================================================
+  // 1. CHAT STATE
+  // =========================================================
+
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -19,24 +23,34 @@ function AIAssistant() {
 
   const [input, setInput] = useState("");
 
-  // Firestore incidents
+  // =========================================================
+  // 2. FIRESTORE INCIDENT STATE
+  // =========================================================
+
   const [incidents, setIncidents] = useState([]);
   const [loadingIncidents, setLoadingIncidents] = useState(true);
 
-  // GPS
+  // =========================================================
+  // 3. GPS STATE
+  // =========================================================
+
   const [currentLocation, setCurrentLocation] = useState(null);
   const [locationLoading, setLocationLoading] = useState(false);
 
   // =========================================================
-  // 1. LOAD INCIDENTS FROM FIRESTORE
+  // 4. LOAD INCIDENTS FROM FIRESTORE
   // =========================================================
 
   useEffect(() => {
+    let mounted = true;
+
     const fetchIncidents = async () => {
       try {
         const snapshot = await getDocs(
           collection(db, "incidents")
         );
+
+        if (!mounted) return;
 
         const firebaseIncidents = snapshot.docs.map((doc) => ({
           id: doc.id,
@@ -55,15 +69,21 @@ function AIAssistant() {
           error
         );
       } finally {
-        setLoadingIncidents(false);
+        if (mounted) {
+          setLoadingIncidents(false);
+        }
       }
     };
 
     fetchIncidents();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // =========================================================
-  // 2. GET CURRENT GPS LOCATION
+  // 5. GET CURRENT GPS LOCATION
   // =========================================================
 
   const getCurrentLocation = () => {
@@ -110,17 +130,13 @@ function AIAssistant() {
           ) {
             message =
               "Location permission was denied. Please allow location access and try again.";
-          }
-
-          if (
+          } else if (
             error.code ===
             error.POSITION_UNAVAILABLE
           ) {
             message =
               "Your current location is unavailable.";
-          }
-
-          if (
+          } else if (
             error.code ===
             error.TIMEOUT
           ) {
@@ -141,7 +157,101 @@ function AIAssistant() {
   };
 
   // =========================================================
-  // 3. HAVERSINE DISTANCE
+  // 6. REVERSE GEOCODING
+  // Convert GPS coordinates into a readable place name
+  // =========================================================
+
+  const getLocationName = async (location) => {
+    if (!location) {
+      return "Unknown location";
+    }
+
+    try {
+      const url =
+        `https://nominatim.openstreetmap.org/reverse` +
+        `?format=jsonv2` +
+        `&lat=${encodeURIComponent(location.lat)}` +
+        `&lon=${encodeURIComponent(location.lng)}` +
+        `&zoom=18` +
+        `&addressdetails=1`;
+
+      const response = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          "Location name could not be loaded."
+        );
+      }
+
+      const data = await response.json();
+      const address = data.address || {};
+
+      const parts = [];
+
+      const area =
+        address.suburb ||
+        address.neighbourhood ||
+        address.quarter ||
+        address.village ||
+        address.town ||
+        address.city_district;
+
+      if (area) {
+        parts.push(area);
+      }
+
+      const city =
+        address.city ||
+        address.municipality ||
+        address.town ||
+        address.county;
+
+      if (
+        city &&
+        city !== area
+      ) {
+        parts.push(city);
+      }
+
+      const district =
+        address.state_district;
+
+      if (
+        district &&
+        !parts.includes(district)
+      ) {
+        parts.push(district);
+      }
+
+      if (address.country) {
+        parts.push(address.country);
+      }
+
+      if (parts.length > 0) {
+        return parts.join(", ");
+      }
+
+      if (data.display_name) {
+        return data.display_name;
+      }
+
+      return "Current location";
+    } catch (error) {
+      console.error(
+        "Reverse geocoding error:",
+        error
+      );
+
+      return "Current location";
+    }
+  };
+
+  // =========================================================
+  // 7. HAVERSINE DISTANCE
   // =========================================================
 
   const calculateDistance = (
@@ -179,14 +289,17 @@ function AIAssistant() {
   };
 
   // =========================================================
-  // 4. FIND INCIDENTS WITHIN 5 KM
+  // 8. FIND NEARBY INCIDENTS
   // =========================================================
 
   const getNearbyIncidents = (
     location,
     radiusKm = 5
   ) => {
-    if (!location || !incidents.length) {
+    if (
+      !location ||
+      !incidents.length
+    ) {
       return [];
     }
 
@@ -212,7 +325,6 @@ function AIAssistant() {
 
         return distance <= radiusKm;
       })
-
       .map((incident) => {
         const distance =
           calculateDistance(
@@ -227,7 +339,6 @@ function AIAssistant() {
           distance,
         };
       })
-
       .sort(
         (a, b) =>
           a.distance - b.distance
@@ -235,7 +346,7 @@ function AIAssistant() {
   };
 
   // =========================================================
-  // 5. GET WEATHER
+  // 9. GET WEATHER
   // =========================================================
 
   const getWeather = async (
@@ -243,8 +354,8 @@ function AIAssistant() {
   ) => {
     const url =
       `https://api.open-meteo.com/v1/forecast` +
-      `?latitude=${location.lat}` +
-      `&longitude=${location.lng}` +
+      `?latitude=${encodeURIComponent(location.lat)}` +
+      `&longitude=${encodeURIComponent(location.lng)}` +
       `&current=temperature_2m,precipitation,weather_code,wind_speed_10m` +
       `&timezone=auto`;
 
@@ -279,7 +390,7 @@ function AIAssistant() {
   };
 
   // =========================================================
-  // 6. WEATHER DESCRIPTION
+  // 10. WEATHER DESCRIPTION
   // =========================================================
 
   const getWeatherDescription = (
@@ -296,7 +407,21 @@ function AIAssistant() {
     }
 
     if (
-      [51, 53, 55, 61, 63, 65].includes(
+      [45, 48].includes(code)
+    ) {
+      return "Foggy";
+    }
+
+    if (
+      [51, 53, 55, 56, 57].includes(
+        code
+      )
+    ) {
+      return "Drizzle";
+    }
+
+    if (
+      [61, 63, 65, 66, 67].includes(
         code
       )
     ) {
@@ -304,13 +429,33 @@ function AIAssistant() {
     }
 
     if (
-      [71, 73, 75].includes(code)
+      [71, 73, 75, 77].includes(
+        code
+      )
     ) {
       return "Snow";
     }
 
     if (
-      [95, 96, 99].includes(code)
+      [80, 81, 82].includes(
+        code
+      )
+    ) {
+      return "Rain showers";
+    }
+
+    if (
+      [85, 86].includes(
+        code
+      )
+    ) {
+      return "Snow showers";
+    }
+
+    if (
+      [95, 96, 99].includes(
+        code
+      )
     ) {
       return "Thunderstorm";
     }
@@ -319,7 +464,7 @@ function AIAssistant() {
   };
 
   // =========================================================
-  // 7. TIME ANALYSIS
+  // 11. TIME INFORMATION
   // =========================================================
 
   const getTimeInformation = () => {
@@ -330,7 +475,10 @@ function AIAssistant() {
 
     let period;
 
-    if (hour >= 5 && hour < 12) {
+    if (
+      hour >= 5 &&
+      hour < 12
+    ) {
       period = "Morning";
     } else if (
       hour >= 12 &&
@@ -353,7 +501,7 @@ function AIAssistant() {
   };
 
   // =========================================================
-  // 8. CALCULATE ROAD RISK
+  // 12. CALCULATE ROAD RISK
   // =========================================================
 
   const calculateRoadRisk = (
@@ -444,7 +592,9 @@ function AIAssistant() {
         );
 
       if (
-        description === "Rain"
+        description === "Rain" ||
+        description === "Rain showers" ||
+        description === "Drizzle"
       ) {
         score += 10;
       }
@@ -454,6 +604,12 @@ function AIAssistant() {
         "Thunderstorm"
       ) {
         score += 15;
+      }
+
+      if (
+        description === "Foggy"
+      ) {
+        score += 8;
       }
     }
 
@@ -487,7 +643,213 @@ function AIAssistant() {
   };
 
   // =========================================================
-  // 9. COMPLETE ROAD RISK ANALYSIS
+  // 13. GET CURRENT LOCATION + NAME
+  // =========================================================
+
+  const getCurrentLocationDetails =
+    async () => {
+      const location =
+        currentLocation ||
+        (await getCurrentLocation());
+
+      const locationName =
+        await getLocationName(
+          location
+        );
+
+      return {
+        location,
+        locationName,
+      };
+    };
+
+  // =========================================================
+  // 14. LOCATION RESPONSE
+  // =========================================================
+
+  const getLocationResponse =
+    async () => {
+      try {
+        const {
+          location,
+          locationName,
+        } =
+          await getCurrentLocationDetails();
+
+        return (
+          `📍 YOUR CURRENT LOCATION\n\n` +
+          `${locationName}\n\n` +
+          `SafeRoute detected your current position successfully.`
+        );
+      } catch (error) {
+        console.error(
+          "Location response error:",
+          error
+        );
+
+        return (
+          `❌ I couldn't determine your current location.\n\n` +
+          `${error.message}`
+        );
+      }
+    };
+
+  // =========================================================
+  // 15. WEATHER RESPONSE
+  // =========================================================
+
+  const getWeatherResponse =
+    async () => {
+      try {
+        const {
+          location,
+          locationName,
+        } =
+          await getCurrentLocationDetails();
+
+        const weather =
+          await getWeather(
+            location
+          );
+
+        const description =
+          getWeatherDescription(
+            weather.weatherCode
+          );
+
+        return (
+          `🌦️ CURRENT WEATHER\n\n` +
+          `📍 ${locationName}\n\n` +
+          `${description}\n` +
+          `Temperature: ${weather.temperature}°C\n` +
+          `Precipitation: ${weather.precipitation} mm\n` +
+          `Wind: ${weather.windSpeed} km/h`
+        );
+      } catch (error) {
+        console.error(
+          "Weather response error:",
+          error
+        );
+
+        return (
+          `❌ I couldn't load the current weather.\n\n` +
+          `${error.message}`
+        );
+      }
+    };
+
+  // =========================================================
+  // 16. NEARBY INCIDENT RESPONSE
+  // =========================================================
+
+  const getNearbyIncidentResponse =
+    async () => {
+      if (loadingIncidents) {
+        return (
+          "⏳ I'm still loading SafeRoute incident data. Please try again in a moment."
+        );
+      }
+
+      try {
+        const {
+          location,
+          locationName,
+        } =
+          await getCurrentLocationDetails();
+
+        const nearbyIncidents =
+          getNearbyIncidents(
+            location,
+            5
+          );
+
+        if (
+          nearbyIncidents.length ===
+          0
+        ) {
+          return (
+            `📍 ${locationName}\n\n` +
+            `✅ No reported incidents were found within 5 km of your current location.`
+          );
+        }
+
+        const high =
+          nearbyIncidents.filter(
+            (incident) =>
+              incident.severity
+                ?.toLowerCase() ===
+              "high"
+          ).length;
+
+        const medium =
+          nearbyIncidents.filter(
+            (incident) =>
+              incident.severity
+                ?.toLowerCase() ===
+              "medium"
+          ).length;
+
+        const low =
+          nearbyIncidents.filter(
+            (incident) =>
+              incident.severity
+                ?.toLowerCase() ===
+              "low"
+          ).length;
+
+        const closest =
+          nearbyIncidents
+            .slice(0, 5)
+            .map(
+              (incident, index) => {
+                const title =
+                  incident.title ||
+                  incident.type ||
+                  incident.category ||
+                  "Reported incident";
+
+                const severity =
+                  incident.severity ||
+                  "Unknown";
+
+                return (
+                  `${index + 1}. ${title} — ` +
+                  `${severity} — ` +
+                  `${incident.distance.toFixed(2)} km away`
+                );
+              }
+            )
+            .join("\n");
+
+        return (
+          `⚠️ NEARBY INCIDENTS\n\n` +
+
+          `📍 ${locationName}\n` +
+
+          `${nearbyIncidents.length} incident(s) found within 5 km.\n\n` +
+
+          `High: ${high}\n` +
+          `Medium: ${medium}\n` +
+          `Low: ${low}\n\n` +
+
+          `📌 Closest incidents\n` +
+          `${closest}`
+        );
+      } catch (error) {
+        console.error(
+          "Nearby incident error:",
+          error
+        );
+
+        return (
+          `❌ I couldn't check nearby incidents.\n\n` +
+          `${error.message}`
+        );
+      }
+    };
+
+  // =========================================================
+  // 17. COMPLETE ROAD RISK ANALYSIS
   // =========================================================
 
   const performRoadRiskAnalysis =
@@ -499,29 +861,42 @@ function AIAssistant() {
       }
 
       try {
-        // GPS
         const location =
           currentLocation ||
           (await getCurrentLocation());
 
-        // Nearby incidents
+        // Run location name and weather
+        // at the same time.
+        const locationNamePromise =
+          getLocationName(
+            location
+          );
+
+        const weatherPromise =
+          getWeather(
+            location
+          );
+
+        // Incident calculation is local,
+        // so it does not need to wait.
         const nearbyIncidents =
           getNearbyIncidents(
             location,
             5
           );
 
-        // Weather
-        const weather =
-          await getWeather(
-            location
-          );
+        const [
+          locationName,
+          weather,
+        ] =
+          await Promise.all([
+            locationNamePromise,
+            weatherPromise,
+          ]);
 
-        // Time
         const time =
           getTimeInformation();
 
-        // Risk
         const risk =
           calculateRoadRisk(
             nearbyIncidents,
@@ -534,15 +909,31 @@ function AIAssistant() {
             weather.weatherCode
           );
 
+        let recommendation;
+
+        if (
+          risk.level === "High"
+        ) {
+          recommendation =
+            "⚠️ Extra caution is recommended. Consider using a safer route and avoid unnecessary travel if possible.";
+        } else if (
+          risk.level === "Moderate"
+        ) {
+          recommendation =
+            "⚠️ Stay alert and consider checking the route before travelling.";
+        } else {
+          recommendation =
+            "✅ Current conditions appear relatively low-risk based on available SafeRoute data.";
+        }
+
         return (
           `🧠 AI ROAD RISK ANALYSIS\n\n` +
 
           `📊 Risk Score: ${risk.score}/100\n` +
           `⚠️ Risk Level: ${risk.level}\n\n` +
 
-          `📍 Location\n` +
-          `Latitude: ${location.lat.toFixed(5)}\n` +
-          `Longitude: ${location.lng.toFixed(5)}\n\n` +
+          `📍 Current Location\n` +
+          `${locationName}\n\n` +
 
           `⚠️ Nearby Incidents\n` +
           `${nearbyIncidents.length} incident(s) found within 5 km\n` +
@@ -567,7 +958,10 @@ function AIAssistant() {
           `The estimate considers historical incident activity, ` +
           `incident severity, proximity, time of day, and current weather conditions.\n\n` +
 
+          `${recommendation}\n\n` +
+
           `⚠️ IMPORTANT\n` +
+
           `This is a risk estimate based on available SafeRoute ` +
           `data and current conditions. It does NOT guarantee ` +
           `that an accident will or will not occur.`
@@ -586,7 +980,583 @@ function AIAssistant() {
     };
 
   // =========================================================
-  // 10. QUICK ACTIONS
+  // 18. ALL INCIDENTS SUMMARY
+  // =========================================================
+
+  const getIncidentSummary =
+    () => {
+      if (loadingIncidents) {
+        return (
+          "⏳ Loading live incident data from Firestore..."
+        );
+      }
+
+      if (
+        incidents.length === 0
+      ) {
+        return (
+          "No reported incidents are currently available in SafeRoute's Firestore data."
+        );
+      }
+
+      const high =
+        incidents.filter(
+          (incident) =>
+            incident.severity
+              ?.toLowerCase() ===
+            "high"
+        ).length;
+
+      const medium =
+        incidents.filter(
+          (incident) =>
+            incident.severity
+              ?.toLowerCase() ===
+            "medium"
+        ).length;
+
+      const low =
+        incidents.filter(
+          (incident) =>
+            incident.severity
+              ?.toLowerCase() ===
+            "low"
+        ).length;
+
+      return (
+        `⚠️ SAFEROUTE INCIDENT SUMMARY\n\n` +
+
+        `SafeRoute currently has ${incidents.length} reported incidents.\n\n` +
+
+        `🔴 High severity: ${high}\n` +
+        `🟠 Medium severity: ${medium}\n` +
+        `🟢 Low severity: ${low}\n\n` +
+
+        `For incidents near your current location, ask: ` +
+        `"Are there any incidents near me?"`
+      );
+    };
+
+  // =========================================================
+  // 19. NORMALIZE USER QUESTION
+  // =========================================================
+
+  const normalizeQuestion = (
+    question
+  ) => {
+    return question
+      .toLowerCase()
+      .trim()
+      .replace(/[?!.,;:]+/g, " ")
+      .replace(/\s+/g, " ");
+  };
+
+  // =========================================================
+  // 20. KEYWORD HELPER
+  // =========================================================
+
+  const hasAny = (
+    text,
+    keywords
+  ) => {
+    return keywords.some(
+      (keyword) =>
+        text.includes(keyword)
+    );
+  };
+
+  // =========================================================
+  // 21. INTENT DETECTION
+  // =========================================================
+
+  const detectIntent = (
+    question
+  ) => {
+    const q =
+      normalizeQuestion(
+        question
+      );
+
+    // -----------------------------------------
+    // LOCATION
+    // -----------------------------------------
+
+    if (
+      hasAny(q, [
+        "where am i",
+        "my location",
+        "current location",
+        "my current location",
+        "where is my location",
+        "what is my location",
+        "show my location",
+        "tell me my location",
+        "location near me",
+      ])
+    ) {
+      return "location";
+    }
+
+    // -----------------------------------------
+    // WEATHER
+    // -----------------------------------------
+
+    if (
+      hasAny(q, [
+        "weather",
+        "temperature",
+        "rain",
+        "raining",
+        "will it rain",
+        "is it raining",
+        "wind speed",
+        "forecast",
+        "climate",
+        "hot outside",
+        "cold outside",
+      ])
+    ) {
+      return "weather";
+    }
+
+    // -----------------------------------------
+    // ROAD RISK / SAFETY
+    // -----------------------------------------
+
+    if (
+      hasAny(q, [
+        "road risk",
+        "risk score",
+        "risk analysis",
+        "analyze road",
+        "road safety",
+        "safe to travel",
+        "safe for travel",
+        "safe right now",
+        "safe now",
+        "safe tonight",
+        "safe today",
+        "is it safe",
+        "is this road safe",
+        "is my area safe",
+        "is the area safe",
+        "how safe",
+        "how dangerous",
+        "how risky",
+        "danger near me",
+        "danger around me",
+        "dangerous near me",
+        "risk near me",
+        "risk around me",
+        "risk around my location",
+        "safety near me",
+        "safety around me",
+        "travel safely",
+        "should i travel",
+        "can i travel",
+        "travel tonight",
+        "travel now",
+        "road dangerous",
+        "roads dangerous",
+        "dangerous road",
+      ])
+    ) {
+      return "roadRisk";
+    }
+
+    // -----------------------------------------
+    // NEARBY INCIDENTS
+    // -----------------------------------------
+
+    if (
+      hasAny(q, [
+        "nearby incident",
+        "nearby incidents",
+        "incidents near me",
+        "incident near me",
+        "danger near me",
+        "dangers near me",
+        "what happened nearby",
+        "what happened around me",
+        "what happened near me",
+        "reported nearby",
+        "reports near me",
+        "reports around me",
+        "anything dangerous nearby",
+        "anything dangerous around me",
+        "accident near me",
+        "accidents near me",
+        "crime near me",
+        "crimes near me",
+      ])
+    ) {
+      return "nearbyIncidents";
+    }
+
+    // -----------------------------------------
+    // EMERGENCY
+    // -----------------------------------------
+
+    if (
+      hasAny(q, [
+        "emergency",
+        "sos",
+        "help me",
+        "i need help",
+        "i am in danger",
+        "im in danger",
+        "immediate danger",
+        "urgent help",
+        "police emergency",
+        "medical emergency",
+      ])
+    ) {
+      return "emergency";
+    }
+
+    // -----------------------------------------
+    // HOSPITAL / POLICE / SERVICES
+    // -----------------------------------------
+
+    if (
+      hasAny(q, [
+        "hospital",
+        "hospitals",
+        "medical center",
+        "medical service",
+        "doctor",
+        "police station",
+        "police stations",
+        "police",
+        "emergency service",
+        "emergency services",
+        "ambulance",
+      ])
+    ) {
+      return "services";
+    }
+
+    // -----------------------------------------
+    // ROUTE
+    // -----------------------------------------
+
+    if (
+      hasAny(q, [
+        "safer route",
+        "safe route",
+        "find a route",
+        "find route",
+        "best route",
+        "route to",
+        "route from",
+        "directions",
+        "journey",
+        "plan journey",
+        "plan my journey",
+        "travel route",
+        "avoid danger",
+        "avoid dangerous roads",
+        "avoid risky roads",
+      ])
+    ) {
+      return "route";
+    }
+
+    // -----------------------------------------
+    // REPORTING
+    // -----------------------------------------
+
+    if (
+      hasAny(q, [
+        "how do i report",
+        "how can i report",
+        "report an incident",
+        "report incident",
+        "submit report",
+        "submit an incident",
+        "make a report",
+        "create a report",
+        "add a report",
+        "report danger",
+      ])
+    ) {
+      return "report";
+    }
+
+    // -----------------------------------------
+    // GENERAL INCIDENT SUMMARY
+    // -----------------------------------------
+
+    if (
+      hasAny(q, [
+        "how many incidents",
+        "total incidents",
+        "all incidents",
+        "incident statistics",
+        "incident stats",
+        "incident summary",
+        "reported incidents",
+        "how many reports",
+        "how many dangers",
+      ])
+    ) {
+      return "incidentSummary";
+    }
+
+    // -----------------------------------------
+    // GENERAL SAFEROUTE QUESTIONS
+    // -----------------------------------------
+
+    if (
+      hasAny(q, [
+        "what is saferoute",
+        "what is safe route",
+        "what can you do",
+        "what do you do",
+        "how does saferoute work",
+        "how does safe route work",
+        "tell me about saferoute",
+        "about saferoute",
+        "what is this app",
+      ])
+    ) {
+      return "about";
+    }
+
+    return "general";
+  };
+
+  // =========================================================
+  // 22. AI RESPONSE ENGINE
+  // =========================================================
+
+  const getAIResponse =
+    async (question) => {
+      const intent =
+        detectIntent(question);
+
+      console.log(
+        "AI INTENT:",
+        intent
+      );
+
+      switch (intent) {
+        // -----------------------------------------
+        // LOCATION
+        // -----------------------------------------
+
+        case "location":
+          return await getLocationResponse();
+
+        // -----------------------------------------
+        // WEATHER
+        // -----------------------------------------
+
+        case "weather":
+          return await getWeatherResponse();
+
+        // -----------------------------------------
+        // ROAD RISK
+        // -----------------------------------------
+
+        case "roadRisk":
+          return await performRoadRiskAnalysis();
+
+        // -----------------------------------------
+        // NEARBY INCIDENTS
+        // -----------------------------------------
+
+        case "nearbyIncidents":
+          return await getNearbyIncidentResponse();
+
+        // -----------------------------------------
+        // EMERGENCY
+        // -----------------------------------------
+
+        case "emergency":
+          return (
+            "🚨 EMERGENCY ASSISTANCE\n\n" +
+
+            "If you are in immediate danger, " +
+            "please use the Emergency section and SOS feature immediately.\n\n" +
+
+            "You can also access nearby hospitals " +
+            "and police stations through SafeRoute."
+          );
+
+        // -----------------------------------------
+        // SERVICES
+        // -----------------------------------------
+
+        case "services":
+          return (
+            "🏥 EMERGENCY SERVICES\n\n" +
+
+            "SafeRoute can help you find nearby " +
+            "hospitals and police stations.\n\n" +
+
+            "Open the Emergency Assistance section " +
+            "to view available emergency services."
+          );
+
+        // -----------------------------------------
+        // ROUTE
+        // -----------------------------------------
+
+        case "route":
+          return (
+            "🗺️ SAFER ROUTE\n\n" +
+
+            "Open Plan Journey and enter your starting " +
+            "point and destination.\n\n" +
+
+            "SafeRoute can then display the route " +
+            "and available safety information."
+          );
+
+        // -----------------------------------------
+        // REPORT
+        // -----------------------------------------
+
+        case "report":
+          return (
+            "⚠️ REPORT AN INCIDENT\n\n" +
+
+            "You can report a dangerous incident " +
+            "through the SafeRoute reporting feature.\n\n" +
+
+            "Add the incident location, type, description, " +
+            "and severity so the community can be informed."
+          );
+
+        // -----------------------------------------
+        // INCIDENT SUMMARY
+        // -----------------------------------------
+
+        case "incidentSummary":
+          return getIncidentSummary();
+
+        // -----------------------------------------
+        // ABOUT
+        // -----------------------------------------
+
+        case "about":
+          return (
+            "🛡️ ABOUT SAFEROUTE\n\n" +
+
+            "SafeRoute is a road and community safety " +
+            "platform designed to help users identify " +
+            "dangerous areas and make safer travel decisions.\n\n" +
+
+            "SafeRoute AI can use GPS location, " +
+            "historical incidents, time of day, " +
+            "and current weather to estimate road risk."
+          );
+
+        // -----------------------------------------
+        // GENERAL
+        // -----------------------------------------
+
+        default:
+          return (
+            "🤖 I can help you with SafeRoute safety information.\n\n" +
+
+            "Try asking me things like:\n\n" +
+
+            "📍 \"Where am I?\"\n" +
+            "⚠️ \"Are there any incidents near me?\"\n" +
+            "🧠 \"Is it safe to travel right now?\"\n" +
+            "🌦️ \"What's the weather near me?\"\n" +
+            "🗺️ \"How can I find a safer route?\"\n" +
+            "🚨 \"I need emergency help\"\n" +
+            "🏥 \"Where are nearby hospitals?\"\n" +
+            "📊 \"How many incidents have been reported?\""
+          );
+      }
+    };
+
+  // =========================================================
+  // 23. SEND MESSAGE
+  // =========================================================
+
+  const sendMessage = async (
+    customText = null
+  ) => {
+    const text = (
+      customText ?? input
+    ).trim();
+
+    if (!text) return;
+
+    const userMessage = {
+      id: Date.now(),
+      sender: "user",
+      text,
+    };
+
+    setMessages((prev) => [
+      ...prev,
+      userMessage,
+    ]);
+
+    setInput("");
+
+    try {
+      const response =
+        await getAIResponse(
+          text
+        );
+
+      const aiMessage = {
+        id:
+          Date.now() + 1,
+        sender: "ai",
+        text: response,
+      };
+
+      setMessages((prev) => [
+        ...prev,
+        aiMessage,
+      ]);
+    } catch (error) {
+      console.error(
+        "AI response error:",
+        error
+      );
+
+      const errorMessage = {
+        id:
+          Date.now() + 1,
+        sender: "ai",
+        text:
+          "❌ Something went wrong while processing your request. Please try again.",
+      };
+
+      setMessages((prev) => [
+        ...prev,
+        errorMessage,
+      ]);
+    }
+  };
+
+  // =========================================================
+  // 24. ENTER KEY
+  // =========================================================
+
+  const handleKeyDown = (
+    event
+  ) => {
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey
+    ) {
+      event.preventDefault();
+      sendMessage();
+    }
+  };
+
+  // =========================================================
+  // 25. QUICK ACTIONS
   // =========================================================
 
   const quickActions = [
@@ -622,178 +1592,7 @@ function AIAssistant() {
   ];
 
   // =========================================================
-  // 11. AI RESPONSE
-  // =========================================================
-
-  const getAIResponse =
-    async (question) => {
-      const q =
-        question.toLowerCase();
-
-      // ROAD RISK
-      if (
-        q.includes("road risk") ||
-        q.includes("risk score") ||
-        q.includes("risk analysis") ||
-        q.includes("road safety") ||
-        q.includes("danger near me") ||
-        q.includes("risk near me") ||
-        q.includes("danger around me") ||
-        q.includes("analyze road")
-      ) {
-        return await performRoadRiskAnalysis();
-      }
-
-      // EMERGENCY
-      if (
-        q.includes("emergency") ||
-        q.includes("sos")
-      ) {
-        return (
-          "🚨 If you are in immediate danger, " +
-          "use the Emergency section and SOS feature. " +
-          "You can also check nearby hospitals and police stations."
-        );
-      }
-
-      // INCIDENT
-      if (
-        q.includes("incident") ||
-        q.includes("danger") ||
-        q.includes("report")
-      ) {
-        if (loadingIncidents) {
-          return "⏳ Loading live incident data from Firestore...";
-        }
-
-        if (incidents.length === 0) {
-          return (
-            "No reported incidents are currently available in SafeRoute's Firestore data."
-          );
-        }
-
-        const high =
-          incidents.filter(
-            (r) =>
-              r.severity
-                ?.toLowerCase() ===
-              "high"
-          ).length;
-
-        const medium =
-          incidents.filter(
-            (r) =>
-              r.severity
-                ?.toLowerCase() ===
-              "medium"
-          ).length;
-
-        const low =
-          incidents.filter(
-            (r) =>
-              r.severity
-                ?.toLowerCase() ===
-              "low"
-          ).length;
-
-        return (
-          `SafeRoute currently has ${incidents.length} reported incidents: ` +
-          `${high} high severity, ` +
-          `${medium} medium severity, ` +
-          `${low} low severity.`
-        );
-      }
-
-      // ROUTE
-      if (
-        q.includes("route") ||
-        q.includes("journey") ||
-        q.includes("safer") ||
-        q.includes("plan")
-      ) {
-        return (
-          "You can use Plan Journey to enter your starting point and destination. " +
-          "SafeRoute can then display route and safety information."
-        );
-      }
-
-      // SERVICES
-      if (
-        q.includes("hospital") ||
-        q.includes("police") ||
-        q.includes("service")
-      ) {
-        return (
-          "Open Emergency Assistance to view nearby hospitals and police stations."
-        );
-      }
-
-      return (
-        "I can analyze nearby road risk using GPS, " +
-        "historical incidents, time, and weather. " +
-        "Try asking: \"What is the road risk near me?\""
-      );
-    };
-
-  // =========================================================
-  // 12. SEND MESSAGE
-  // =========================================================
-
-  const sendMessage = async (
-    customText = null
-  ) => {
-    const text = (
-      customText ?? input
-    ).trim();
-
-    if (!text) return;
-
-    const userMessage = {
-      id: Date.now(),
-      sender: "user",
-      text,
-    };
-
-    setMessages((prev) => [
-      ...prev,
-      userMessage,
-    ]);
-
-    setInput("");
-
-    const response =
-      await getAIResponse(text);
-
-    const aiMessage = {
-      id: Date.now() + 1,
-      sender: "ai",
-      text: response,
-    };
-
-    setMessages((prev) => [
-      ...prev,
-      aiMessage,
-    ]);
-  };
-
-  // =========================================================
-  // 13. ENTER KEY
-  // =========================================================
-
-  const handleKeyDown = (
-    event
-  ) => {
-    if (
-      event.key === "Enter" &&
-      !event.shiftKey
-    ) {
-      event.preventDefault();
-      sendMessage();
-    }
-  };
-
-  // =========================================================
-  // 14. QUICK ACTION HANDLER
+  // 26. QUICK ACTION HANDLER
   // =========================================================
 
   const handleQuickAction = (
@@ -823,11 +1622,13 @@ function AIAssistant() {
       return;
     }
 
-    sendMessage(action.text);
+    sendMessage(
+      action.text
+    );
   };
 
   // =========================================================
-  // 15. UI
+  // 27. UI
   // =========================================================
 
   return (
@@ -836,6 +1637,7 @@ function AIAssistant() {
         <div className="ai-container">
 
           {/* HEADER */}
+
           <header className="ai-header">
 
             <div className="ai-header-icon">
@@ -858,9 +1660,11 @@ function AIAssistant() {
           </header>
 
           {/* MAIN CONTENT */}
+
           <div className="ai-content">
 
             {/* LEFT PANEL */}
+
             <aside className="ai-info-panel">
 
               <div className="ai-welcome">
@@ -947,6 +1751,7 @@ function AIAssistant() {
             </aside>
 
             {/* CHAT */}
+
             <main className="ai-chat">
 
               <div className="chat-header">
@@ -971,6 +1776,7 @@ function AIAssistant() {
               </div>
 
               {/* MESSAGES */}
+
               <div className="messages">
 
                 {messages.map(
@@ -1000,6 +1806,7 @@ function AIAssistant() {
               </div>
 
               {/* SUGGESTIONS */}
+
               <div className="chat-suggestions">
 
                 <button
@@ -1035,12 +1842,15 @@ function AIAssistant() {
               </div>
 
               {/* INPUT */}
+
               <div className="chat-input-area">
 
                 <textarea
                   value={input}
                   onChange={(e) =>
-                    setInput(e.target.value)
+                    setInput(
+                      e.target.value
+                    )
                   }
                   onKeyDown={
                     handleKeyDown
@@ -1058,7 +1868,9 @@ function AIAssistant() {
                   onClick={() =>
                     sendMessage()
                   }
-                  disabled={!input.trim()}
+                  disabled={
+                    !input.trim()
+                  }
                   aria-label="Send message"
                 >
                   ➤
