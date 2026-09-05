@@ -1,15 +1,51 @@
+/* =========================================================
+   NOTIFICATIONS PAGE
+========================================================= */
+
 .notifications-page {
   padding: 28px;
+  color: var(--text-primary, #0f172a);
 }
 
 .notifications-page h1 {
-  margin-bottom: 8px;
+  margin: 0 0 8px;
+  color: var(--text-primary, #0f172a);
+  font-size: 30px;
+  font-weight: 800;
 }
 
 .notifications-subtitle {
-  color: #64748b;
-  margin-bottom: 24px;
+  margin: 0 0 28px;
+  color: var(--text-secondary, #64748b);
+  font-size: 14px;
+  line-height: 1.6;
 }
+
+/* =========================================================
+   SECTION HEADINGS
+========================================================= */
+
+.notifications-page > h2,
+.sos-notification-section h2,
+.notification-section-header h2 {
+  color: var(--text-primary, #0f172a);
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.notification-section-header h2 {
+  margin: 0;
+}
+
+.notification-section-header p {
+  margin: 5px 0 0;
+  color: var(--text-secondary, #64748b);
+  font-size: 12px;
+}
+
+/* =========================================================
+   ROAD ALERTS
+========================================================= */
 
 .notification-list {
   display: grid;
@@ -17,82 +53,28 @@
 }
 
 .notification-card {
+  position: relative;
   display: flex;
   gap: 16px;
-
-  background: #ffffff;
-
-  padding: 18px;
-
-  border-radius: 14px;
-
-  box-shadow:
-    0 4px 14px rgba(0, 0, 0, 0.07);
-}
-
-.notification-icon {
-  font-size: 28px;
-}
-
-.notification-content h3 {
-  margin-bottom: 8px;
-}
-
-.notification-content p {
-  margin: 4px 0;
-}
-
-.no-notifications {
-  background: white;
-
-  padding: 22px;
-
-  border-radius: 14px;
-
-  color: #64748b;
-}
-.notifications-page {
-  padding: 28px;
-  color: #f8fafc;
-}
-
-.notifications-page h1 {
-  color: #f8fafc;
-  margin-bottom: 8px;
-}
-
-.notifications-subtitle {
-  color: #94a3b8;
-  margin-bottom: 24px;
-}
-
-.notification-list {
-  display: grid;
-  gap: 16px;
-}
-
-.notification-card {
-  display: flex;
-  align-items: flex-start;
-
-  gap: 16px;
-
-  background: #ffffff;
-
-  color: #172033;
-
   padding: 20px;
 
-  border-radius: 16px;
+  background: var(--card-bg, #fff);
+  color: var(--text-primary, #172033);
 
-  box-shadow:
-    0 6px 18px rgba(0, 0, 0, 0.12);
-
+  border: 1px solid var(--border-color, #e2e8f0);
   border-left: 5px solid #64748b;
+  border-radius: 15px;
+
+  box-shadow: 0 5px 18px rgba(15, 23, 42, 0.06);
+  transition: 0.2s ease;
+}
+
+.notification-card:hover {
+  transform: translateY(-2px);
 }
 
 .notification-card.high {
-  border-left-color: #dc2626;
+  border-left-color: #ef4444;
 }
 
 .notification-card.medium {
@@ -100,482 +82,797 @@
 }
 
 .notification-card.low {
-  border-left-color: #16a34a;
+  border-left-color: #22c55e;
 }
 
 .notification-icon {
-  font-size: 30px;
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   flex-shrink: 0;
+
+  background: #fff7ed;
+  border-radius: 11px;
+
+  font-size: 22px;
 }
 
 .notification-content {
   flex: 1;
+  min-width: 0;
 }
 
 .notification-content h3 {
-  color: #172033;
-
-  font-size: 22px;
-
   margin: 0 0 10px;
+  color: #172033;
+  font-size: 19px;
+  font-weight: 800;
 }
 
 .notification-content p {
-  color: #475569;
-
   margin: 6px 0;
-
-  line-height: 1.5;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.55;
 }
 
 .notification-content strong {
   color: #172033;
 }
 
-.no-notifications {
-  background: #ffffff;
+/* =========================================================
+   SOS ALERTS
+========================================================= */
 
-  color: #64748b;
-
-  padding: 22px;
-
-  border-radius: 14px;
-}
 .sos-notification-section {
   margin-bottom: 28px;
 }
 
 .sos-notification-section h2 {
-  margin-bottom: 14px;
-  color: #f8fafc;
+  margin: 0 0 15px;
 }
 
 .sos-notification-card {
-  background: #fff1f2;
-  color: #172033;
-
-  border-left: 5px solid #dc2626;
-
-  padding: 18px;
-
-  border-radius: 14px;
+  position: relative;
 
   margin-bottom: 12px;
+  padding: 20px;
+
+  background: #fff1f2;
+
+  border: 1px solid #fecdd3;
+  border-left: 5px solid #dc2626;
+  border-radius: 15px;
+
+  color: #172033;
 }
 
 .sos-notification-card h3 {
-  margin: 0 0 8px;
+  margin: 0 40px 10px 0;
   color: #b91c1c;
+  font-size: 18px;
 }
 
 .sos-notification-card p {
-  margin: 5px 0;
+  margin: 6px 0;
   color: #475569;
-}
-/* ========================================= notification. Jsx
-SAVED ROUTE NOTIFICATIONS
-========================================= */
-
-.route-notification-section {
-margin-bottom: 30px;
+  font-size: 13px;
+  line-height: 1.55;
 }
 
-.notification-section-header {
-display: flex;
-align-items: center;
-justify-content: space-between;
-
-gap: 15px;
-
-margin-bottom: 14px;
+.sos-notification-card strong {
+  color: #172033;
 }
 
-.notification-section-header h2 {
-margin: 0;
+/* =========================================================
+   BUTTONS
+========================================================= */
 
-color:
-var(--text-primary, #0f172a);
-
-font-size: 21px;
+.track-location-btn,
+.view-saved-route-btn {
+  border: 0;
+  border-radius: 9px;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
 }
 
-.notification-section-header p {
-margin: 5px 0 0;
-
-color:
-var(--text-secondary, #64748b);
-
-font-size: 12px;
+.track-location-btn {
+  margin-top: 12px;
+  padding: 10px 15px;
+  background: #dc2626;
 }
 
-.notification-section-header > span {
-min-width: 31px;
-height: 31px;
-
-display: flex;
-align-items: center;
-justify-content: center;
-
-padding: 0 8px;
-
-background: #eff6ff;
-color: #2563eb;
-
-border-radius: 20px;
-
-font-size: 11px;
-font-weight: 800;
-}
-
-.route-notification-list {
-display: grid;
-gap: 12px;
-}
-
-.route-notification-card {
-display: flex;
-gap: 14px;
-
-padding: 18px;
-
-background:
-var(--card-bg, #ffffff);
-
-border:
-1px solid
-var(--border-color, #e2e8f0);
-
-border-left: 5px solid #3b82f6;
-
-border-radius: 14px;
-
-box-shadow:
-0 5px 17px
-rgba(15, 23, 42, 0.05);
-}
-
-.route-notification-card.high {
-border-left-color: #ef4444;
-}
-
-.route-notification-card.medium {
-border-left-color: #f59e0b;
-}
-
-.route-notification-card.low {
-border-left-color: #22c55e;
-}
-
-.route-alert-icon {
-width: 43px;
-height: 43px;
-
-display: flex;
-align-items: center;
-justify-content: center;
-
-flex-shrink: 0;
-
-background: #fff7ed;
-
-border-radius: 11px;
-
-font-size: 19px;
-}
-
-.route-alert-content {
-min-width: 0;
-flex: 1;
-}
-
-.route-alert-heading {
-display: flex;
-
-justify-content:
-space-between;
-
-align-items: flex-start;
-
-gap: 12px;
-}
-
-.route-alert-label {
-display: block;
-
-margin-bottom: 3px;
-
-color: #2563eb;
-
-font-size: 9px;
-font-weight: 800;
-
-letter-spacing: 0.7px;
-}
-
-.route-alert-heading h3 {
-margin: 0;
-
-color:
-var(--text-primary, #0f172a);
-
-font-size: 16px;
-}
-
-.route-alert-message {
-margin: 7px 0 13px;
-
-color:
-var(--text-secondary, #64748b);
-
-font-size: 12px;
-}
-
-.route-notification-severity {
-padding: 5px 9px;
-
-border-radius: 20px;
-
-font-size: 9px;
-font-weight: 800;
-
-white-space: nowrap;
-}
-
-.route-notification-severity.high {
-background: #fee2e2;
-color: #b91c1c;
-}
-
-.route-notification-severity.medium {
-background: #fef3c7;
-color: #b45309;
-}
-
-.route-notification-severity.low {
-background: #dcfce7;
-color: #15803d;
-}
-
-.route-notification-details {
-display: grid;
-
-grid-template-columns:
-repeat(3, minmax(0, 1fr));
-
-gap: 9px;
-
-margin-bottom: 13px;
-}
-
-.route-notification-details > div {
-padding: 9px 10px;
-
-background:
-var(--bg-tertiary, #f8fafc);
-
-border-radius: 8px;
-}
-
-.route-notification-details small {
-display: block;
-
-margin-bottom: 3px;
-
-color:
-var(--text-muted, #94a3b8);
-
-font-size: 8px;
-
-text-transform: uppercase;
-}
-
-.route-notification-details strong {
-display: block;
-
-color:
-var(--text-primary, #0f172a);
-
-font-size: 10px;
-
-overflow: hidden;
-text-overflow: ellipsis;
-white-space: nowrap;
+.track-location-btn:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
 }
 
 .view-saved-route-btn {
-padding: 9px 13px;
-
-border: none;
-border-radius: 8px;
-
-background: #2563eb;
-color: #ffffff;
-
-font-size: 10px;
-font-weight: 750;
-
-cursor: pointer;
+  padding: 9px 14px;
+  background: #2563eb;
+  font-size: 11px;
 }
 
 .view-saved-route-btn:hover {
-background: #1d4ed8;
+  background: #1d4ed8;
+  transform: translateY(-1px);
 }
 
+/* =========================================================
+   SAVED ROUTE ALERTS
+========================================================= */
 
-/* DARK MODE */
-
-.dark .route-notification-card {
-background: #111c2e;
-
-border-top-color: #22314a;
-border-right-color: #22314a;
-border-bottom-color: #22314a;
+.route-notification-section {
+  margin-bottom: 30px;
 }
 
-.dark
-.route-notification-details
-> div {
-background: #0f1a2c;
+.notification-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+
+  margin-bottom: 14px;
 }
 
+.notification-section-header > span {
+  min-width: 32px;
+  padding: 8px 10px;
 
-/* MOBILE */
+  background: #eff6ff;
+  color: #2563eb;
 
-@media (max-width: 650px) {
+  border-radius: 20px;
 
-.route-alert-heading {
-flex-direction: column;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 800;
 }
 
-.route-notification-details {
-grid-template-columns: 1fr;
+.route-notification-list {
+  display: grid;
+  gap: 13px;
 }
 
 .route-notification-card {
-padding: 14px;
+  position: relative;
+
+  display: flex;
+  gap: 14px;
+
+  padding: 18px;
+
+  background: var(--card-bg, #fff);
+
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-left: 5px solid #3b82f6;
+  border-radius: 15px;
+
+  box-shadow: 0 5px 17px rgba(15, 23, 42, 0.05);
+
+  transition: 0.2s ease;
 }
 
-.view-saved-route-btn {
-width: 100%;
+.route-notification-card:hover {
+  transform: translateY(-2px);
 }
+
+.route-notification-card.high {
+  border-left-color: #ef4444;
 }
-/* ================================
-   SMALL DELETE / HIDE BUTTON
-================================ */
 
-.notification-delete-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
+.route-notification-card.medium {
+  border-left-color: #f59e0b;
+}
 
-  width: 30px;
-  height: 30px;
+.route-notification-card.low {
+  border-left-color: #22c55e;
+}
 
-  border: none;
-  border-radius: 7px;
-
-  background: rgba(255, 255, 255, 0.85);
-
-  cursor: pointer;
-
-  font-size: 14px;
+.route-alert-icon {
+  width: 44px;
+  height: 44px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  transition: 0.2s ease;
+  flex-shrink: 0;
 
-  z-index: 5;
+  background: #eff6ff;
+  border-radius: 11px;
+
+  font-size: 20px;
+}
+
+.route-alert-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.route-alert-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.route-alert-label {
+  display: block;
+  margin-bottom: 3px;
+
+  color: #2563eb;
+
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+}
+
+.route-alert-heading h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 16px;
+}
+
+.route-alert-message {
+  margin: 8px 0 13px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   SEVERITY
+========================================================= */
+
+.route-notification-severity {
+  padding: 5px 9px;
+  border-radius: 20px;
+
+  font-size: 9px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.route-notification-severity.high {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.route-notification-severity.medium {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.route-notification-severity.low {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+/* =========================================================
+   ROUTE DETAILS
+========================================================= */
+
+.route-notification-details {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+
+  margin-bottom: 13px;
+}
+
+.route-notification-details > div {
+  min-width: 0;
+  padding: 9px;
+
+  background: var(--bg-tertiary, #f8fafc);
+  border-radius: 8px;
+}
+
+.route-notification-details small {
+  display: block;
+  margin-bottom: 3px;
+
+  color: #94a3b8;
+  font-size: 8px;
+  text-transform: uppercase;
+}
+
+.route-notification-details strong {
+  display: block;
+
+  color: #0f172a;
+  font-size: 10px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   DELETE / HIDE BUTTON
+========================================================= */
+
+.notification-delete-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+
+  cursor: pointer;
+  transition: 0.2s ease;
 }
 
 .notification-delete-btn:hover {
-  background: #ff4d4d;
-  transform: scale(1.08);
+  background: #fee2e2;
+  color: #dc2626;
+  transform: scale(1.06);
 }
 
-.route-delete-btn {
-  top: 10px;
-  right: 10px;
-}
-
-/* Make cards relative so button positions correctly */
-
-.notification-card,
-.sos-notification-card,
-.route-notification-card {
-  position: relative;
-}
-
-
-/* ================================
-   INCIDENT EVIDENCE
-================================ */
+/* =========================================================
+   EVIDENCE
+========================================================= */
 
 .notification-evidence {
-  margin-top: 16px;
+  margin-top: 15px;
   padding-top: 12px;
-
   border-top: 1px solid #e5e7eb;
 }
 
 .notification-evidence h4 {
   margin: 0 0 10px;
-
-  font-size: 15px;
+  color: #0f172a;
 }
 
 .notification-evidence-grid {
   display: grid;
-
-  grid-template-columns: repeat(
-    auto-fit,
-    minmax(150px, 1fr)
-  );
-
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 10px;
 }
 
 .notification-evidence-item {
-  background: #f8fafc;
-
-  border: 1px solid #e2e8f0;
-
-  border-radius: 10px;
-
   padding: 8px;
 
-  overflow: hidden;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
 }
 
 .notification-evidence-media {
   width: 100%;
-
   height: 150px;
 
-  object-fit: cover;
-
-  border-radius: 7px;
-
   display: block;
+
+  object-fit: cover;
+  border-radius: 7px;
 }
 
 .view-evidence-link {
   display: block;
-
   margin-top: 7px;
-
-  text-align: center;
-
-  font-size: 12px;
-
-  font-weight: 600;
 
   color: #2563eb;
 
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
   text-decoration: none;
 }
 
-.view-evidence-link:hover {
-  text-decoration: underline;
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.no-notifications {
+  padding: 22px;
+
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 14px;
+
+  color: #64748b;
+  text-align: center;
 }
+
+/* =========================================================
+   DELETE MODAL
+========================================================= */
+
+.notification-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(5px);
+}
+
+.notification-confirm-modal {
+  width: 100%;
+  max-width: 420px;
+
+  padding: 28px;
+
+  background: #fff;
+  border-radius: 20px;
+
+  text-align: center;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+}
+
+.notification-confirm-icon {
+  width: 58px;
+  height: 58px;
+
+  margin: 0 auto 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  background: #fee2e2;
+
+  font-size: 25px;
+}
+
+.notification-confirm-modal h3 {
+  margin: 0 0 8px;
+  color: #0f172a;
+}
+
+.notification-confirm-modal p {
+  margin: 0 auto 22px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.notification-confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.notification-cancel-btn,
+.notification-confirm-delete-btn {
+  min-width: 110px;
+  padding: 11px 18px;
+
+  border: 0;
+  border-radius: 10px;
+
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.notification-cancel-btn {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.notification-confirm-delete-btn {
+  background: #dc2626;
+  color: #fff;
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+/* MAIN TITLES — THIS FIXES YOUR BLACK TEXT */
+.dark .notifications-page h1,
+.dark .notifications-page > h2,
+.dark .notifications-page .sos-notification-section h2,
+.dark .notifications-page .notification-section-header h2 {
+  color: #f8fafc !important;
+}
+
+/* Subtitle */
+.dark .notifications-page .notifications-subtitle {
+  color: #94a3b8 !important;
+}
+
+/* Saved route description */
+.dark .notifications-page .notification-section-header p,
+.dark .notifications-page .route-alert-message {
+  color: #cbd5e1 !important;
+}
+
+/* Road cards */
+.dark .notifications-page .notification-card,
+.dark .notifications-page .route-notification-card {
+  background: #111c2e !important;
+  border-color: #26364f !important;
+}
+
+.dark .notifications-page .notification-content h3,
+.dark .notifications-page .route-alert-heading h3 {
+  color: #f8fafc !important;
+}
+
+.dark .notifications-page .notification-content p,
+.dark .notifications-page .sos-notification-card p {
+  color: #cbd5e1 !important;
+}
+
+.dark .notifications-page strong {
+  color: #ffffff !important;
+}
+
+/* SOS */
+.dark .notifications-page .sos-notification-card {
+  background: #29171c !important;
+  border-color: #54212a !important;
+  border-left-color: #ef4444 !important;
+}
+
+.dark .notifications-page .sos-notification-card h3 {
+  color: #fca5a5 !important;
+}
+
+/* Route details */
+.dark .notifications-page .route-notification-details > div {
+  background: #0f1a2c !important;
+  border: 1px solid #26364f;
+}
+
+.dark .notifications-page .route-notification-details small {
+  color: #94a3b8 !important;
+}
+
+.dark .notifications-page .route-notification-details strong {
+  color: #f8fafc !important;
+}
+
+/* Route label */
+.dark .notifications-page .route-alert-label {
+  color: #60a5fa !important;
+}
+
+/* Evidence */
+.dark .notifications-page .notification-evidence {
+  border-color: #334155 !important;
+}
+
+.dark .notifications-page .notification-evidence h4 {
+  color: #f8fafc !important;
+}
+
+.dark .notifications-page .notification-evidence-item {
+  background: #0f1a2c !important;
+  border-color: #26364f !important;
+}
+
+/* Empty state */
+.dark .notifications-page .no-notifications {
+  background: #111c2e !important;
+  color: #94a3b8 !important;
+}
+
+/* Delete button */
+.dark .notifications-page .notification-delete-btn {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+/* Modal */
+.dark .notifications-page .notification-confirm-modal {
+  background: #111c2e !important;
+}
+
+.dark .notifications-page .notification-confirm-modal h3 {
+  color: #f8fafc !important;
+}
+
+.dark .notifications-page .notification-confirm-modal p {
+  color: #cbd5e1 !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+  .notifications-page {
+    padding: 22px;
+  }
+
+  .route-notification-details {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+  .notifications-page {
+    padding: 16px;
+  }
+
+  .notifications-page h1 {
+    font-size: 24px;
+  }
+
+  .route-alert-heading {
+    flex-direction: column;
+  }
+
+  .route-notification-details {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .track-location-btn,
+  .view-saved-route-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .notification-card,
+  .sos-notification-card,
+  .route-notification-card {
+    padding-top: 45px;
+  }
+
+  .route-notification-card {
+    flex-direction: column;
+  }
+
+  .route-notification-details {
+    grid-template-columns: 1fr;
+  }
+
+  .notification-evidence-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .notification-confirm-actions {
+    flex-direction: column;
+  }
+
+  .notification-cancel-btn,
+  .notification-confirm-delete-btn {
+    width: 100%;
+  }
+}
+/* =========================================================
+   DARK MODE
+   Your project uses: body.dark-mode
+========================================================= */
+
+/* Main page headings */
+body.dark-mode .notifications-page h1,
+body.dark-mode .notifications-page > h2,
+body.dark-mode .notifications-page .sos-notification-section h2,
+body.dark-mode .notifications-page .notification-section-header h2 {
+  color: #f8fafc !important;
+}
+
+/* Subtitle */
+body.dark-mode .notifications-page .notifications-subtitle {
+  color: #94a3b8 !important;
+}
+
+/* Saved route subtitle */
+body.dark-mode .notifications-page .notification-section-header p,
+body.dark-mode .notifications-page .route-alert-message {
+  color: #cbd5e1 !important;
+}
+
+/* Road notification cards */
+body.dark-mode .notifications-page .notification-card,
+body.dark-mode .notifications-page .route-notification-card {
+  background: #111c2e !important;
+  border-color: #26364f !important;
+}
+
+/* Road alert text */
+body.dark-mode .notifications-page .notification-content h3,
+body.dark-mode .notifications-page .route-alert-heading h3 {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .notifications-page .notification-content p,
+body.dark-mode .notifications-page .sos-notification-card p {
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode .notifications-page strong {
+  color: #ffffff !important;
+}
+
+/* SOS */
+body.dark-mode .notifications-page .sos-notification-card {
+  background: #29171c !important;
+  border-color: #54212a !important;
+  border-left-color: #ef4444 !important;
+}
+
+body.dark-mode .notifications-page .sos-notification-card h3 {
+  color: #fca5a5 !important;
+}
+
+/* Saved route details */
+body.dark-mode .notifications-page .route-notification-details > div {
+  background: #0f1a2c !important;
+  border-color: #26364f !important;
+}
+
+body.dark-mode .notifications-page .route-notification-details small {
+  color: #94a3b8 !important;
+}
+
+body.dark-mode .notifications-page .route-notification-details strong {
+  color: #f8fafc !important;
+}
+
+/* Route label */
+body.dark-mode .notifications-page .route-alert-label {
+  color: #60a5fa !important;
+}
+
+/* Evidence */
+body.dark-mode .notifications-page .notification-evidence {
+  border-color: #334155 !important;
+}
+
+body.dark-mode .notifications-page .notification-evidence h4 {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .notifications-page .notification-evidence-item {
+  background: #0f1a2c !important;
+  border-color: #26364f !important;
+}
+
+/* Empty notification */
+body.dark-mode .notifications-page .no-notifications {
+  background: #111c2e !important;
+  color: #94a3b8 !important;
+}
+
+/* Delete button */
+body.dark-mode .notifications-page .notification-delete-btn {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+/* Confirmation modal */
+body.dark-mode .notifications-page .notification-confirm-modal {
+  background: #111c2e !important;
+}
+
+body.dark-mode .notifications-page .notification-confirm-modal h3 {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .notifications-page .notification-confirm-modal p {
+  color: #cbd5e1 !important;
+}
+
+
