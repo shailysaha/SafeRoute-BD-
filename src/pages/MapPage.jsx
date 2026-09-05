@@ -1,6 +1,7 @@
 import {
-  useState,
   useEffect,
+  useState,
+  useCallback,
 } from "react";
 
 import { useNavigate } from "react-router-dom";
@@ -19,14 +20,17 @@ import "leaflet/dist/leaflet.css";
 import {
   collection,
   addDoc,
-  getDocs,
   onSnapshot,
   doc,
   updateDoc,
   serverTimestamp,
-  arrayUnion,
   increment,
+  arrayUnion,
 } from "firebase/firestore";
+
+import {
+  onAuthStateChanged,
+} from "firebase/auth";
 
 import {
   db,
@@ -51,6 +55,8 @@ import MyLocationButton from "../components/MyLocationButton";
 
 import IncidentVerification from "../components/incidents/IncidentVerification";
 
+import ModerationReportButton from "../components/ModerationReportButton";
+import { notify } from "../utils/notify";
 import {
   redIcon,
   orangeIcon,
@@ -58,46 +64,93 @@ import {
   blueIcon,
 } from "../utils/markerIcons";
 
-import {
-  findDuplicateIncident,
-} from "../utils/duplicateDetection";
-
 import "./MapPage.css";
 
 import "../components/SOSButton.css";
 
+import {
+  findDuplicateIncident,
+} from "../utils/duplicateDetection";
 
-// =====================================================
+
+// =========================================================
+// USER REPORT COUNTER
+//
+// Kept inside this file because your current
+// moderationService.js does not export incrementTotalReports.
+// =========================================================
+
+async function incrementTotalReports(userId) {
+  if (!userId) {
+    return;
+  }
+
+  try {
+    await updateDoc(
+      doc(
+        db,
+        "users",
+        userId
+      ),
+      {
+        totalReports: increment(1),
+        updatedAt: serverTimestamp(),
+      }
+    );
+
+    console.log(
+      "✅ Total reports updated:",
+      userId
+    );
+  } catch (error) {
+    console.error(
+      "⚠️ Failed to update total reports:",
+      error
+    );
+
+    throw error;
+  }
+}
+
+
+// =========================================================
 // MAP CLICK HANDLER
-// =====================================================
+// =========================================================
 
 function ClickHandler({
   onMapClick,
 }) {
   useMapEvents({
-    async click(e) {
-      const lat = e.latlng.lat;
-      const lng = e.latlng.lng;
+    async click(event) {
+      const lat =
+        event.latlng.lat;
+
+      const lng =
+        event.latlng.lng;
 
       try {
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
-          {
-            headers: {
-              Accept: "application/json",
-            },
-          }
-        );
+        const response =
+          await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
+            {
+              headers: {
+                Accept:
+                  "application/json",
+              },
+            }
+          );
 
         if (!response.ok) {
           throw new Error(
-            "Reverse geocoding failed"
+            "Reverse geocoding failed."
           );
         }
 
-        const data = await response.json();
+        const data =
+          await response.json();
 
-        const address = data.address || {};
+        const address =
+          data.address || {};
 
         const area =
           address.suburb ||
@@ -117,16 +170,6 @@ function ClickHandler({
           address.city ||
           address.state ||
           "";
-
-        console.log(
-          "📍 Map clicked:",
-          {
-            lat,
-            lng,
-            area,
-            district,
-          }
-        );
 
         onMapClick({
           lat,
@@ -148,7 +191,8 @@ function ClickHandler({
           lng,
           area: "",
           district: "",
-          name: "Clicked Location",
+          name:
+            "Clicked Location",
         });
       }
     },
@@ -158,14 +202,15 @@ function ClickHandler({
 }
 
 
-// =====================================================
+// =========================================================
 // MAP CONTROLLER
-// =====================================================
+// =========================================================
 
 function MapController({
   setMap,
 }) {
-  const map = useMap();
+  const map =
+    useMap();
 
   useEffect(() => {
     if (map) {
@@ -180,22 +225,30 @@ function MapController({
 }
 
 
-// =====================================================
+// =========================================================
 // FLY TO LOCATION
-// =====================================================
+// =========================================================
 
 function FlyToLocation({
   location,
 }) {
-  const map = useMap();
+  const map =
+    useMap();
 
   useEffect(() => {
     if (!location) {
       return;
     }
 
-    const lat = Number(location.lat);
-    const lng = Number(location.lng);
+    const lat =
+      Number(
+        location.lat
+      );
+
+    const lng =
+      Number(
+        location.lng
+      );
 
     if (
       !Number.isFinite(lat) ||
@@ -205,7 +258,10 @@ function FlyToLocation({
     }
 
     map.flyTo(
-      [lat, lng],
+      [
+        lat,
+        lng,
+      ],
       16,
       {
         duration: 1.5,
@@ -220,18 +276,20 @@ function FlyToLocation({
 }
 
 
-// =====================================================
+// =========================================================
 // MAIN MAP PAGE
-// =====================================================
+// =========================================================
 
 export default function MapPage({
   hideSidebar = false,
 }) {
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
-  // ===================================================
+
+  // =======================================================
   // STATES
-  // ===================================================
+  // =======================================================
 
   const [
     selectedLocation,
@@ -243,627 +301,1179 @@ export default function MapPage({
     setCurrentLocation,
   ] = useState(null);
 
-  const [reports, setReports] = useState([]);
-  const [myReports, setMyReports] = useState([]);
-  const [communityReports, setCommunityReports] = useState([]);
+  const [
+    reports,
+    setReports,
+  ] = useState([]);
+
+  const [
+    myReports,
+    setMyReports,
+  ] = useState([]);
+
+  const [
+    communityReports,
+    setCommunityReports,
+  ] = useState([]);
 
   const [
     map,
     setMap,
   ] = useState(null);
 
+  const [
+    currentUser,
+    setCurrentUser,
+  ] = useState(
+    auth.currentUser
+  );
 
-  // ===================================================
-  // LIVE FIRESTORE LISTENERS (INCIDENTS & OLD REPORTS)
-  // ===================================================
+
+  // =======================================================
+  // AUTH LISTENER
+  // =======================================================
+
+  useEffect(() => {
+    const unsubscribe =
+      onAuthStateChanged(
+        auth,
+        (user) => {
+          setCurrentUser(
+            user
+          );
+        }
+      );
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+
+  // =======================================================
+  // LOAD FIRESTORE INCIDENTS + OLD REPORTS
+  // =======================================================
 
   useEffect(() => {
     let incidentsData = [];
+
     let oldReportsData = [];
 
+
     const updateReports = () => {
-      /*
-       * ------------------------------------------------
-       * 1. NORMALIZE NEW INCIDENTS
-       * ------------------------------------------------
-       */
-      const normalizedIncidents = incidentsData.map((item) => ({
-        ...item,
 
-        id: item.id,
+      // ---------------------------------------------------
+      // NORMALIZE INCIDENTS
+      // ---------------------------------------------------
 
-        source: "incident",
+      const normalizedIncidents =
+        incidentsData.map(
+          (item) => ({
+            ...item,
 
-        status: item.status || "Unverified",
+            id:
+              item.id,
 
-        incidentType:
-          item.incidentType ||
-          item.dangerType ||
-          "Road Incident",
+            source:
+              "incident",
 
-        area: item.area || "",
-        district: item.district || "",
+            status:
+              item.status ||
+              "Unverified",
 
-        lat: Number(item.lat),
-        lng: Number(item.lng),
+            incidentType:
+              item.incidentType ||
+              item.dangerType ||
+              "Road Incident",
 
-        severity: item.severity || "Medium",
+            area:
+              item.area ||
+              "",
 
-        description: item.description || "",
+            district:
+              item.district ||
+              "",
 
-        evidence:
-          Array.isArray(item.evidence)
-            ? item.evidence
-            : [],
+            lat:
+              Number(
+                item.lat
+              ),
 
-        userId:
-          item.userId ||
-          item.createdBy ||
-          item.reportedBy ||
-          "",
+            lng:
+              Number(
+                item.lng
+              ),
 
-        userEmail:
-          item.userEmail || "",
-      }));
+            severity:
+              item.severity ||
+              "Medium",
 
-      /*
-       * ------------------------------------------------
-       * 2. NORMALIZE OLD REPORTS
-       * ------------------------------------------------
-       */
-      const normalizedOldReports = oldReportsData.map((item) => ({
-        ...item,
+            description:
+              item.description ||
+              "",
 
-        id: item.id,
+            locationName:
+              item.locationName ||
+              "",
 
-        source: "report",
+            evidence:
+              Array.isArray(
+                item.evidence
+              )
+                ? item.evidence
+                : [],
 
-        status: item.status || "Unverified",
+            userId:
+              item.userId ||
+              item.reporterId ||
+              item.createdBy ||
+              item.reportedBy ||
+              "",
 
-        incidentType:
-          item.incidentType ||
-          item.dangerType ||
-          "Road Incident",
+            reporterId:
+              item.reporterId ||
+              item.userId ||
+              "",
 
-        area: item.area || "",
-        district: item.district || "",
+            userEmail:
+              item.reporterEmail ||
+              item.userEmail ||
+              "",
 
-        lat: Number(item.lat),
-        lng: Number(item.lng),
+            reporterEmail:
+              item.reporterEmail ||
+              item.userEmail ||
+              "",
 
-        severity: item.severity || "Medium",
+            reportCount:
+              Number(
+                item.reportCount ||
+                1
+              ),
 
-        description: item.description || "",
+            confirmationCount:
+              Number(
+                item.confirmationCount ||
+                0
+              ),
 
-        evidence:
-          Array.isArray(item.evidence)
-            ? item.evidence
-            : [],
+            rejectionCount:
+              Number(
+                item.rejectionCount ||
+                0
+              ),
 
-        userId:
-          item.userId ||
-          item.createdBy ||
-          item.reportedBy ||
-          "",
+            confirmedBy:
+              Array.isArray(
+                item.confirmedBy
+              )
+                ? item.confirmedBy
+                : [],
 
-        userEmail:
-          item.userEmail || "",
-      }));
+            rejectedBy:
+              Array.isArray(
+                item.rejectedBy
+              )
+                ? item.rejectedBy
+                : [],
 
-      /*
-       * ------------------------------------------------
-       * 3. COMBINE BOTH
-       * ------------------------------------------------
-       */
+            verificationHistory:
+              Array.isArray(
+                item.verificationHistory
+              )
+                ? item.verificationHistory
+                : [],
+
+            relatedReports:
+              Array.isArray(
+                item.relatedReports
+              )
+                ? item.relatedReports
+                : [],
+
+            reputationProcessed:
+              item.reputationProcessed === true,
+
+            reputationResult:
+              item.reputationResult ||
+              null,
+          })
+        );
+
+
+      // ---------------------------------------------------
+      // NORMALIZE OLD REPORTS
+      // ---------------------------------------------------
+
+      const normalizedOldReports =
+        oldReportsData.map(
+          (item) => ({
+            ...item,
+
+            id:
+              item.id,
+
+            source:
+              "report",
+
+            status:
+              item.status ||
+              "Unverified",
+
+            incidentType:
+              item.incidentType ||
+              item.dangerType ||
+              "Road Incident",
+
+            area:
+              item.area ||
+              "",
+
+            district:
+              item.district ||
+              "",
+
+            lat:
+              Number(
+                item.lat
+              ),
+
+            lng:
+              Number(
+                item.lng
+              ),
+
+            severity:
+              item.severity ||
+              "Medium",
+
+            description:
+              item.description ||
+              "",
+
+            locationName:
+              item.locationName ||
+              "",
+
+            evidence:
+              Array.isArray(
+                item.evidence
+              )
+                ? item.evidence
+                : [],
+
+            userId:
+              item.userId ||
+              item.reporterId ||
+              item.createdBy ||
+              item.reportedBy ||
+              "",
+
+            reporterId:
+              item.reporterId ||
+              item.userId ||
+              "",
+
+            userEmail:
+              item.reporterEmail ||
+              item.userEmail ||
+              "",
+
+            reporterEmail:
+              item.reporterEmail ||
+              item.userEmail ||
+              "",
+
+            reportCount:
+              Number(
+                item.reportCount ||
+                1
+              ),
+
+            confirmationCount:
+              Number(
+                item.confirmationCount ||
+                0
+              ),
+
+            rejectionCount:
+              Number(
+                item.rejectionCount ||
+                0
+              ),
+
+            confirmedBy:
+              Array.isArray(
+                item.confirmedBy
+              )
+                ? item.confirmedBy
+                : [],
+
+            rejectedBy:
+              Array.isArray(
+                item.rejectedBy
+              )
+                ? item.rejectedBy
+                : [],
+          })
+        );
+
+
+      // ---------------------------------------------------
+      // COMBINE
+      // ---------------------------------------------------
 
       const combined = [
         ...normalizedIncidents,
         ...normalizedOldReports,
       ];
 
-      /*
-       * ------------------------------------------------
-       * 4. REMOVE INVALID COORDINATES
-       * ------------------------------------------------
-       */
 
-      const validReports = combined.filter(
-        (report) =>
-          Number.isFinite(report.lat) &&
-          Number.isFinite(report.lng) &&
-          report.lat >= -90 &&
-          report.lat <= 90 &&
-          report.lng >= -180 &&
-          report.lng <= 180
-      );
+      // ---------------------------------------------------
+      // VALID COORDINATES
+      // ---------------------------------------------------
 
-      /*
-       * ------------------------------------------------
-       * 5. REMOVE DUPLICATES
-       * ------------------------------------------------
-       */
+      const validReports =
+        combined.filter(
+          (report) => (
+            Number.isFinite(
+              report.lat
+            ) &&
+            Number.isFinite(
+              report.lng
+            ) &&
+            report.lat >= -90 &&
+            report.lat <= 90 &&
+            report.lng >= -180 &&
+            report.lng <= 180
+          )
+        );
+
+
+      // ---------------------------------------------------
+      // UNIQUE BY SOURCE + ID
+      // ---------------------------------------------------
 
       const uniqueReports = [];
 
-      const seen = new Set();
+      const seen =
+        new Set();
 
-      validReports.forEach((report) => {
-        const key = `${report.source}-${report.id}`;
+      validReports.forEach(
+        (report) => {
+          const key =
+            `${report.source}-${report.id}`;
 
-        if (!seen.has(key)) {
-          seen.add(key);
-          uniqueReports.push(report);
+          if (
+            !seen.has(key)
+          ) {
+            seen.add(key);
+
+            uniqueReports.push(
+              report
+            );
+          }
         }
-      });
+      );
 
-      /*
-       * ------------------------------------------------
-       * 6. SET ALL REPORTS
-       * ------------------------------------------------
-       */
 
-      setReports(uniqueReports);
+      // ---------------------------------------------------
+      // SET ALL REPORTS
+      // ---------------------------------------------------
 
-      /*
-       * ------------------------------------------------
-       * 7. CURRENT USER'S REPORTS
-       * ------------------------------------------------
-       */
+      setReports(
+        uniqueReports
+      );
 
-      const currentUser = auth.currentUser;
+
+      // ---------------------------------------------------
+      // USER REPORTS
+      // ---------------------------------------------------
 
       if (currentUser) {
-        const mine = uniqueReports.filter(
-          (report) =>
-            report.userId === currentUser.uid
+
+        const mine =
+          uniqueReports.filter(
+            (report) =>
+              report.userId ===
+                currentUser.uid ||
+              report.reporterId ===
+                currentUser.uid
+          );
+
+        const community =
+          uniqueReports.filter(
+            (report) =>
+              report.userId !==
+                currentUser.uid &&
+              report.reporterId !==
+                currentUser.uid
+          );
+
+        setMyReports(
+          mine
         );
 
-        setMyReports(mine);
-
-        /*
-         * ------------------------------------------------
-         * 8. COMMUNITY REPORTS
-         * ------------------------------------------------
-         */
-
-        const community = uniqueReports.filter(
-          (report) =>
-            report.userId !== currentUser.uid
+        setCommunityReports(
+          community
         );
 
-        setCommunityReports(community);
       } else {
+
         setMyReports([]);
-        setCommunityReports(uniqueReports);
+
+        setCommunityReports(
+          uniqueReports
+        );
       }
     };
 
-    /*
-     * ------------------------------------------------
-     * 9. LISTEN TO NEW INCIDENTS
-     * ------------------------------------------------
-     */
 
-    const unsubscribeIncidents = onSnapshot(
-      collection(db, "incidents"),
-      (snapshot) => {
-        incidentsData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+    // =====================================================
+    // INCIDENT LISTENER
+    // =====================================================
 
-        console.log(
-          "🔥 Incidents loaded:",
-          incidentsData
-        );
+    const unsubscribeIncidents =
+      onSnapshot(
+        collection(
+          db,
+          "incidents"
+        ),
 
-        updateReports();
-      },
-      (error) => {
-        console.error(
-          "❌ Incidents listener error:",
-          error
-        );
-      }
-    );
+        (snapshot) => {
+          incidentsData =
+            snapshot.docs.map(
+              (item) => ({
+                id:
+                  item.id,
 
-    /*
-     * ------------------------------------------------
-     * 10. LISTEN TO OLD REPORTS
-     * ------------------------------------------------
-     */
+                ...item.data(),
+              })
+            );
 
-    const unsubscribeReports = onSnapshot(
-      collection(db, "reports"),
-      (snapshot) => {
-        oldReportsData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+          updateReports();
+        },
 
-        console.log(
-          "📋 Old reports loaded:",
-          oldReportsData
-        );
+        (error) => {
+          console.error(
+            "Incidents listener error:",
+            error
+          );
+        }
+      );
 
-        updateReports();
-      },
-      (error) => {
-        console.error(
-          "❌ Reports listener error:",
-          error
-        );
-      }
-    );
 
-    /*
-     * ------------------------------------------------
-     * 11. CLEANUP
-     * ------------------------------------------------
-     */
+    // =====================================================
+    // OLD REPORT LISTENER
+    // =====================================================
+
+    const unsubscribeReports =
+      onSnapshot(
+        collection(
+          db,
+          "reports"
+        ),
+
+        (snapshot) => {
+          oldReportsData =
+            snapshot.docs.map(
+              (item) => ({
+                id:
+                  item.id,
+
+                ...item.data(),
+              })
+            );
+
+          updateReports();
+        },
+
+        (error) => {
+          console.error(
+            "Reports listener error:",
+            error
+          );
+        }
+      );
+
+
+    // =====================================================
+    // CLEANUP
+    // =====================================================
 
     return () => {
       unsubscribeIncidents();
       unsubscribeReports();
     };
-  }, []);
+
+  }, [
+    currentUser,
+  ]);
 
 
-  // ===================================================
+  // =======================================================
   // SUBMIT INCIDENT
-  // ===================================================
+  //
+  // DUPLICATE DETECTION IS PERFORMED BEFORE addDoc().
+  // =======================================================
 
   const submitIncident =
-    async (incident) => {
-      const currentUser =
-        auth.currentUser;
+    useCallback(
+      async (incident) => {
 
-      if (!currentUser) {
-        alert(
-          "Please login before submitting a report."
-        );
+        const loggedUser =
+          auth.currentUser;
 
-        navigate(
-          "/login",
-          {
-            state: {
-              from: {
-                pathname:
-                  "/report-area",
+
+        // -------------------------------------------------
+        // LOGIN
+        // -------------------------------------------------
+
+        if (!loggedUser) {
+          notify(
+            "Please login before submitting a report."
+          );
+
+          navigate(
+            "/login",
+            {
+              state: {
+                from: {
+                  pathname:
+                    "/report-area",
+                },
               },
-            },
-            replace: true,
-          }
-        );
 
-        return false;
-      }
+              replace: true,
+            }
+          );
 
-      const latitude =
-        Number(
-          incident?.lat ??
+          return false;
+        }
+
+
+        // -------------------------------------------------
+        // COORDINATES
+        // -------------------------------------------------
+
+        const latitude =
+          Number(
+            incident?.lat ??
             selectedLocation?.lat
-        );
+          );
 
-      const longitude =
-        Number(
-          incident?.lng ??
+        const longitude =
+          Number(
+            incident?.lng ??
             selectedLocation?.lng
-        );
+          );
 
-      if (
-        !Number.isFinite(latitude) ||
-        !Number.isFinite(longitude)
-      ) {
-        alert(
-          "Invalid GPS coordinates."
-        );
 
-        return false;
-      }
-
-      const evidenceFiles =
-        Array.isArray(
-          incident?.evidenceFiles
-        )
-          ? incident.evidenceFiles
-          : [];
-
-      const {
-        evidenceFiles:
-          ignoredEvidenceFiles,
-        ...incidentData
-      } = incident || {};
-
-      void ignoredEvidenceFiles;
-
-      const locationName =
-        incident?.locationName ||
-        selectedLocation?.name ||
-        `${incident?.area || selectedLocation?.area || ""}, ${
-          incident?.district ||
-          selectedLocation?.district ||
-          ""
-        }`
-          .replace(
-            /^,\s*|\s*,$/g,
-            ""
+        if (
+          !Number.isFinite(
+            latitude
           ) ||
-        "Unknown Location";
-
-      const newIncident = {
-        ...incidentData,
-
-        lat: latitude,
-
-        lng: longitude,
-
-        area:
-          incident?.area ||
-          selectedLocation?.area ||
-          "",
-
-        district:
-          incident?.district ||
-          selectedLocation?.district ||
-          "",
-
-        locationName,
-
-        userId: currentUser.uid,
-
-        reporterId:
-          currentUser.uid,
-
-        reporterEmail:
-          currentUser.email || "",
-
-        reporterName:
-          currentUser.displayName ||
-          currentUser.email?.split(
-            "@"
-          )[0] ||
-          "Unknown User",
-
-        status:
-          "Unverified",
-
-        reportCount: 1,
-
-        confirmationCount: 0,
-
-        rejectionCount: 0,
-
-        confirmedBy: [],
-
-        rejectedBy: [],
-
-        evidence: [],
-
-        evidenceCount:
-          evidenceFiles.length,
-
-        relatedReports: [],
-
-        createdAt:
-          new Date().toISOString(),
-
-        updatedAt:
-          new Date().toISOString(),
-
-        resolvedAt: null,
-      };
-
-      try {
-        const snapshot =
-          await getDocs(
-            collection(
-              db,
-              "incidents"
-            )
+          !Number.isFinite(
+            longitude
+          )
+        ) {
+          notify(
+            "Invalid GPS coordinates."
           );
 
-        const existingIncidents =
-          snapshot.docs.map(
-            (item) => ({
-              id: item.id,
-              ...item.data(),
-            })
+          return false;
+        }
+
+
+        // -------------------------------------------------
+        // EVIDENCE FILES
+        // -------------------------------------------------
+
+        const evidenceFiles =
+          Array.isArray(
+            incident?.evidenceFiles
+          )
+            ? incident.evidenceFiles
+            : [];
+
+
+        if (
+          evidenceFiles.length >
+          5
+        ) {
+          notify(
+            "Maximum 5 evidence files are allowed."
           );
 
-        const duplicate =
-          findDuplicateIncident(
-            newIncident,
-            existingIncidents
+          return false;
+        }
+
+
+        // -------------------------------------------------
+        // REMOVE FILE OBJECTS
+        // -------------------------------------------------
+
+        const {
+          evidenceFiles:
+            ignoredEvidenceFiles,
+
+          ...formData
+        } =
+          incident || {};
+
+        void ignoredEvidenceFiles;
+
+
+        // -------------------------------------------------
+        // LOCATION NAME
+        // -------------------------------------------------
+
+        const locationName =
+          incident?.locationName ||
+
+          selectedLocation?.name ||
+
+          `${incident?.area ||
+            selectedLocation?.area ||
+            ""}, ${
+              incident?.district ||
+              selectedLocation?.district ||
+              ""
+            }`
+            .replace(
+              /^,\s*|\s*,$/g,
+              ""
+            ) ||
+
+          "Unknown Location";
+
+
+        // -------------------------------------------------
+        // INCIDENT TYPE
+        // -------------------------------------------------
+
+        const incidentType =
+          incident?.incidentType ||
+          incident?.dangerType ||
+          "Road Incident";
+
+
+        // -------------------------------------------------
+        // NEW INCIDENT OBJECT
+        // -------------------------------------------------
+
+        const newIncident = {
+          ...formData,
+
+          incidentType,
+
+          dangerType:
+            incident?.dangerType ||
+            incidentType,
+
+          lat:
+            latitude,
+
+          lng:
+            longitude,
+
+          area:
+            incident?.area ||
+            selectedLocation?.area ||
+            "",
+
+          district:
+            incident?.district ||
+            selectedLocation?.district ||
+            "",
+
+          locationName,
+
+          severity:
+            incident?.severity ||
+            "Medium",
+
+          description:
+            incident?.description ||
+            "",
+
+
+          // ---------------------------------------------
+          // AUTHENTICATED USER
+          // ---------------------------------------------
+
+          userId:
+            loggedUser.uid,
+
+          reporterId:
+            loggedUser.uid,
+
+          reporterEmail:
+            loggedUser.email ||
+            "",
+
+          reporterName:
+            loggedUser.displayName ||
+            loggedUser.email?.split(
+              "@"
+            )[0] ||
+            "Unknown User",
+
+
+          // ---------------------------------------------
+          // STATUS
+          // ---------------------------------------------
+
+          status:
+            "Unverified",
+
+          verificationStatus:
+            "pending",
+
+          reputationProcessed:
+            false,
+
+          reputationResult:
+            null,
+
+
+          // ---------------------------------------------
+          // COUNTERS
+          // ---------------------------------------------
+
+          reportCount:
+            1,
+
+          confirmationCount:
+            0,
+
+          rejectionCount:
+            0,
+
+
+          // ---------------------------------------------
+          // VERIFICATION
+          // ---------------------------------------------
+
+          confirmedBy:
+            [],
+
+          rejectedBy:
+            [],
+
+
+          // ---------------------------------------------
+          // EVIDENCE
+          // ---------------------------------------------
+
+          evidence:
+            [],
+
+          evidenceCount:
+            evidenceFiles.length,
+
+
+          // ---------------------------------------------
+          // RELATIONSHIP
+          // ---------------------------------------------
+
+          relatedReports:
+            [],
+
+          verificationHistory:
+            [],
+
+
+          // ---------------------------------------------
+          // TIMESTAMPS
+          // ---------------------------------------------
+
+          createdAt:
+            serverTimestamp(),
+
+          updatedAt:
+            serverTimestamp(),
+
+          communityConfirmedAt:
+            null,
+
+          verifiedAt:
+            null,
+
+          resolvedAt:
+            null,
+        };
+
+
+        try {
+
+          console.log(
+            "🔎 Checking for duplicate incident..."
           );
 
-        if (duplicate) {
-          const duplicateId =
-            duplicate.id;
+
+          // =================================================
+          // DUPLICATE DETECTION
+          // =================================================
+
+          const duplicate =
+            findDuplicateIncident(
+              newIncident,
+              reports.filter(
+                (report) =>
+                  report.source ===
+                  "incident"
+              )
+            );
+
+
+          // =================================================
+          // DUPLICATE FOUND
+          // =================================================
+
+          if (duplicate) {
+
+            console.log(
+              "⚠️ Duplicate incident detected:",
+              duplicate.id
+            );
+
+
+            // ------------------------------------------------
+            // PREVENT SAME USER DUPLICATE
+            // ------------------------------------------------
+
+            const alreadyReported =
+              Array.isArray(
+                duplicate.relatedReports
+              ) &&
+              duplicate.relatedReports.some(
+                (item) =>
+                  item?.userId ===
+                  loggedUser.uid
+              );
+
+
+            if (
+              duplicate.userId ===
+                loggedUser.uid ||
+              duplicate.reporterId ===
+                loggedUser.uid ||
+              alreadyReported
+            ) {
+
+              notify(
+                "⚠️ You have already reported this incident.\n\n" +
+                "Your report was not created again."
+              );
+
+              return false;
+            }
+
+
+            // ------------------------------------------------
+            // RELATED REPORT
+            // ------------------------------------------------
+
+            const relatedReport = {
+              userId:
+                loggedUser.uid,
+
+              reporterId:
+                loggedUser.uid,
+
+              reporterEmail:
+                loggedUser.email ||
+                "",
+
+              reporterName:
+                loggedUser.displayName ||
+                loggedUser.email?.split(
+                  "@"
+                )[0] ||
+                "Unknown User",
+
+              description:
+                newIncident.description ||
+                "",
+
+              lat:
+                latitude,
+
+              lng:
+                longitude,
+
+              reportedAt:
+                new Date().toISOString(),
+            };
+
+
+            // ------------------------------------------------
+            // UPDATE EXISTING INCIDENT
+            // ------------------------------------------------
+
+            await updateDoc(
+              doc(
+                db,
+                "incidents",
+                duplicate.id
+              ),
+              {
+                reportCount:
+                  increment(1),
+
+                relatedReports:
+                  arrayUnion(
+                    relatedReport
+                  ),
+
+                updatedAt:
+                  serverTimestamp(),
+              }
+            );
+
+
+            // ------------------------------------------------
+            // UPDATE REPUTATION
+            // ------------------------------------------------
+
+            try {
+
+              await incrementTotalReports(
+                loggedUser.uid
+              );
+
+            } catch (
+              reputationError
+            ) {
+
+              console.error(
+                "⚠️ Failed to update total reports for duplicate:",
+                reputationError
+              );
+            }
+
+
+            notify(
+              "⚠️ Similar incident already exists.\n\n" +
+              "Your report has been added to the existing incident instead of creating a duplicate.\n\n" +
+              `Incident ID: ${duplicate.id}\n` +
+              `Total reports: ${
+                Number(
+                  duplicate.reportCount ||
+                  1
+                ) + 1
+              }`
+            );
+
+
+            return true;
+          }
+
+
+          // =================================================
+          // NO DUPLICATE
+          // =================================================
+
+          console.log(
+            "✅ No duplicate found."
+          );
+
+          console.log(
+            "🚨 Creating NEW incident..."
+          );
+
+
+          const docRef =
+            await addDoc(
+              collection(
+                db,
+                "incidents"
+              ),
+
+              newIncident
+            );
+
+
+          const incidentId =
+            docRef.id;
+
+
+          console.log(
+            "✅ Incident created:",
+            incidentId
+          );
+
+
+          // =================================================
+          // UPDATE TOTAL REPORTS
+          // =================================================
+
+          try {
+
+            await incrementTotalReports(
+              loggedUser.uid
+            );
+
+            console.log(
+              "✅ Total reports updated for user:",
+              loggedUser.uid
+            );
+
+          } catch (
+            reputationError
+          ) {
+
+            console.error(
+              "⚠️ Failed to update total reports:",
+              reputationError
+            );
+
+            // Incident has already been created.
+          }
+
+
+          // =================================================
+          // UPLOAD EVIDENCE
+          // =================================================
 
           let uploadedEvidence =
             [];
+
 
           if (
             evidenceFiles.length >
             0
           ) {
-            uploadedEvidence =
-              await uploadEvidenceFiles(
-                evidenceFiles,
-                currentUser.uid,
-                duplicateId
+
+            try {
+
+              uploadedEvidence =
+                await uploadEvidenceFiles(
+                  evidenceFiles,
+                  loggedUser.uid,
+                  incidentId
+                );
+
+
+              if (
+                uploadedEvidence.length >
+                0
+              ) {
+
+                await updateDoc(
+                  doc(
+                    db,
+                    "incidents",
+                    incidentId
+                  ),
+
+                  {
+                    evidence:
+                      uploadedEvidence,
+
+                    evidenceCount:
+                      uploadedEvidence.length,
+
+                    updatedAt:
+                      serverTimestamp(),
+                  }
+                );
+              }
+
+            } catch (
+              evidenceError
+            ) {
+
+              console.error(
+                "Evidence upload error:",
+                evidenceError
               );
+
+              notify(
+                "⚠️ Incident was created successfully, but evidence upload failed."
+              );
+            }
           }
 
-          const relatedReport = {
-            reporterId:
-              currentUser.uid,
 
-            reporterEmail:
-              currentUser.email ||
-              "",
+          // =================================================
+          // SUCCESS
+          // =================================================
 
-            lat: latitude,
-
-            lng: longitude,
-
-            area:
-              newIncident.area,
-
-            district:
-              newIncident.district,
-
-            incidentType:
-              incident?.incidentType ||
-              "",
-
-            dangerType:
-              incident?.dangerType ||
-              "",
-
-            severity:
-              incident?.severity ||
-              "",
-
-            description:
-              incident?.description ||
-              "",
-
-            evidence:
-              uploadedEvidence,
-
-            reportedAt:
-              new Date().toISOString(),
-          };
-
-          const duplicateUpdate = {
-            reportCount:
-              increment(1),
-
-            relatedReports:
-              arrayUnion(
-                relatedReport
-              ),
-
-            updatedAt:
-              serverTimestamp(),
-          };
-
-          if (
-            uploadedEvidence.length >
-            0
-          ) {
-            duplicateUpdate.evidence =
-              arrayUnion(
-                ...uploadedEvidence
-              );
-
-            duplicateUpdate.evidenceCount =
-              increment(
-                uploadedEvidence.length
-              );
-          }
-
-          await updateDoc(
-            doc(
-              db,
-              "incidents",
-              duplicateId
-            ),
-            duplicateUpdate
+          notify(
+            "✅ Incident submitted successfully!\n\n" +
+            `Incident ID: ${incidentId}\n` +
+            "Status: Unverified\n" +
+            `Evidence uploaded: ${uploadedEvidence.length}`
           );
 
-          alert(
-            "ℹ️ Duplicate report detected and merged.\n\n" +
-              `Incident ID: ${duplicateId}\n` +
-              `Evidence uploaded: ${uploadedEvidence.length}`
-          );
 
           return true;
-        }
 
-        const docRef =
-          await addDoc(
-            collection(
-              db,
-              "incidents"
-            ),
-            newIncident
+
+        } catch (error) {
+
+          console.error(
+            "❌ INCIDENT SUBMISSION ERROR:",
+            error
           );
 
-        const incidentId =
-          docRef.id;
+          console.error(
+            "Error code:",
+            error?.code
+          );
 
-        let uploadedEvidence =
-          [];
+          console.error(
+            "Error message:",
+            error?.message
+          );
 
-        if (
-          evidenceFiles.length >
-          0
-        ) {
-          uploadedEvidence =
-            await uploadEvidenceFiles(
-              evidenceFiles,
-              currentUser.uid,
-              incidentId
+
+          if (
+            error?.code ===
+            "permission-denied"
+          ) {
+
+            notify(
+              "❌ Firestore permission denied.\n\n" +
+              "Please make sure you are logged in and the latest Firestore rules have been published."
             );
 
-          await updateDoc(
-            doc(
-              db,
-              "incidents",
-              incidentId
-            ),
-            {
-              evidence:
-                uploadedEvidence,
+          } else {
 
-              evidenceCount:
-                uploadedEvidence.length,
+            notify(
+              `❌ Failed to create incident.\n\n${
+                error?.message ||
+                "Unknown error"
+              }`
+            );
+          }
 
-              updatedAt:
-                serverTimestamp(),
-            }
-          );
+
+          return false;
         }
+      },
 
-        alert(
-          "✅ Incident submitted successfully.\n\n" +
-            `Incident ID: ${incidentId}\n` +
-            `Status: Unverified\n` +
-            `Evidence uploaded: ${uploadedEvidence.length}`
-        );
-
-        return true;
-
-      } catch (error) {
-        console.error(
-          "❌ INCIDENT SUBMISSION ERROR:",
-          error
-        );
-
-        alert(
-          `❌ Failed to submit incident.\n\n${
-            error?.message ||
-            "Unknown error"
-          }`
-        );
-
-        return false;
-      }
-    };
+      [
+        navigate,
+        selectedLocation,
+        reports,
+      ]
+    );
 
 
-  // ===================================================
+  // =======================================================
   // MARKER ICON
-  // ===================================================
+  // =======================================================
 
   const getMarkerIcon =
     (severity) => {
+
       switch (
         severity
       ) {
+
         case "High":
           return redIcon;
 
@@ -879,15 +1489,17 @@ export default function MapPage({
     };
 
 
-  // ===================================================
-  // CURRENT GPS LOCATION
-  // ===================================================
+  // =======================================================
+  // GPS
+  // =======================================================
 
   const handleMyLocation =
     (location) => {
+
       if (!location) {
         return;
       }
+
 
       const lat =
         Number(
@@ -899,10 +1511,12 @@ export default function MapPage({
           location.lng
         );
 
+
       if (
         !Number.isFinite(lat) ||
         !Number.isFinite(lng)
       ) {
+
         console.error(
           "Invalid GPS location:",
           location
@@ -911,17 +1525,18 @@ export default function MapPage({
         return;
       }
 
+
       const locationData = {
         ...location,
 
         lat,
-
         lng,
 
         name:
           location.name ||
           "My Current Location",
       };
+
 
       setCurrentLocation(
         locationData
@@ -931,7 +1546,9 @@ export default function MapPage({
         locationData
       );
 
+
       if (map) {
+
         map.flyTo(
           [
             lat,
@@ -946,19 +1563,23 @@ export default function MapPage({
     };
 
 
-  // ===================================================
+  // =======================================================
   // SOS
-  // ===================================================
+  // =======================================================
 
   const handleSOS =
     async () => {
-      const currentUser =
+
+      const loggedUser =
         auth.currentUser;
 
-      if (!currentUser) {
-        alert(
+
+      if (!loggedUser) {
+
+        notify(
           "Please login before sending an SOS alert."
         );
+
 
         navigate(
           "/login",
@@ -975,13 +1596,16 @@ export default function MapPage({
         return;
       }
 
+
       if (!selectedLocation) {
-        alert(
+
+        notify(
           "Select your location first."
         );
 
         return;
       }
+
 
       const latitude =
         Number(
@@ -993,21 +1617,31 @@ export default function MapPage({
           selectedLocation.lng
         );
 
+
       if (
-        !Number.isFinite(latitude) ||
-        !Number.isFinite(longitude)
+        !Number.isFinite(
+          latitude
+        ) ||
+        !Number.isFinite(
+          longitude
+        )
       ) {
-        alert(
+
+        notify(
           "Invalid location."
         );
 
         return;
       }
 
-      const emergency = {
-        lat: latitude,
 
-        lng: longitude,
+      const emergency = {
+
+        lat:
+          latitude,
+
+        lng:
+          longitude,
 
         area:
           selectedLocation.area ||
@@ -1019,25 +1653,18 @@ export default function MapPage({
 
         locationName:
           selectedLocation.name ||
-          `${selectedLocation.area || ""}, ${
-            selectedLocation.district || ""
-          }`
-            .replace(
-              /^,\s*|\s*,$/g,
-              ""
-            ) ||
           "Unknown Location",
 
         userId:
-          currentUser.uid,
+          loggedUser.uid,
 
         userEmail:
-          currentUser.email ||
+          loggedUser.email ||
           "",
 
         userName:
-          currentUser.displayName ||
-          currentUser.email?.split(
+          loggedUser.displayName ||
+          loggedUser.email?.split(
             "@"
           )[0] ||
           "Unknown User",
@@ -1049,51 +1676,155 @@ export default function MapPage({
           serverTimestamp(),
       };
 
+
       try {
+
         const docRef =
           await addDoc(
             collection(
               db,
               "emergencyAlerts"
             ),
+
             emergency
           );
+
 
         console.log(
           "🚨 SOS Alert Created:",
           docRef.id
         );
 
-        alert(
+
+        notify(
           "🚨 SOS Alert Sent Successfully!"
         );
 
+
       } catch (error) {
+
         console.error(
           "SOS Error:",
           error
         );
 
-        alert(
-          "Failed to send SOS."
+        notify(
+          `Failed to send SOS.\n\n${
+            error?.message ||
+            "Unknown error"
+          }`
         );
       }
     };
 
 
-  // ===================================================
+  // =======================================================
+  // VERIFICATION UPDATE
+  // =======================================================
+
+  const handleVerificationUpdate =
+    useCallback(
+      (updatedIncident) => {
+
+        if (
+          !updatedIncident ||
+          !updatedIncident.id
+        ) {
+          return;
+        }
+
+
+        setReports(
+          (previousReports) =>
+            previousReports.map(
+              (report) => {
+
+                if (
+                  report.id ===
+                    updatedIncident.id &&
+                  report.source ===
+                    "incident"
+                ) {
+
+                  return {
+                    ...report,
+                    ...updatedIncident,
+                  };
+                }
+
+                return report;
+              }
+            )
+        );
+
+
+        setMyReports(
+          (previousReports) =>
+            previousReports.map(
+              (report) => {
+
+                if (
+                  report.id ===
+                    updatedIncident.id &&
+                  report.source ===
+                    "incident"
+                ) {
+
+                  return {
+                    ...report,
+                    ...updatedIncident,
+                  };
+                }
+
+                return report;
+              }
+            )
+        );
+
+
+        setCommunityReports(
+          (previousReports) =>
+            previousReports.map(
+              (report) => {
+
+                if (
+                  report.id ===
+                    updatedIncident.id &&
+                  report.source ===
+                    "incident"
+                ) {
+
+                  return {
+                    ...report,
+                    ...updatedIncident,
+                  };
+                }
+
+                return report;
+              }
+            )
+        );
+      },
+
+      []
+    );
+
+
+  // =======================================================
   // RENDER
-  // ===================================================
+  // =======================================================
 
   return (
     <DashboardLayout>
 
       <div
-        className={`page-layout ${
-          hideSidebar
-            ? "map-only-layout"
-            : "report-layout"
-        }`}
+        className={
+          `page-layout ${
+            hideSidebar
+              ? "map-only-layout"
+              : "report-layout"
+          }`
+        }
       >
 
         {/* =================================================
@@ -1101,11 +1832,13 @@ export default function MapPage({
         ================================================= */}
 
         <div
-          className={`map-section ${
-            hideSidebar
-              ? "map-full-width"
-              : ""
-          }`}
+          className={
+            `map-section ${
+              hideSidebar
+                ? "map-full-width"
+                : ""
+            }`
+          }
         >
 
           <MapContainer
@@ -1121,11 +1854,13 @@ export default function MapPage({
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
+
             <FlyToLocation
               location={
                 selectedLocation
               }
             />
+
 
             <MapController
               setMap={
@@ -1133,11 +1868,13 @@ export default function MapPage({
               }
             />
 
+
             <PoliceStations
               center={
                 selectedLocation
               }
             />
+
 
             <Hospitals
               center={
@@ -1145,19 +1882,26 @@ export default function MapPage({
               }
             />
 
+
             <ClickHandler
               onMapClick={
                 setSelectedLocation
               }
             />
 
-            {/* CURRENT GPS MARKER */}
+
+            {/* =================================================
+                CURRENT GPS MARKER
+            ================================================= */}
+
             {currentLocation && (
+
               <Marker
                 position={[
                   Number(
                     currentLocation.lat
                   ),
+
                   Number(
                     currentLocation.lng
                   ),
@@ -1173,49 +1917,69 @@ export default function MapPage({
                     📍 My Current Location
                   </strong>
 
+
                   {currentLocation.area && (
+
                     <p>
                       Area:{" "}
                       {
                         currentLocation.area
                       }
                     </p>
+
                   )}
 
+
                   {currentLocation.district && (
+
                     <p>
                       District:{" "}
                       {
                         currentLocation.district
                       }
                     </p>
+
                   )}
 
+
                   <small>
+
                     {Number(
                       currentLocation.lat
                     ).toFixed(6)}
+
                     {" , "}
+
                     {Number(
                       currentLocation.lng
                     ).toFixed(6)}
+
                   </small>
 
                 </Popup>
 
               </Marker>
+
             )}
 
-            {/* COMBINED & NORMALIZED REPORT MARKERS */}
+
+            {/* =================================================
+                INCIDENT MARKERS
+            ================================================= */}
+
             {reports.map(
               (report) => (
 
                 <Marker
-                  key={`${report.source}-${report.id}`}
+                  key={
+                    `${report.source}-${report.id}`
+                  }
+
                   position={[
                     report.lat,
                     report.lng,
                   ]}
+
                   icon={
                     getMarkerIcon(
                       report.severity
@@ -1223,7 +1987,13 @@ export default function MapPage({
                   }
                 >
 
-                  <Popup>
+                  <Popup
+                  className="incident-popup"
+                  maxWidth={360}
+                  minWidth={280}
+                  autoPan={true}
+                  autoPanPadding={[30, 30]}
+                  >
 
                     <div
                       className="report-popup"
@@ -1236,6 +2006,7 @@ export default function MapPage({
                         }
                       </h3>
 
+
                       <p>
                         <strong>
                           Area:
@@ -1245,6 +2016,7 @@ export default function MapPage({
                           "-"
                         }
                       </p>
+
 
                       <p>
                         <strong>
@@ -1256,6 +2028,7 @@ export default function MapPage({
                         }
                       </p>
 
+
                       <p>
                         <strong>
                           Location:
@@ -1266,6 +2039,7 @@ export default function MapPage({
                         }
                       </p>
 
+
                       <p>
                         <strong>
                           Severity:
@@ -1275,6 +2049,7 @@ export default function MapPage({
                         }
                       </p>
 
+
                       <p>
                         <strong>
                           Status:
@@ -1283,6 +2058,7 @@ export default function MapPage({
                           report.status
                         }
                       </p>
+
 
                       <p>
                         <strong>
@@ -1294,6 +2070,7 @@ export default function MapPage({
                         }
                       </p>
 
+
                       <p>
                         <strong>
                           Confirmations:
@@ -1303,6 +2080,7 @@ export default function MapPage({
                           0
                         }
                       </p>
+
 
                       <p>
                         <strong>
@@ -1314,11 +2092,13 @@ export default function MapPage({
                         }
                       </p>
 
+
                       <p>
                         <strong>
                           Description:
                         </strong>
                       </p>
+
 
                       <p>
                         {
@@ -1327,7 +2107,13 @@ export default function MapPage({
                         }
                       </p>
 
-                      {report.evidence.length > 0 && (
+
+                      {/* =================================================
+                          EVIDENCE
+                      ================================================= */}
+
+                      {report.evidence?.length >
+                        0 && (
 
                         <div
                           style={{
@@ -1354,6 +2140,7 @@ export default function MapPage({
                           }{" "}
                           file(s)
 
+
                           <div
                             style={{
                               marginTop:
@@ -1373,15 +2160,18 @@ export default function MapPage({
                                     ? evidenceItem
                                     : evidenceItem?.url;
 
+
                                 const type =
                                   typeof evidenceItem ===
                                   "object"
                                     ? evidenceItem?.type
                                     : "";
 
+
                                 if (!url) {
                                   return null;
                                 }
+
 
                                 const isVideo =
                                   type?.startsWith(
@@ -1391,9 +2181,14 @@ export default function MapPage({
                                     url
                                   );
 
+
                                 return (
+
                                   <div
-                                    key={`${report.id}-evidence-${index}`}
+                                    key={
+                                      `${report.id}-evidence-${index}`
+                                    }
+
                                     style={{
                                       marginBottom:
                                         "8px",
@@ -1401,9 +2196,14 @@ export default function MapPage({
                                   >
 
                                     {isVideo ? (
+
                                       <video
-                                        src={url}
+                                        src={
+                                          url
+                                        }
+
                                         controls
+
                                         style={{
                                           width:
                                             "100%",
@@ -1415,12 +2215,20 @@ export default function MapPage({
                                             "8px",
                                         }}
                                       />
+
                                     ) : (
+
                                       <img
-                                        src={url}
-                                        alt={`Incident evidence ${
-                                          index + 1
-                                        }`}
+                                        src={
+                                          url
+                                        }
+
+                                        alt={
+                                          `Incident evidence ${
+                                            index + 1
+                                          }`
+                                        }
+
                                         style={{
                                           width:
                                             "100%",
@@ -1435,9 +2243,11 @@ export default function MapPage({
                                             "8px",
                                         }}
                                       />
+
                                     )}
 
                                   </div>
+
                                 );
                               }
                             )}
@@ -1445,9 +2255,16 @@ export default function MapPage({
                           </div>
 
                         </div>
+
                       )}
 
-                      {(report.reportCount || 1) > 1 && (
+
+                      {/* =================================================
+                          MULTIPLE REPORTS
+                      ================================================= */}
+
+                      {(report.reportCount || 1) >
+                        1 && (
 
                         <div
                           style={{
@@ -1472,6 +2289,7 @@ export default function MapPage({
                         >
 
                           🔗{" "}
+
                           <strong>
                             Multiple reports
                           </strong>
@@ -1487,29 +2305,83 @@ export default function MapPage({
                           </small>
 
                         </div>
+
                       )}
 
-                      <IncidentVerification
-                        incident={
-                          report
-                        }
-                        onUpdate={
-                          () => {}
-                        }
-                      />
+
+                      {/* =================================================
+                          COMMUNITY VERIFICATION
+                      ================================================= */}
+
+                      {report.source ===
+                        "incident" && (
+
+                        <IncidentVerification
+                          incident={
+                            report
+                          }
+
+                          onUpdate={
+                            handleVerificationUpdate
+                          }
+                        />
+
+                      )}
+
+
+                      {/* =================================================
+                          MODERATION REPORT BUTTON
+                          
+                          Only actual incidents get this button.
+                          Old "reports" documents do not.
+                      ================================================= */}
+
+                      {report.source ===
+                        "incident" && (
+
+                        <div
+                          style={{
+                            marginTop:
+                              "12px",
+
+                            paddingTop:
+                              "10px",
+
+                            borderTop:
+                              "1px solid #eee",
+                          }}
+                        >
+
+                          <ModerationReportButton
+                            incidentId={
+                              report.id
+                            }
+                          />
+
+                        </div>
+
+                      )}
+
 
                       <hr />
 
+
                       <small>
                         Latitude:{" "}
-                        {report.lat.toFixed(5)}
+                        {report.lat.toFixed(
+                          5
+                        )}
                       </small>
+
 
                       <br />
 
+
                       <small>
                         Longitude:{" "}
-                        {report.lng.toFixed(5)}
+                        {report.lng.toFixed(
+                          5
+                        )}
                       </small>
 
                     </div>
@@ -1521,7 +2393,11 @@ export default function MapPage({
               )
             )}
 
-            {/* SELECTED SEARCH / CLICK LOCATION */}
+
+            {/* =================================================
+                SELECTED LOCATION
+            ================================================= */}
+
             {selectedLocation &&
 
               Number.isFinite(
@@ -1542,16 +2418,16 @@ export default function MapPage({
                 Number(
                   selectedLocation.lat
                 ) ===
-                  Number(
-                    currentLocation.lat
-                  ) &&
+                Number(
+                  currentLocation.lat
+                ) &&
 
                 Number(
                   selectedLocation.lng
                 ) ===
-                  Number(
-                    currentLocation.lng
-                  )
+                Number(
+                  currentLocation.lng
+                )
               ) && (
 
                 <Marker
@@ -1559,10 +2435,12 @@ export default function MapPage({
                     Number(
                       selectedLocation.lat
                     ),
+
                     Number(
                       selectedLocation.lng
                     ),
                   ]}
+
                   icon={
                     blueIcon
                   }
@@ -1578,6 +2456,7 @@ export default function MapPage({
                         📌 Selected Location
                       </strong>
 
+
                       <p>
                         {
                           selectedLocation.name ||
@@ -1585,7 +2464,9 @@ export default function MapPage({
                         }
                       </p>
 
+
                       {selectedLocation.area && (
+
                         <>
                           <small>
                             Area:{" "}
@@ -1596,27 +2477,37 @@ export default function MapPage({
 
                           <br />
                         </>
+
                       )}
 
+
                       {selectedLocation.district && (
+
                         <small>
                           District:{" "}
                           {
                             selectedLocation.district
                           }
                         </small>
+
                       )}
+
 
                       <br />
 
+
                       <small>
+
                         {Number(
                           selectedLocation.lat
                         ).toFixed(6)}
+
                         {" , "}
+
                         {Number(
                           selectedLocation.lng
                         ).toFixed(6)}
+
                       </small>
 
                     </div>
@@ -1630,6 +2521,11 @@ export default function MapPage({
 
           </MapContainer>
 
+
+          {/* =================================================
+              MAP CONTROLS
+          ================================================= */}
+
           <div
             className="map-controls"
           >
@@ -1640,6 +2536,7 @@ export default function MapPage({
               }
             />
 
+
             <SOSButton
               onSOS={
                 handleSOS
@@ -1649,6 +2546,11 @@ export default function MapPage({
           </div>
 
         </div>
+
+
+        {/* =================================================
+            REPORT SIDEBAR
+        ================================================= */}
 
         {!hideSidebar && (
 
@@ -1679,3 +2581,4 @@ export default function MapPage({
     </DashboardLayout>
   );
 }
+
