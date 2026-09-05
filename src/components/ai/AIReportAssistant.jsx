@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import "./AIReportAssistant.css";
-
+import { notify } from "../../utils/notify";
 function AIReportAssistant({
   onApplySuggestion,
 }) {
@@ -20,7 +20,7 @@ function AIReportAssistant({
       .toLowerCase();
 
     if (!text) {
-      alert(
+      notify(
         "Please describe the road incident first."
       );
       return;
@@ -160,7 +160,7 @@ function AIReportAssistant({
         error
       );
 
-      alert(
+      notify(
         "Unable to analyze the report."
       );
 
