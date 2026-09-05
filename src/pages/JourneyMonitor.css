@@ -1,0 +1,797 @@
+/* =========================================================
+   SAFE JOURNEY MONITOR
+========================================================= */
+
+.journey-monitor-page {
+  width: 100%;
+  max-width: 1450px;
+  margin: 0 auto;
+  padding: 30px;
+  box-sizing: border-box;
+  color: #172033;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.jm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 25px;
+  margin-bottom: 25px;
+}
+
+.jm-label {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #2563eb;
+  margin-bottom: 8px;
+}
+
+.jm-header h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.jm-header p {
+  margin: 8px 0 0;
+  color: #64748b;
+  font-size: 15px;
+}
+
+.jm-live-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  background: #f1f5f9;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.jm-live-status.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.jm-live-status.arrived {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.jm-live-status.completed {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.jm-live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #94a3b8;
+}
+
+.jm-live-status.active .jm-live-dot {
+  background: #22c55e;
+  animation: jmPulse 1.5s infinite;
+}
+
+@keyframes jmPulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+}
+
+/* =========================================================
+   WARNING
+========================================================= */
+
+.jm-warning-banner {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 17px 20px;
+  margin-bottom: 22px;
+  border-radius: 16px;
+  border: 1px solid #fecaca;
+  background: #fff7f7;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.07);
+}
+
+.jm-warning-banner.jm-risk-high {
+  border-color: #fca5a5;
+  background: #fff1f2;
+}
+
+.jm-warning-banner.jm-risk-medium {
+  border-color: #fcd34d;
+  background: #fffbeb;
+}
+
+.jm-warning-banner.jm-risk-safe {
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.jm-warning-icon {
+  font-size: 28px;
+}
+
+.jm-warning-content {
+  flex: 1;
+}
+
+.jm-warning-content strong {
+  display: block;
+  font-size: 16px;
+}
+
+.jm-warning-content p {
+  margin: 4px 0 0;
+  color: #64748b;
+}
+
+.jm-warning-banner > button {
+  border: none;
+  background: transparent;
+  font-size: 25px;
+  color: #64748b;
+  cursor: pointer;
+}
+
+/* =========================================================
+   STATUS CARD
+========================================================= */
+
+.jm-status-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px;
+  margin-bottom: 20px;
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+}
+
+.jm-status-main {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.jm-status-icon {
+  width: 55px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  background: #eff6ff;
+  font-size: 26px;
+}
+
+.jm-status-main span {
+  display: block;
+  color: #64748b;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.jm-status-main h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.jm-status-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.jm-start-btn,
+.jm-end-btn,
+.jm-back-btn {
+  border: none;
+  border-radius: 11px;
+  padding: 12px 18px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.jm-start-btn {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.jm-start-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.jm-end-btn {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.jm-end-btn:hover {
+  background: #fecaca;
+}
+
+.jm-back-btn {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.jm-back-btn:hover {
+  background: #e2e8f0;
+}
+
+/* =========================================================
+   LOCATION ERROR
+========================================================= */
+
+.jm-location-error {
+  padding: 14px 17px;
+  margin-bottom: 20px;
+  border-radius: 13px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #9a3412;
+  font-size: 14px;
+}
+
+/* =========================================================
+   METRICS
+========================================================= */
+
+.jm-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.jm-metric-card {
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 17px;
+  box-shadow: 0 7px 25px rgba(15, 23, 42, 0.05);
+}
+
+.jm-metric-card span {
+  display: block;
+  color: #64748b;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.jm-metric-card strong {
+  display: block;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.jm-metric-card small {
+  display: block;
+  margin-top: 4px;
+  color: #94a3b8;
+}
+
+.jm-danger-number {
+  color: #dc2626;
+}
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+.jm-progress-card {
+  padding: 20px;
+  margin-bottom: 22px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 17px;
+}
+
+.jm-progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.jm-progress-header span {
+  font-weight: 800;
+  color: #2563eb;
+}
+
+.jm-progress-track {
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #e2e8f0;
+}
+
+.jm-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: #2563eb;
+  transition: width 0.5s ease;
+}
+
+.jm-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 9px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.jm-progress-labels span:last-child {
+  text-align: right;
+}
+
+/* =========================================================
+   SECTION HEADING
+========================================================= */
+
+.jm-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.jm-section-heading h2 {
+  margin: 0;
+  font-size: 21px;
+}
+
+.jm-section-heading p {
+  margin: 5px 0 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.jm-refresh-info {
+  color: #64748b;
+  font-size: 12px;
+}
+
+/* =========================================================
+   MAP
+========================================================= */
+
+.jm-map-section {
+  margin-bottom: 25px;
+}
+
+.jm-map-wrapper {
+  height: 560px;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid #dbe3ec;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.jm-map {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.jm-map-legend {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.jm-map-legend span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.jm-map-legend i {
+  width: 22px;
+  height: 5px;
+  display: inline-block;
+  border-radius: 5px;
+}
+
+.legend-safe {
+  background: #2563eb;
+}
+
+.legend-danger {
+  background: #ef4444;
+}
+
+.legend-warning {
+  background: #f59e0b;
+}
+
+/* =========================================================
+   ALERTS
+========================================================= */
+
+.jm-alert-section,
+.jm-risk-section {
+  margin-bottom: 25px;
+}
+
+.jm-safe-box {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+}
+
+.jm-safe-box > div:first-child {
+  font-size: 27px;
+}
+
+.jm-safe-box strong {
+  color: #166534;
+}
+
+.jm-safe-box p {
+  margin: 5px 0 0;
+  color: #64748b;
+}
+
+.jm-alert-list {
+  display: grid;
+  gap: 12px;
+}
+
+.jm-alert-card {
+  display: flex;
+  gap: 15px;
+  padding: 18px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+.jm-alert-card.jm-risk-high {
+  border-left: 5px solid #ef4444;
+}
+
+.jm-alert-card.jm-risk-medium {
+  border-left: 5px solid #f59e0b;
+}
+
+.jm-alert-card.jm-risk-low {
+  border-left: 5px solid #22c55e;
+}
+
+.jm-alert-card-icon {
+  font-size: 25px;
+}
+
+.jm-alert-card-content {
+  flex: 1;
+}
+
+.jm-alert-card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.jm-alert-card-title h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.jm-alert-card-title span {
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.jm-risk-high .jm-alert-card-title span {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.jm-risk-medium .jm-alert-card-title span {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.jm-risk-low .jm-alert-card-title span {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.jm-alert-card-content p {
+  margin: 7px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* =========================================================
+   HIGH RISK
+========================================================= */
+
+.jm-no-risk {
+  padding: 18px;
+  border-radius: 15px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  font-weight: 700;
+}
+
+.jm-risk-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.jm-high-risk-card {
+  padding: 18px;
+  border-radius: 16px;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+}
+
+.jm-high-risk-card strong {
+  display: block;
+  color: #b91c1c;
+}
+
+.jm-high-risk-card span {
+  display: block;
+  margin-top: 7px;
+  color: #475569;
+}
+
+.jm-high-risk-card small {
+  display: block;
+  margin-top: 8px;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   NOTIFICATION
+========================================================= */
+
+.jm-notification-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px;
+  margin-bottom: 25px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.jm-notification-info strong {
+  display: block;
+}
+
+.jm-notification-info p {
+  margin: 5px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 800px;
+}
+
+.notification-on,
+.notification-off {
+  padding: 7px 11px;
+  border-radius: 999px;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.notification-on {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.notification-off {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+/* =========================================================
+   BOTTOM
+========================================================= */
+
+.jm-bottom-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding-top: 5px;
+}
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.jm-empty {
+  min-height: 65vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 30px;
+}
+
+.jm-empty-icon {
+  font-size: 60px;
+  margin-bottom: 15px;
+}
+
+.jm-empty h2 {
+  margin: 0;
+  font-size: 25px;
+}
+
+.jm-empty p {
+  max-width: 500px;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.jm-empty button {
+  margin-top: 10px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* =========================================================
+   RISK COLORS
+========================================================= */
+
+.jm-risk-high {
+  color: #b91c1c;
+}
+
+.jm-risk-medium {
+  color: #92400e;
+}
+
+.jm-risk-low {
+  color: #166534;
+}
+
+.jm-risk-safe {
+  color: #166534;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+  .jm-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 800px) {
+  .journey-monitor-page {
+    padding: 20px 15px;
+  }
+
+  .jm-header {
+    flex-direction: column;
+  }
+
+  .jm-status-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .jm-status-actions {
+    width: 100%;
+  }
+
+  .jm-status-actions button {
+    flex: 1;
+  }
+
+  .jm-map-wrapper {
+    height: 430px;
+  }
+
+  .jm-risk-list {
+    grid-template-columns: 1fr;
+  }
+
+  .jm-notification-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .jm-bottom-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .jm-bottom-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 550px) {
+  .jm-header h1 {
+    font-size: 25px;
+  }
+
+  .jm-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .jm-section-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .jm-map-wrapper {
+    height: 380px;
+  }
+
+  .jm-map-legend {
+    gap: 8px;
+  }
+
+  .jm-warning-banner {
+    align-items: flex-start;
+  }
+
+  .jm-alert-card-title {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
