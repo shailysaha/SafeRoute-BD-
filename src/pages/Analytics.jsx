@@ -16,9 +16,14 @@ import {
 } from "recharts";
 
 import { db } from "../firebase/firebase";
-import DashboardLayout from "../layout/DashboardLayout";
 
 import "./Analytics.css";
+
+// =========================================================
+// IMPORT ACCIDENT ANALYTICS
+// =========================================================
+
+import AccidentAnalytics from "./AccidentAnalytics";
 
 function Analytics() {
   const [incidents, setIncidents] = useState([]);
@@ -388,349 +393,367 @@ function Analytics() {
 
   if (loading) {
     return (
-      <DashboardLayout>
+      <div className="analytics-page">
         <div className="analytics-loading">
           Loading road safety analytics...
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
   return (
-    <DashboardLayout>
-      <div className="analytics-page">
-        {/* HEADER */}
-        <div className="analytics-header">
+    <div className="analytics-page">
+      {/* HEADER */}
+      <div className="analytics-header">
+        <div>
+          <span className="analytics-label">ROAD SAFETY INTELLIGENCE</span>
+          <h1>📊 Analytics Dashboard</h1>
+          <p>
+            Real-time incident patterns and road safety intelligence from
+            SafeRoute BD reports.
+          </p>
+        </div>
+
+        <div className="analytics-live">
+          <span></span>
+          Live Data
+        </div>
+      </div>
+
+      {/* SUMMARY */}
+      <div className="analytics-summary">
+        <div className="analytics-stat">
+          <div className="analytics-stat-icon">📍</div>
           <div>
-            <span className="analytics-label">ROAD SAFETY INTELLIGENCE</span>
-            <h1>📊 Analytics Dashboard</h1>
+            <h2>{totalIncidents}</h2>
+            <p>Total Incidents</p>
+          </div>
+        </div>
+
+        <div className="analytics-stat">
+          <div className="analytics-stat-icon danger">⚠</div>
+          <div>
+            <h2>{highRisk}</h2>
+            <p>High Risk</p>
+          </div>
+        </div>
+
+        <div className="analytics-stat">
+          <div className="analytics-stat-icon verified">✓</div>
+          <div>
+            <h2>{verified}</h2>
+            <p>Verified</p>
+          </div>
+        </div>
+
+        <div className="analytics-stat">
+          <div className="analytics-stat-icon resolved">✓</div>
+          <div>
+            <h2>{resolved}</h2>
+            <p>Resolved</p>
+          </div>
+        </div>
+      </div>
+
+      {/* =========================================================
+          ACCIDENT ANALYTICS - ACCIDENT SPECIFIC DETAILS
+      ========================================================= */}
+
+      <div className="analytics-card" style={{ marginTop: "24px" }}>
+        <div className="analytics-card-header">
+          <div>
+            <h2>🚗 Accident Analytics</h2>
             <p>
-              Real-time incident patterns and road safety intelligence from
-              SafeRoute BD reports.
+              Comprehensive analytics and insights about road accidents
+              including weather conditions, vehicle types, and reported factors.
             </p>
           </div>
+        </div>
 
-          <div className="analytics-live">
-            <span></span>
-            Live Data
+        <div style={{ marginTop: "16px" }}>
+          <AccidentAnalytics embedded />
+        </div>
+      </div>
+
+      {/* TIME-BASED INCIDENT TRENDS */}
+      <div className="analytics-card trend-card">
+        <div className="trend-header">
+          <div>
+            <h2>📈 Accident Trends</h2>
+            <p>Analyze how reported road incidents change over time.</p>
+          </div>
+
+          <div className="trend-filter">
+            <button
+              className={trendMode === "daily" ? "active" : ""}
+              onClick={() => setTrendMode("daily")}
+            >
+              Daily
+            </button>
+            <button
+              className={trendMode === "weekly" ? "active" : ""}
+              onClick={() => setTrendMode("weekly")}
+            >
+              Weekly
+            </button>
+            <button
+              className={trendMode === "monthly" ? "active" : ""}
+              onClick={() => setTrendMode("monthly")}
+            >
+              Monthly
+            </button>
           </div>
         </div>
 
-        {/* SUMMARY */}
-        <div className="analytics-summary">
-          <div className="analytics-stat">
-            <div className="analytics-stat-icon">📍</div>
-            <div>
-              <h2>{totalIncidents}</h2>
-              <p>Total Incidents</p>
-            </div>
-          </div>
-
-          <div className="analytics-stat">
-            <div className="analytics-stat-icon danger">⚠</div>
-            <div>
-              <h2>{highRisk}</h2>
-              <p>High Risk</p>
-            </div>
-          </div>
-
-          <div className="analytics-stat">
-            <div className="analytics-stat-icon verified">✓</div>
-            <div>
-              <h2>{verified}</h2>
-              <p>Verified</p>
-            </div>
-          </div>
-
-          <div className="analytics-stat">
-            <div className="analytics-stat-icon resolved">✓</div>
-            <div>
-              <h2>{resolved}</h2>
-              <p>Resolved</p>
-            </div>
-          </div>
-        </div>
-
-        {/* TIME-BASED INCIDENT TRENDS */}
-        <div className="analytics-card trend-card">
-          <div className="trend-header">
-            <div>
-              <h2>📈 Accident Trends</h2>
-              <p>Analyze how reported road incidents change over time.</p>
-            </div>
-
-            <div className="trend-filter">
-              <button
-                className={trendMode === "daily" ? "active" : ""}
-                onClick={() => setTrendMode("daily")}
+        {trendData.length > 0 ? (
+          <div className="trend-chart">
+            <ResponsiveContainer width="100%" height={320}>
+              <LineChart
+                data={trendData}
+                margin={{
+                  top: 10,
+                  right: 20,
+                  left: 0,
+                  bottom: 10,
+                }}
               >
-                Daily
-              </button>
-              <button
-                className={trendMode === "weekly" ? "active" : ""}
-                onClick={() => setTrendMode("weekly")}
-              >
-                Weekly
-              </button>
-              <button
-                className={trendMode === "monthly" ? "active" : ""}
-                onClick={() => setTrendMode("monthly")}
-              >
-                Monthly
-              </button>
-            </div>
-          </div>
-
-          {trendData.length > 0 ? (
-            <div className="trend-chart">
-              <ResponsiveContainer width="100%" height={320}>
-                <LineChart
-                  data={trendData}
-                  margin={{
-                    top: 10,
-                    right: 20,
-                    left: 0,
-                    bottom: 10,
-                  }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis
-                    dataKey="date"
-                    tick={{
-                      fontSize: 11,
-                    }}
-                  />
-                  <YAxis
-                    allowDecimals={false}
-                    tick={{
-                      fontSize: 11,
-                    }}
-                  />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="incidents"
-                    name="Incidents"
-                    stroke="#2563eb"
-                    strokeWidth={3}
-                    dot={{
-                      r: 4,
-                    }}
-                    activeDot={{
-                      r: 6,
-                    }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="chart-empty">No dated incident data available.</div>
-          )}
-        </div>
-
-        {/* FIRST GRAPH ROW */}
-        <div className="analytics-grid">
-          {/* INCIDENT TYPES */}
-          <div className="analytics-card large-card">
-            <div className="analytics-card-header">
-              <div>
-                <h2>Incidents by Type</h2>
-                <p>Most frequently reported road hazards</p>
-              </div>
-            </div>
-
-            {typeData.length > 0 ? (
-              <div className="chart-container">
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={typeData}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis
-                      dataKey="name"
-                      tick={{
-                        fontSize: 11,
-                      }}
-                    />
-                    <YAxis allowDecimals={false} />
-                    <Tooltip />
-                    <Bar
-                      dataKey="value"
-                      fill="#3b82f6"
-                      radius={[6, 6, 0, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            ) : (
-              <div className="chart-empty">No incident data available.</div>
-            )}
-          </div>
-
-          {/* SEVERITY */}
-          <div className="analytics-card">
-            <div className="analytics-card-header">
-              <div>
-                <h2>Severity Distribution</h2>
-                <p>Risk level of reported incidents</p>
-              </div>
-            </div>
-
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={severityData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={90}
-                  label
-                >
-                  {severityData.map((entry, index) => (
-                    <Cell
-                      key={entry.name}
-                      fill={PIE_COLORS[index % PIE_COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* SECOND GRAPH ROW */}
-        <div className="analytics-grid">
-          {/* DISTRICTS */}
-          <div className="analytics-card large-card">
-            <div className="analytics-card-header">
-              <div>
-                <h2>Incidents by District</h2>
-                <p>Districts with the highest number of reports</p>
-              </div>
-            </div>
-
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={districtData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis
-                  dataKey="name"
+                  dataKey="date"
                   tick={{
                     fontSize: 11,
                   }}
                 />
-                <YAxis allowDecimals={false} />
+                <YAxis
+                  allowDecimals={false}
+                  tick={{
+                    fontSize: 11,
+                  }}
+                />
                 <Tooltip />
-                <Bar dataKey="value" fill="#8b5cf6" radius={[6, 6, 0, 0]} />
-              </BarChart>
+                <Line
+                  type="monotone"
+                  dataKey="incidents"
+                  name="Incidents"
+                  stroke="#2563eb"
+                  strokeWidth={3}
+                  dot={{
+                    r: 4,
+                  }}
+                  activeDot={{
+                    r: 6,
+                  }}
+                />
+              </LineChart>
             </ResponsiveContainer>
           </div>
+        ) : (
+          <div className="chart-empty">No dated incident data available.</div>
+        )}
+      </div>
 
-          {/* STATUS */}
-          <div className="analytics-card">
-            <div className="analytics-card-header">
-              <div>
-                <h2>Verification Status</h2>
-                <p>Current report verification lifecycle</p>
-              </div>
-            </div>
-
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={statusData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={90}
-                  label
-                >
-                  {statusData.map((entry, index) => (
-                    <Cell
-                      key={entry.name}
-                      fill={PIE_COLORS[index % PIE_COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* =====================================
-            HIGH-RISK AREA INTELLIGENCE
-        ===================================== */}
-        <div className="analytics-card risk-intelligence-card">
+      {/* FIRST GRAPH ROW */}
+      <div className="analytics-grid">
+        {/* INCIDENT TYPES */}
+        <div className="analytics-card large-card">
           <div className="analytics-card-header">
             <div>
-              <h2>⚠ High-Risk Area Intelligence</h2>
-              <p>
-                Risk ranking based on incident frequency, severity and verification.
-              </p>
+              <h2>Incidents by Type</h2>
+              <p>Most frequently reported road hazards</p>
             </div>
-
-            <span className="risk-analysis-badge">Intelligence Score</span>
           </div>
 
-          {riskAreaData.length > 0 ? (
-            <div className="risk-intelligence-table">
-              <div className="risk-table-header">
-                <span>Rank</span>
-                <span>Location</span>
-                <span>Reports</span>
-                <span>High</span>
-                <span>Verified</span>
-                <span>Score</span>
-                <span>Risk Level</span>
-              </div>
-
-              {riskAreaData.map((item, index) => {
-                const risk = getRiskLevel(item.score);
-
-                return (
-                  <div
-                    className="risk-table-row"
-                    key={`${item.area}-${item.district}`}
-                  >
-                    <div
-                      className={
-                        index < 3
-                          ? "risk-position top-risk"
-                          : "risk-position"
-                      }
-                    >
-                      #{index + 1}
-                    </div>
-
-                    <div className="risk-location">
-                      <strong>{item.area}</strong>
-                      <small>{item.district}</small>
-                    </div>
-
-                    <div>{item.incidents}</div>
-                    <div>{item.high}</div>
-                    <div>{item.verified}</div>
-
-                    <div className="intelligence-score">{item.score}</div>
-
-                    <div>
-                      <span className={`risk-level ${risk.className}`}>
-                        {risk.label}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+          {typeData.length > 0 ? (
+            <div className="chart-container">
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={typeData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis
+                    dataKey="name"
+                    tick={{
+                      fontSize: 11,
+                    }}
+                  />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip />
+                  <Bar
+                    dataKey="value"
+                    fill="#3b82f6"
+                    radius={[6, 6, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           ) : (
-            <div className="chart-empty">
-              No incident data available for risk analysis.
-            </div>
+            <div className="chart-empty">No incident data available.</div>
           )}
         </div>
+
+        {/* SEVERITY */}
+        <div className="analytics-card">
+          <div className="analytics-card-header">
+            <div>
+              <h2>Severity Distribution</h2>
+              <p>Risk level of reported incidents</p>
+            </div>
+          </div>
+
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={severityData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={90}
+                label
+              >
+                {severityData.map((entry, index) => (
+                  <Cell
+                    key={entry.name}
+                    fill={PIE_COLORS[index % PIE_COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       </div>
-    </DashboardLayout>
+
+      {/* SECOND GRAPH ROW */}
+      <div className="analytics-grid">
+        {/* DISTRICTS */}
+        <div className="analytics-card large-card">
+          <div className="analytics-card-header">
+            <div>
+              <h2>Incidents by District</h2>
+              <p>Districts with the highest number of reports</p>
+            </div>
+          </div>
+
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={districtData}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis
+                dataKey="name"
+                tick={{
+                  fontSize: 11,
+                }}
+              />
+              <YAxis allowDecimals={false} />
+              <Tooltip />
+              <Bar dataKey="value" fill="#8b5cf6" radius={[6, 6, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* STATUS */}
+        <div className="analytics-card">
+          <div className="analytics-card-header">
+            <div>
+              <h2>Verification Status</h2>
+              <p>Current report verification lifecycle</p>
+            </div>
+          </div>
+
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={statusData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={90}
+                label
+              >
+                {statusData.map((entry, index) => (
+                  <Cell
+                    key={entry.name}
+                    fill={PIE_COLORS[index % PIE_COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* =====================================
+          HIGH-RISK AREA INTELLIGENCE
+      ===================================== */}
+      <div className="analytics-card risk-intelligence-card">
+        <div className="analytics-card-header">
+          <div>
+            <h2>⚠ High-Risk Area Intelligence</h2>
+            <p>
+              Risk ranking based on incident frequency, severity and verification.
+            </p>
+          </div>
+
+          <span className="risk-analysis-badge">Intelligence Score</span>
+        </div>
+
+        {riskAreaData.length > 0 ? (
+          <div className="risk-intelligence-table">
+            <div className="risk-table-header">
+              <span>Rank</span>
+              <span>Location</span>
+              <span>Reports</span>
+              <span>High</span>
+              <span>Verified</span>
+              <span>Score</span>
+              <span>Risk Level</span>
+            </div>
+
+            {riskAreaData.map((item, index) => {
+              const risk = getRiskLevel(item.score);
+
+              return (
+                <div
+                  className="risk-table-row"
+                  key={`${item.area}-${item.district}`}
+                >
+                  <div
+                    className={
+                      index < 3
+                        ? "risk-position top-risk"
+                        : "risk-position"
+                    }
+                  >
+                    #{index + 1}
+                  </div>
+
+                  <div className="risk-location">
+                    <strong>{item.area}</strong>
+                    <small>{item.district}</small>
+                  </div>
+
+                  <div>{item.incidents}</div>
+                  <div>{item.high}</div>
+                  <div>{item.verified}</div>
+
+                  <div className="intelligence-score">{item.score}</div>
+
+                  <div>
+                    <span className={`risk-level ${risk.className}`}>
+                      {risk.label}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="chart-empty">
+            No incident data available for risk analysis.
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 

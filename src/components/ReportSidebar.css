@@ -326,3 +326,53 @@ body.dark-mode .report-sidebar hr {
     min-height: 95px;
   }
 }
+/* =====================================================
+   ACCIDENT DETAILS
+===================================================== */
+
+.accident-details-section {
+  margin-top: 18px;
+  padding: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.form-section-title {
+  margin-bottom: 14px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.accident-details-section label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 13px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.accident-details-section input,
+.accident-details-section select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.accident-details-section select[multiple] {
+  min-height: 125px;
+}
+
+.accident-details-section small {
+  margin-top: -4px;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 500;
+}

@@ -6,8 +6,7 @@ import Topbar from "../components/dashboard/Topbar";
 import "./DashboardLayout.css";
 
 function DashboardLayout({ children }) {
-  const [sidebarOpen, setSidebarOpen] =
-    useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const openSidebar = () => {
     setSidebarOpen(true);
@@ -19,26 +18,21 @@ function DashboardLayout({ children }) {
 
   return (
     <div className="dashboard">
-
       <Sidebar
         isOpen={sidebarOpen}
         onClose={closeSidebar}
       />
 
       <div className="dashboard-content">
-
-        <Topbar
-          onMenuClick={openSidebar}
-        />
+        <Topbar onMenuClick={openSidebar} />
 
         <main className="dashboard-main">
           {children}
         </main>
-
       </div>
-
     </div>
   );
 }
 
 export default DashboardLayout;
+

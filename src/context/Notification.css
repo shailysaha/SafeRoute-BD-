@@ -1,0 +1,97 @@
+/* =========================================================
+   GLOBAL NOTIFICATION
+========================================================= */
+
+.global-notification {
+  position: fixed;
+
+  top: 24px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  z-index: 999999;
+
+  min-width: 270px;
+  max-width: calc(100vw - 30px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  padding: 12px 17px;
+
+  border-radius: 11px;
+
+  font-family: "Poppins", sans-serif;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.4);
+
+  animation: notificationIn 0.3s ease;
+}
+
+
+/* SUCCESS */
+
+.global-notification.success {
+  background: #14291f;
+
+  border: 1px solid #2d6a47;
+
+  color: #86efac;
+}
+
+
+/* ERROR */
+
+.global-notification.error {
+  background: #351b22;
+
+  border: 1px solid #6b2b36;
+
+  color: #fca5a5;
+}
+.global-notification.info {
+  background: #172554;
+  border: 1px solid #3b82f6;
+  color: #bfdbfe;
+}
+
+/* ANIMATION */
+
+@keyframes notificationIn {
+  from {
+    opacity: 0;
+
+    transform:
+      translate(-50%, -15px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translate(-50%, 0);
+  }
+}
+
+
+/* MOBILE */
+
+@media (max-width: 500px) {
+  .global-notification {
+    top: 15px;
+
+    width: calc(100% - 30px);
+
+    min-width: 0;
+
+    font-size: 12px;
+  }
+}

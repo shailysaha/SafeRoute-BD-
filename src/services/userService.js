@@ -1,39 +1,46 @@
 import {
-doc,
-setDoc,
-getDoc,
-serverTimestamp
+  doc,
+  setDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 
 import { db } from "../firebase/firebase";
 
-export const createUserProfile = async (user, name) => {
-if (!user) return;
+export async function createUserProfile(
+  user,
+  fullName,
+  accountType = "user"
+) {
+  const isCompany =
+    accountType === "company";
 
-const userRef = doc(db, "users", user.uid);
+  await setDoc(
+    doc(db, "users", user.uid),
+    {
+      uid: user.uid,
 
-await setDoc(userRef, {
-uid: user.uid,
-name: name,
-email: user.email,
-role: "user",
+      fullName: fullName,
 
-reputationScore: 0,
-totalReports: 0,
-verifiedReports: 0,
-rejectedReports: 0,
+      name: fullName,
 
-createdAt: serverTimestamp()
-});
-};
+      email: user.email,
 
-export const getUserProfile = async (uid) => {
-const userRef = doc(db, "users", uid);
-const snapshot = await getDoc(userRef);
+      accountType: isCompany
+        ? "company"
+        : "user",
 
-if (snapshot.exists()) {
-return snapshot.data();
+      role: isCompany
+        ? "company_admin"
+        : "user",
+
+      emailVerified:
+        user.emailVerified || false,
+
+      createdAt:
+        serverTimestamp(),
+
+      updatedAt:
+        serverTimestamp(),
+    }
+  );
 }
-
-return null;
-};

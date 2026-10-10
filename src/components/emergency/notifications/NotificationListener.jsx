@@ -8,7 +8,7 @@ import {
   orderBy,
   limit,
 } from "firebase/firestore";
-
+import { notify } from "../../utils/notify";
 import { auth, db } from "../../firebase/firebase";
 
 function NotificationListener() {
@@ -54,7 +54,7 @@ function NotificationListener() {
               if (
                 notification.type === "SOS"
               ) {
-                alert(
+                notify(
                   `🚨 EMERGENCY SOS\n\n${notification.message}\n\n📍 ${
                     notification.displayName ||
                     notification.area ||

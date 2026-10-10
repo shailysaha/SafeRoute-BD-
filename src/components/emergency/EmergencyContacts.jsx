@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 
 import { auth, db } from "../../firebase/firebase";
+import { notify } from "../../utils/notify";
 
 import "./EmergencyContacts.css";
 
@@ -23,6 +24,9 @@ function EmergencyContacts() {
   const [mobile, setMobile] = useState("");
 
   const [loading, setLoading] = useState(false);
+
+  // Custom delete confirmation
+  const [deleteId, setDeleteId] = useState(null);
 
   const currentUser = auth.currentUser;
 
@@ -76,7 +80,6 @@ function EmergencyContacts() {
 
       const snapshot = await getDocs(userQuery);
 
-      // User does not exist
       if (snapshot.empty) {
         return null;
       }
@@ -103,17 +106,13 @@ function EmergencyContacts() {
   const handleAddContact = async () => {
     const user = auth.currentUser;
 
-    // ------------------------------------------
     // LOGIN CHECK
-    // ------------------------------------------
     if (!user) {
-      alert("Please login first.");
+      notify("Please login first.", "error");
       return;
     }
 
-    // ------------------------------------------
     // CLEAN INPUTS
-    // ------------------------------------------
     const trimmedName = name.trim();
 
     const normalizedEmail = email
@@ -122,61 +121,51 @@ function EmergencyContacts() {
 
     const trimmedMobile = mobile.trim();
 
-    // ------------------------------------------
     // REQUIRED FIELD VALIDATION
-    // ------------------------------------------
     if (
       !trimmedName ||
       !normalizedEmail ||
       !trimmedMobile
     ) {
-      alert(
-        "Please enter contact name, registered SafeRoute BD email and mobile number."
+      notify(
+        "Please enter contact name, registered SafeRoute BD email and mobile number.",
+        "error"
       );
       return;
     }
 
-    // ------------------------------------------
     // EMAIL FORMAT VALIDATION
-    // ------------------------------------------
     const emailRegex =
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(normalizedEmail)) {
-      alert("Please enter a valid email address.");
-      return;
-    }
-
-    // ------------------------------------------
-    // BANGLADESH MOBILE NUMBER VALIDATION
-    // ------------------------------------------
-    //
-    // Accepted:
-    // 01712345678
-    // 01812345678
-    // 01912345678
-    // +8801712345678
-    //
-    const mobileRegex =
-      /^(?:\+8801|01)[3-9]\d{8}$/;
-
-    if (!mobileRegex.test(trimmedMobile)) {
-      alert(
-        "Please enter a valid Bangladesh mobile number.\n\n" +
-        "Example: 01712345678"
+      notify(
+        "Please enter a valid email address.",
+        "error"
       );
       return;
     }
 
-    // ------------------------------------------
+    // BANGLADESH MOBILE NUMBER VALIDATION
+    const mobileRegex =
+      /^(?:\+8801|01)[3-9]\d{8}$/;
+
+    if (!mobileRegex.test(trimmedMobile)) {
+      notify(
+        "Please enter a valid Bangladesh mobile number.\n\nExample: 01712345678",
+        "error"
+      );
+      return;
+    }
+
     // PREVENT ADDING YOURSELF
-    // ------------------------------------------
     if (
       normalizedEmail ===
       user.email?.trim().toLowerCase()
     ) {
-      alert(
-        "You cannot add yourself as an emergency contact."
+      notify(
+        "You cannot add yourself as an emergency contact.",
+        "error"
       );
       return;
     }
@@ -190,13 +179,10 @@ function EmergencyContacts() {
       const linkedUser =
         await findLinkedUser(normalizedEmail);
 
-      // ==========================================
-      // ❌ EMAIL NOT REGISTERED
-      // ==========================================
       if (!linkedUser) {
-        alert(
-          "❌ This email is not registered in SafeRoute BD.\n\n" +
-          "Only registered SafeRoute BD users can be added as emergency contacts."
+        notify(
+          "❌ This email is not registered in SafeRoute BD.\n\nOnly registered SafeRoute BD users can be added as emergency contacts.",
+          "error"
         );
 
         return;
@@ -215,8 +201,9 @@ function EmergencyContacts() {
         await getDocs(duplicateQuery);
 
       if (!duplicateSnapshot.empty) {
-        alert(
-          "This emergency contact has already been added."
+        notify(
+          "This emergency contact has already been added.",
+          "error"
         );
 
         return;
@@ -234,17 +221,12 @@ function EmergencyContacts() {
 
           email: normalizedEmail,
 
-          // Mobile number for SMS
           mobile: trimmedMobile,
 
-          // Registered SafeRoute user's UID
           linkedUserId: linkedUser.id,
 
-          // Always true because verification
-          // happened above
           isRegisteredUser: true,
 
-          // SMS enabled
           smsEnabled: true,
 
           createdAt: serverTimestamp(),
@@ -266,11 +248,9 @@ function EmergencyContacts() {
       // ==========================================
       // 6. SUCCESS MESSAGE
       // ==========================================
-      alert(
-        `✅ ${trimmedName} added successfully!\n\n` +
-        "✓ Registered SafeRoute BD user\n" +
-        "✓ Real-time SOS notification enabled\n" +
-        "✓ SMS notification enabled"
+      notify(
+        `✅ ${trimmedName} added successfully!\n\n✓ Registered SafeRoute BD user\n✓ Real-time SOS notification enabled\n✓ SMS notification enabled`,
+        "success"
       );
     } catch (error) {
       console.error(
@@ -278,9 +258,9 @@ function EmergencyContacts() {
         error
       );
 
-      alert(
-        "❌ Failed to add emergency contact.\n\n" +
-        "Please check your Firebase connection and permissions."
+      notify(
+        "❌ Failed to add emergency contact.\n\nPlease check your Firebase connection and permissions.",
+        "error"
       );
     } finally {
       setLoading(false);
@@ -288,28 +268,34 @@ function EmergencyContacts() {
   };
 
   // ==========================================
-  // DELETE EMERGENCY CONTACT
+  // OPEN DELETE CONFIRMATION
   // ==========================================
-  const handleDeleteContact = async (id) => {
-    const confirmDelete = window.confirm(
-      "Remove this emergency contact?"
-    );
+  const handleDeleteContact = (id) => {
+    setDeleteId(id);
+  };
 
-    if (!confirmDelete) return;
+  // ==========================================
+  // CONFIRM DELETE
+  // ==========================================
+  const confirmDeleteContact = async () => {
+    if (!deleteId) return;
 
     try {
       await deleteDoc(
-        doc(db, "emergencyContacts", id)
+        doc(db, "emergencyContacts", deleteId)
       );
 
       setContacts((previous) =>
         previous.filter(
-          (contact) => contact.id !== id
+          (contact) => contact.id !== deleteId
         )
       );
 
-      alert(
-        "Emergency contact removed successfully."
+      setDeleteId(null);
+
+      notify(
+        "Emergency contact removed successfully.",
+        "success"
       );
     } catch (error) {
       console.error(
@@ -317,10 +303,20 @@ function EmergencyContacts() {
         error
       );
 
-      alert(
-        "❌ Failed to remove emergency contact."
+      setDeleteId(null);
+
+      notify(
+        "❌ Failed to remove emergency contact.",
+        "error"
       );
     }
+  };
+
+  // ==========================================
+  // CANCEL DELETE
+  // ==========================================
+  const cancelDeleteContact = () => {
+    setDeleteId(null);
   };
 
   return (
@@ -443,6 +439,52 @@ function EmergencyContacts() {
         )}
 
       </div>
+
+      {/* =====================================
+          CUSTOM DELETE CONFIRMATION
+      ====================================== */}
+      {deleteId && (
+        <div className="delete-confirm">
+          <div className="delete-confirm-content">
+
+            <div className="delete-confirm-icon">
+              ⚠️
+            </div>
+
+            <div>
+              <h3>
+                Remove Emergency Contact?
+              </h3>
+
+              <p>
+                Are you sure you want to remove
+                this emergency contact?
+              </p>
+            </div>
+
+          </div>
+
+          <div className="delete-confirm-actions">
+
+            <button
+              type="button"
+              className="delete-cancel-btn"
+              onClick={cancelDeleteContact}
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              className="delete-confirm-btn"
+              onClick={confirmDeleteContact}
+            >
+              Remove
+            </button>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );

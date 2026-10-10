@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import {
   doc,
   updateDoc,
@@ -9,29 +10,27 @@ import {
 
 import { auth, db } from "../../firebase/firebase";
 
-// =====================================
-// CONFIGURATION
-// =====================================
 
-// Nearby users must be within 5 KM
+// =========================================================
+// CONFIGURATION
+// =========================================================
+
 const VERIFICATION_RADIUS_KM = 5;
 
-// Minimum confirmations required
-// to become Community Confirmed
 const COMMUNITY_CONFIRMATION_THRESHOLD = 3;
 
 
-// =====================================
-// DISTANCE CALCULATION
-// Haversine Formula
-// =====================================
+// =========================================================
+// HAVERSINE DISTANCE
+// =========================================================
+
 function calculateDistance(
   lat1,
   lng1,
   lat2,
   lng2
 ) {
-  const R = 6371; // Earth radius in KM
+  const R = 6371;
 
   const dLat =
     ((lat2 - lat1) * Math.PI) / 180;
@@ -40,16 +39,14 @@ function calculateDistance(
     ((lng2 - lng1) * Math.PI) / 180;
 
   const a =
-    Math.sin(dLat / 2) *
-      Math.sin(dLat / 2) +
+    Math.sin(dLat / 2) ** 2 +
     Math.cos(
       (lat1 * Math.PI) / 180
     ) *
       Math.cos(
         (lat2 * Math.PI) / 180
       ) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
+      Math.sin(dLng / 2) ** 2;
 
   const c =
     2 *
@@ -62,9 +59,53 @@ function calculateDistance(
 }
 
 
-// =====================================
+// =========================================================
+// GET USER GPS
+// =========================================================
+
+function getUserLocation() {
+  return new Promise(
+    (resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(
+          new Error(
+            "Geolocation is not supported by your browser."
+          )
+        );
+
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            lat:
+              position.coords.latitude,
+
+            lng:
+              position.coords.longitude,
+          });
+        },
+
+        (error) => {
+          reject(error);
+        },
+
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0,
+        }
+      );
+    }
+  );
+}
+
+
+// =========================================================
 // COMPONENT
-// =====================================
+// =========================================================
+
 function IncidentVerification({
   incident,
   onUpdate,
@@ -78,21 +119,166 @@ function IncidentVerification({
   const [userDistance, setUserDistance] =
     useState(null);
 
-
-  // =====================================
-  // GET CURRENT USER
-  // =====================================
   const currentUser =
     auth.currentUser;
 
 
-  // =====================================
-  // CHECK USER LOGIN
-  // =====================================
-  const checkLogin = () => {
+  // =======================================================
+  // ARRAYS
+  // =======================================================
+
+  const confirmedBy =
+    Array.isArray(
+      incident?.confirmedBy
+    )
+      ? incident.confirmedBy
+      : [];
+
+  const rejectedBy =
+    Array.isArray(
+      incident?.rejectedBy
+    )
+      ? incident.rejectedBy
+      : [];
+
+
+  // =======================================================
+  // REPORTER
+  // =======================================================
+
+  const ownerId =
+    incident?.reporterId ||
+    incident?.userId ||
+    "";
+
+
+  // =======================================================
+  // COUNTS
+  // =======================================================
+
+  const confirmations =
+    Number(
+      incident?.confirmationCount
+    ) || 0;
+
+  const rejections =
+    Number(
+      incident?.rejectionCount
+    ) || 0;
+
+
+  // =======================================================
+  // CURRENT USER VOTE
+  // =======================================================
+
+  const getCurrentVote = () => {
+    if (!currentUser) {
+      return "none";
+    }
+
+    if (
+      confirmedBy.includes(
+        currentUser.uid
+      )
+    ) {
+      return "confirmed";
+    }
+
+    if (
+      rejectedBy.includes(
+        currentUser.uid
+      )
+    ) {
+      return "rejected";
+    }
+
+    return "none";
+  };
+
+
+  // =======================================================
+  // VALIDATE
+  // =======================================================
+
+  const validate = () => {
     if (!currentUser) {
       setMessage(
-        "🔐 Please login before verifying an incident."
+        "🔐 Please login before verifying."
+      );
+
+      return false;
+    }
+
+    if (!incident?.id) {
+      setMessage(
+        "❌ Incident ID is missing."
+      );
+
+      return false;
+    }
+
+    if (
+      ownerId ===
+      currentUser.uid
+    ) {
+      setMessage(
+        "⚠️ You cannot verify your own incident."
+      );
+
+      return false;
+    }
+
+    const vote =
+      getCurrentVote();
+
+    if (
+      vote === "confirmed"
+    ) {
+      setMessage(
+        "✅ You have already confirmed this incident."
+      );
+
+      return false;
+    }
+
+    if (
+      vote === "rejected"
+    ) {
+      setMessage(
+        "❌ You have already rejected this incident."
+      );
+
+      return false;
+    }
+
+    if (
+      incident?.status ===
+      "Verified"
+    ) {
+      setMessage(
+        "🎉 This incident has already been verified."
+      );
+
+      return false;
+    }
+
+    if (
+      incident?.status ===
+      "False Report"
+    ) {
+      setMessage(
+        "❌ This incident has already been marked as a false report."
+      );
+
+      return false;
+    }
+
+    if (
+      incident?.status ===
+      "Resolved"
+    ) {
+      setMessage(
+        "ℹ️ This incident is already resolved."
       );
 
       return false;
@@ -102,487 +288,428 @@ function IncidentVerification({
   };
 
 
-  // =====================================
-  // GET USER GPS
-  // =====================================
-  const getUserLocation = () => {
-    return new Promise(
-      (resolve, reject) => {
-        if (!navigator.geolocation) {
-          reject(
-            new Error(
-              "Geolocation is not supported by your browser."
-            )
+  // =======================================================
+  // CHECK 5 KM
+  // =======================================================
+
+  const checkNearby =
+    async () => {
+      try {
+        const location =
+          await getUserLocation();
+
+        const incidentLat =
+          Number(
+            incident?.lat
           );
 
-          return;
+        const incidentLng =
+          Number(
+            incident?.lng
+          );
+
+        if (
+          !Number.isFinite(
+            incidentLat
+          ) ||
+          !Number.isFinite(
+            incidentLng
+          )
+        ) {
+          throw new Error(
+            "Incident coordinates are invalid."
+          );
         }
 
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            resolve({
-              lat:
-                position.coords.latitude,
+        const distance =
+          calculateDistance(
+            location.lat,
+            location.lng,
+            incidentLat,
+            incidentLng
+          );
 
-              lng:
-                position.coords.longitude,
-            });
-          },
-
-          (error) => {
-            reject(error);
-          },
-
-          {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 0,
-          }
-        );
-      }
-    );
-  };
-
-
-  // =====================================
-  // CHECK WHETHER USER IS NEARBY
-  // =====================================
-  const checkNearbyUser = async () => {
-    try {
-      const userLocation =
-        await getUserLocation();
-
-      const incidentLat =
-        Number(incident.lat);
-
-      const incidentLng =
-        Number(incident.lng);
-
-      if (
-        !Number.isFinite(
-          incidentLat
-        ) ||
-        !Number.isFinite(
-          incidentLng
-        )
-      ) {
-        throw new Error(
-          "Incident location is invalid."
-        );
-      }
-
-      const distance =
-        calculateDistance(
-          userLocation.lat,
-          userLocation.lng,
-          incidentLat,
-          incidentLng
+        setUserDistance(
+          distance
         );
 
-      setUserDistance(distance);
+        if (
+          distance >
+          VERIFICATION_RADIUS_KM
+        ) {
+          setMessage(
+            `📍 You are ${distance.toFixed(
+              2
+            )} km away. You must be within ${VERIFICATION_RADIUS_KM} km to verify.`
+          );
 
-      if (
-        distance >
-        VERIFICATION_RADIUS_KM
-      ) {
-        setMessage(
-          `📍 You are ${distance.toFixed(
-            2
-          )} km away. Only users within ${VERIFICATION_RADIUS_KM} km can verify this incident.`
+          return false;
+        }
+
+        return true;
+
+      } catch (error) {
+        console.error(
+          "GPS verification error:",
+          error
         );
+
+        switch (
+          error?.code
+        ) {
+          case 1:
+            setMessage(
+              "📍 Please enable location permissions to verify."
+            );
+            break;
+
+          case 2:
+            setMessage(
+              "❌ Your current position is unavailable."
+            );
+            break;
+
+          case 3:
+            setMessage(
+              "❌ GPS request timed out."
+            );
+            break;
+
+          default:
+            setMessage(
+              error?.message ||
+                "❌ Could not retrieve your location."
+            );
+        }
 
         return false;
       }
+    };
 
-      return true;
-    } catch (error) {
-      console.error(
-        "Location verification error:",
-        error
-      );
 
-      if (
-        error.code ===
-        error.PERMISSION_DENIED
-      ) {
-        setMessage(
-          "📍 Location permission is required to verify this incident."
-        );
-      } else if (
-        error.code ===
-        error.POSITION_UNAVAILABLE
-      ) {
-        setMessage(
-          "❌ Your current location is unavailable."
-        );
-      } else if (
-        error.code === error.TIMEOUT
-      ) {
-        setMessage(
-          "❌ GPS request timed out. Please try again."
-        );
-      } else {
-        setMessage(
-          error.message ||
-            "❌ Could not verify your location."
+  // =======================================================
+  // PROCESS REPUTATION
+  // =======================================================
+
+  const processReputation =
+    async (result) => {
+      const reporterId =
+        incident?.reporterId ||
+        incident?.userId ||
+        "";
+
+      if (!reporterId) {
+        throw new Error(
+          "Original reporter ID is missing."
         );
       }
 
-      return false;
-    }
-  };
-
-
-  // =====================================
-  // CHECK WHETHER USER ALREADY VOTED
-  // =====================================
-  const checkExistingVote = () => {
-    if (!currentUser) {
-      return "none";
-    }
-
-    const userId =
-      currentUser.uid;
-
-    const confirmedBy =
-      incident.confirmedBy || [];
-
-    const rejectedBy =
-      incident.rejectedBy || [];
-
-    if (
-      confirmedBy.includes(userId)
-    ) {
-      return "confirmed";
-    }
-
-    if (
-      rejectedBy.includes(userId)
-    ) {
-      return "rejected";
-    }
-
-    return "none";
-  };
-
-
-  // =====================================
-  // CONFIRM INCIDENT
-  // =====================================
-  const handleConfirm = async () => {
-    setMessage("");
-
-    // -------------------------------------
-    // Login check
-    // -------------------------------------
-    if (!checkLogin()) {
-      return;
-    }
-
-    // -------------------------------------
-    // Prevent reporter from verifying
-    // own incident
-    // -------------------------------------
-    if (
-      incident.reporterId &&
-      incident.reporterId ===
-        currentUser.uid
-    ) {
-      setMessage(
-        "⚠️ You cannot verify your own incident."
+      await processReportReputation(
+        incident.id,
+        reporterId,
+        result
       );
+    };
 
-      return;
-    }
 
-    // -------------------------------------
-    // Already voted?
-    // -------------------------------------
-    const existingVote =
-      checkExistingVote();
+  // =======================================================
+  // CONFIRM
+  // =======================================================
 
-    if (existingVote === "confirmed") {
-      setMessage(
-        "✅ You have already confirmed this incident."
-      );
+  const handleConfirm =
+    async () => {
+      setMessage("");
 
-      return;
-    }
-
-    if (existingVote === "rejected") {
-      setMessage(
-        "⚠️ You have already rejected this incident."
-      );
-
-      return;
-    }
-
-    // -------------------------------------
-    // Resolved incidents cannot be voted
-    // -------------------------------------
-    if (
-      incident.status ===
-      "Resolved"
-    ) {
-      setMessage(
-        "ℹ️ This incident has already been resolved."
-      );
-
-      return;
-    }
-
-    // -------------------------------------
-    // Check GPS
-    // -------------------------------------
-    setLoading(true);
-
-    const nearby =
-      await checkNearbyUser();
-
-    if (!nearby) {
-      setLoading(false);
-      return;
-    }
-
-    // -------------------------------------
-    // Firestore update
-    // -------------------------------------
-    try {
-      const incidentRef =
-        doc(
-          db,
-          "incidents",
-          incident.id
-        );
-
-      const currentConfirmations =
-        Number(
-          incident.confirmationCount ||
-            0
-        );
-
-      const newConfirmationCount =
-        currentConfirmations + 1;
-
-      // -------------------------------------
-      // Determine new status
-      // -------------------------------------
-      let newStatus =
-        incident.status ||
-        "Unverified";
-
-      if (
-        newConfirmationCount >=
-        COMMUNITY_CONFIRMATION_THRESHOLD
-      ) {
-        newStatus =
-          "Community Confirmed";
+      if (!validate()) {
+        return;
       }
 
-      await updateDoc(
-        incidentRef,
-        {
-          confirmationCount:
-            increment(1),
+      setLoading(true);
 
-          confirmedBy:
-            arrayUnion(
-              currentUser.uid
-            ),
+      try {
+        const nearby =
+          await checkNearby();
 
-          status: newStatus,
-
-          updatedAt:
-            serverTimestamp(),
+        if (!nearby) {
+          return;
         }
-      );
 
-      setMessage(
-        newStatus ===
-          "Community Confirmed"
-          ? "🎉 Incident is now Community Confirmed!"
-          : "✅ Thank you! Your confirmation has been recorded."
-      );
+        const incidentRef =
+          doc(
+            db,
+            "incidents",
+            incident.id
+          );
 
-      // -------------------------------------
-      // Refresh incidents
-      // -------------------------------------
-      if (onUpdate) {
-        await onUpdate();
-      }
-    } catch (error) {
-      console.error(
-        "Confirm incident error:",
-        error
-      );
+        const newCount =
+          confirmations + 1;
 
-      if (
-        error.code ===
-        "permission-denied"
-      ) {
-        setMessage(
-          "❌ You do not have permission to verify this incident."
-        );
-      } else {
-        setMessage(
-          "❌ Failed to confirm incident."
-        );
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+        const reachedThreshold =
+          newCount >=
+          COMMUNITY_CONFIRMATION_THRESHOLD;
+
+        const newStatus =
+          reachedThreshold
+            ? "Verified"
+            : "Unverified";
 
 
-  // =====================================
-  // REJECT INCIDENT
-  // =====================================
-  const handleReject = async () => {
-    setMessage("");
+        // =================================================
+        // UPDATE INCIDENT
+        // =================================================
 
-    // -------------------------------------
-    // Login check
-    // -------------------------------------
-    if (!checkLogin()) {
-      return;
-    }
+        await updateDoc(
+          incidentRef,
+          {
+            confirmationCount:
+              increment(1),
 
-    // -------------------------------------
-    // Prevent reporter from rejecting
-    // own incident
-    // -------------------------------------
-    if (
-      incident.reporterId &&
-      incident.reporterId ===
-        currentUser.uid
-    ) {
-      setMessage(
-        "⚠️ You cannot reject your own incident."
-      );
+            confirmedBy:
+              arrayUnion(
+                currentUser.uid
+              ),
 
-      return;
-    }
+            status:
+              newStatus,
 
-    // -------------------------------------
-    // Already voted?
-    // -------------------------------------
-    const existingVote =
-      checkExistingVote();
+            updatedAt:
+              serverTimestamp(),
 
-    if (existingVote === "confirmed") {
-      setMessage(
-        "⚠️ You have already confirmed this incident."
-      );
+            ...(reachedThreshold
+              ? {
+                  verificationStatus:
+                    "verified",
 
-      return;
-    }
+                  communityConfirmedAt:
+                    serverTimestamp(),
 
-    if (existingVote === "rejected") {
-      setMessage(
-        "❌ You have already rejected this incident."
-      );
-
-      return;
-    }
-
-    // -------------------------------------
-    // Resolved incidents
-    // -------------------------------------
-    if (
-      incident.status ===
-      "Resolved"
-    ) {
-      setMessage(
-        "ℹ️ This incident has already been resolved."
-      );
-
-      return;
-    }
-
-    // -------------------------------------
-    // Check GPS
-    // -------------------------------------
-    setLoading(true);
-
-    const nearby =
-      await checkNearbyUser();
-
-    if (!nearby) {
-      setLoading(false);
-      return;
-    }
-
-    // -------------------------------------
-    // Firestore update
-    // -------------------------------------
-    try {
-      const incidentRef =
-        doc(
-          db,
-          "incidents",
-          incident.id
+                  verifiedAt:
+                    serverTimestamp(),
+                }
+              : {}),
+          }
         );
 
-      await updateDoc(
-        incidentRef,
-        {
-          rejectionCount:
-            increment(1),
 
-          rejectedBy:
-            arrayUnion(
-              currentUser.uid
-            ),
+        // =================================================
+        // PROCESS REPUTATION
+        // =================================================
 
-          updatedAt:
-            serverTimestamp(),
+        if (
+          reachedThreshold
+        ) {
+          try {
+            await processReputation(
+              "verified"
+            );
+
+            setMessage(
+              "🎉 3 community confirmations reached. Incident verified and reporter reputation updated (+5)."
+            );
+
+          } catch (
+            reputationError
+          ) {
+            console.error(
+              "Reputation error:",
+              reputationError
+            );
+
+            setMessage(
+              "⚠️ Incident was verified, but reporter reputation could not be updated. Please check Firestore rules."
+            );
+          }
+
+        } else {
+          setMessage(
+            `✅ Your confirmation has been recorded. ${newCount}/${COMMUNITY_CONFIRMATION_THRESHOLD} confirmations.`
+          );
         }
-      );
 
-      setMessage(
-        "❌ Your rejection has been recorded."
-      );
 
-      // -------------------------------------
-      // Refresh incidents
-      // -------------------------------------
-      if (onUpdate) {
-        await onUpdate();
-      }
-    } catch (error) {
-      console.error(
-        "Reject incident error:",
-        error
-      );
+        // =================================================
+        // REFRESH
+        // =================================================
 
-      if (
-        error.code ===
-        "permission-denied"
-      ) {
-        setMessage(
-          "❌ You do not have permission to verify this incident."
+        if (
+          typeof onUpdate ===
+          "function"
+        ) {
+          await onUpdate();
+        }
+
+      } catch (error) {
+        console.error(
+          "Confirm error:",
+          error
         );
-      } else {
+
         setMessage(
-          "❌ Failed to record rejection."
+          error?.code ===
+            "permission-denied"
+            ? "❌ Verification permission denied by Firestore security rules."
+            : `❌ Failed to confirm: ${
+                error?.message ||
+                "Unknown error"
+              }`
         );
+
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
 
-  // =====================================
-  // CURRENT USER VOTE
-  // =====================================
+  // =======================================================
+  // REJECT
+  // =======================================================
+
+  const handleReject =
+    async () => {
+      setMessage("");
+
+      if (!validate()) {
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const nearby =
+          await checkNearby();
+
+        if (!nearby) {
+          return;
+        }
+
+        const incidentRef =
+          doc(
+            db,
+            "incidents",
+            incident.id
+          );
+
+        const newCount =
+          rejections + 1;
+
+        const reachedThreshold =
+          newCount >=
+          COMMUNITY_CONFIRMATION_THRESHOLD;
+
+
+        // =================================================
+        // UPDATE INCIDENT
+        // =================================================
+
+        await updateDoc(
+          incidentRef,
+          {
+            rejectionCount:
+              increment(1),
+
+            rejectedBy:
+              arrayUnion(
+                currentUser.uid
+              ),
+
+            status:
+              reachedThreshold
+                ? "False Report"
+                : "Unverified",
+
+            updatedAt:
+              serverTimestamp(),
+
+            ...(reachedThreshold
+              ? {
+                  verificationStatus:
+                    "false",
+
+                  rejectedAt:
+                    serverTimestamp(),
+                }
+              : {}),
+          }
+        );
+
+
+        // =================================================
+        // PROCESS REPUTATION
+        // =================================================
+
+        if (
+          reachedThreshold
+        ) {
+          try {
+            await processReputation(
+              "false"
+            );
+
+            setMessage(
+              "❌ 3 community rejections reached. This report was marked as false and reporter reputation was updated (-10)."
+            );
+
+          } catch (
+            reputationError
+          ) {
+            console.error(
+              "Reputation error:",
+              reputationError
+            );
+
+            setMessage(
+              "⚠️ Report was marked as false, but reporter reputation could not be updated. Please check Firestore rules."
+            );
+          }
+
+        } else {
+          setMessage(
+            `❌ Your rejection has been recorded. ${newCount}/${COMMUNITY_CONFIRMATION_THRESHOLD} rejections.`
+          );
+        }
+
+
+        // =================================================
+        // REFRESH
+        // =================================================
+
+        if (
+          typeof onUpdate ===
+          "function"
+        ) {
+          await onUpdate();
+        }
+
+      } catch (error) {
+        console.error(
+          "Reject error:",
+          error
+        );
+
+        setMessage(
+          error?.code ===
+            "permission-denied"
+            ? "❌ Verification permission denied by Firestore security rules."
+            : `❌ Failed to reject: ${
+                error?.message ||
+                "Unknown error"
+              }`
+        );
+
+      } finally {
+        setLoading(false);
+      }
+    };
+
+
   const currentVote =
-    checkExistingVote();
+    getCurrentVote();
 
 
-  // =====================================
+  // =======================================================
   // RENDER
-  // =====================================
+  // =======================================================
+
   return (
     <div
       className="incident-verification"
@@ -590,26 +717,22 @@ function IncidentVerification({
         marginTop: "12px",
         padding: "12px",
         borderRadius: "10px",
-        border:
-          "1px solid #ddd",
+        border: "1px solid #ddd",
         background: "#fafafa",
       }}
     >
-      {/* =====================================
-          TITLE
-          ===================================== */}
+
       <h4
         style={{
-          marginTop: 0,
-          marginBottom: "8px",
+          margin: "0 0 10px",
         }}
       >
         🛡️ Community Verification
       </h4>
 
-      {/* =====================================
-          STATUS
-          ===================================== */}
+
+      {/* STATUS */}
+
       <div
         style={{
           marginBottom: "8px",
@@ -617,177 +740,251 @@ function IncidentVerification({
         }}
       >
         Status:{" "}
-        <span>
-          {incident.status ||
-            "Unverified"}
-        </span>
+        {incident?.status ||
+          "Unverified"}
       </div>
 
-      {/* =====================================
-          COUNTS
-          ===================================== */}
+
+      {/* COUNTS */}
+
       <div
         style={{
           display: "flex",
           gap: "12px",
+          flexWrap: "wrap",
           marginBottom: "10px",
-          fontSize: "14px",
         }}
       >
         <span>
           ✅ Confirmed:{" "}
-          {incident.confirmationCount ||
-            0}
+          {confirmations}
         </span>
 
         <span>
           ❌ Rejected:{" "}
-          {incident.rejectionCount ||
-            0}
+          {rejections}
         </span>
       </div>
 
-      {/* =====================================
-          GPS INFORMATION
-          ===================================== */}
-      {userDistance !== null && (
-        <p
+
+      {/* PROGRESS */}
+
+      {incident?.status !==
+        "Verified" &&
+        incident?.status !==
+          "False Report" && (
+
+        <div
           style={{
+            marginBottom: "10px",
             fontSize: "13px",
+          }}
+        >
+          🎯{" "}
+          {Math.min(
+            Math.max(
+              confirmations,
+              rejections
+            ),
+            COMMUNITY_CONFIRMATION_THRESHOLD
+          )}{" "}
+          /{" "}
+          {COMMUNITY_CONFIRMATION_THRESHOLD}{" "}
+          community responses needed
+        </div>
+      )}
+
+
+      {/* DISTANCE */}
+
+      {userDistance !==
+        null && (
+
+        <div
+          style={{
             marginBottom: "8px",
+            fontSize: "13px",
           }}
         >
           📍 Your distance:{" "}
-          {userDistance.toFixed(2)} km
-        </p>
+          {userDistance.toFixed(
+            2
+          )} km
+        </div>
       )}
 
-      {/* =====================================
-          ALREADY VOTED
-          ===================================== */}
+
+      {/* USER CONFIRMED */}
+
       {currentVote ===
         "confirmed" && (
+
         <p
           style={{
             color: "green",
             fontWeight: "600",
           }}
         >
-          ✅ You confirmed this
-          incident.
+          ✅ You confirmed this incident.
         </p>
       )}
 
+
+      {/* USER REJECTED */}
+
       {currentVote ===
         "rejected" && (
+
         <p
           style={{
             color: "#b00020",
             fontWeight: "600",
           }}
         >
-          ❌ You rejected this
-          incident.
+          ❌ You rejected this incident.
         </p>
       )}
 
-      {/* =====================================
-          ACTION BUTTONS
-          ===================================== */}
-      {currentVote === "none" &&
-        incident.status !==
-          "Resolved" && (
-          <div
+
+      {/* BUTTONS */}
+
+      {currentVote ===
+        "none" &&
+        incident?.status !==
+          "Resolved" &&
+        incident?.status !==
+          "Verified" &&
+        incident?.status !==
+          "False Report" && (
+
+        <div
+          style={{
+            display: "flex",
+            gap: "8px",
+          }}
+        >
+
+          <button
+            type="button"
+            onClick={
+              handleConfirm
+            }
+            disabled={loading}
             style={{
-              display: "flex",
-              gap: "8px",
+              flex: 1,
+              padding: "9px",
+              border: "none",
+              borderRadius: "7px",
+              cursor: loading
+                ? "not-allowed"
+                : "pointer",
+              fontWeight: "600",
+              backgroundColor:
+                "#2e7d32",
+              color: "#ffffff",
             }}
           >
-            <button
-              type="button"
-              onClick={
-                handleConfirm
-              }
-              disabled={loading}
-              style={{
-                flex: 1,
-                padding:
-                  "9px 8px",
-                border: "none",
-                borderRadius:
-                  "7px",
-                cursor: loading
-                  ? "not-allowed"
-                  : "pointer",
-                fontWeight:
-                  "600",
-              }}
-            >
-              {loading
-                ? "Checking..."
-                : "✅ Confirm"}
-            </button>
+            {loading
+              ? "Checking..."
+              : "✅ Confirm"}
+          </button>
 
-            <button
-              type="button"
-              onClick={
-                handleReject
-              }
-              disabled={loading}
-              style={{
-                flex: 1,
-                padding:
-                  "9px 8px",
-                border: "none",
-                borderRadius:
-                  "7px",
-                cursor: loading
-                  ? "not-allowed"
-                  : "pointer",
-                fontWeight:
-                  "600",
-              }}
-            >
-              {loading
-                ? "Checking..."
-                : "❌ Reject"}
-            </button>
-          </div>
-        )}
 
-      {/* =====================================
-          RESOLVED MESSAGE
-          ===================================== */}
-      {incident.status ===
+          <button
+            type="button"
+            onClick={
+              handleReject
+            }
+            disabled={loading}
+            style={{
+              flex: 1,
+              padding: "9px",
+              border: "none",
+              borderRadius: "7px",
+              cursor: loading
+                ? "not-allowed"
+                : "pointer",
+              fontWeight: "600",
+              backgroundColor:
+                "#c62828",
+              color: "#ffffff",
+            }}
+          >
+            {loading
+              ? "Checking..."
+              : "❌ Reject"}
+          </button>
+
+        </div>
+      )}
+
+
+      {/* VERIFIED */}
+
+      {incident?.status ===
+        "Verified" && (
+
+        <p
+          style={{
+            color: "green",
+            fontWeight: "600",
+          }}
+        >
+          🎉 This incident has been verified by the community.
+        </p>
+      )}
+
+
+      {/* FALSE */}
+
+      {incident?.status ===
+        "False Report" && (
+
+        <p
+          style={{
+            color: "#b00020",
+            fontWeight: "600",
+          }}
+        >
+          ❌ This incident has been marked as a false report by the community.
+        </p>
+      )}
+
+
+      {/* RESOLVED */}
+
+      {incident?.status ===
         "Resolved" && (
+
         <p
           style={{
             fontWeight: "600",
           }}
         >
-          🟢 This incident has been
-          resolved.
+          🟢 This incident has been resolved.
         </p>
       )}
 
-      {/* =====================================
-          MESSAGE
-          ===================================== */}
+
+      {/* MESSAGE */}
+
       {message && (
+
         <p
           style={{
             marginTop: "10px",
             marginBottom: 0,
             fontSize: "13px",
+            wordBreak: "break-word",
           }}
         >
           {message}
         </p>
       )}
 
-      {/* =====================================
-          VERIFICATION INFO
-          ===================================== */}
+
+      {/* RADIUS */}
+
       <small
         style={{
           display: "block",
@@ -796,11 +993,12 @@ function IncidentVerification({
         }}
       >
         📍 Only users within{" "}
-        {VERIFICATION_RADIUS_KM} km
-        can verify this incident.
+        {VERIFICATION_RADIUS_KM} km can verify this incident.
       </small>
+
     </div>
   );
 }
+
 
 export default IncidentVerification;

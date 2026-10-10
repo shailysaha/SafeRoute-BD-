@@ -1,216 +1,1616 @@
-.profile-page {
-  min-height: 100vh;
-  padding: 32px;
-  box-sizing: border-box;
-  background:
-    radial-gradient(
-      circle at top right,
-      rgba(37, 99, 235, 0.13),
-      transparent 30%
-    ),
-    #f4f7fb;
-  color: #0f172a;
+/* =========================================================
+   SAFEROUTE BD - PROFESSIONAL PROFILE PAGE
+   Works with the Profile.jsx you provided
+========================================================= */
+
+/* =========================================================
+   ROOT VARIABLES
+========================================================= */
+
+:root {
+  --profile-primary: #2563eb;
+  --profile-primary-dark: #1d4ed8;
+  --profile-primary-light: #60a5fa;
+
+  --profile-bg: #f1f5f9;
+  --profile-card: #ffffff;
+  --profile-surface: #f8fafc;
+  --profile-border: #e2e8f0;
+
+  --profile-text: #0f172a;
+  --profile-heading: #0b1f44;
+  --profile-muted: #64748b;
+
+  --profile-success: #16a34a;
+  --profile-warning: #d97706;
+  --profile-danger: #dc2626;
+
+  --profile-radius: 20px;
+  --profile-radius-small: 14px;
+
+  --profile-shadow:
+    0 10px 30px rgba(15, 23, 42, 0.07);
+
+  --profile-shadow-hover:
+    0 18px 40px rgba(15, 23, 42, 0.12);
+
+  --profile-transition:
+    0.25s ease;
 }
 
+/* =========================================================
+   MAIN PAGE
+========================================================= */
+
+.profile-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 30px;
+  box-sizing: border-box;
+
+  background:
+    radial-gradient(
+      circle at 85% 0%,
+      rgba(37, 99, 235, 0.10),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 0% 35%,
+      rgba(59, 130, 246, 0.05),
+      transparent 25%
+    ),
+    var(--profile-bg);
+
+  color: var(--profile-text);
+}
+
+/* =========================================================
+   PROFILE HEADER
+========================================================= */
+
 .profile-header-card {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 22px;
-  padding: 28px;
-  margin-bottom: 22px;
 
-  background: linear-gradient(135deg, #172554, #2563eb);
-  color: white;
+  padding: 30px;
+  margin-bottom: 24px;
 
-  border-radius: 22px;
-  box-shadow: 0 18px 40px rgba(30, 64, 175, 0.25);
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(96, 165, 250, 0.28),
+      transparent 35%
+    ),
+    linear-gradient(
+      135deg,
+      #0f2a5f 0%,
+      #1d4ed8 55%,
+      #2563eb 100%
+    );
+
+  color: #ffffff;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--profile-radius);
+
+  box-shadow:
+    0 20px 45px rgba(30, 64, 175, 0.22);
 }
+
+/* Decorative circle */
+
+.profile-header-card::after {
+  content: "";
+  position: absolute;
+
+  width: 180px;
+  height: 180px;
+
+  right: -70px;
+  bottom: -100px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   AVATAR
+========================================================= */
 
 .profile-avatar {
+  position: relative;
+  z-index: 1;
+
   display: grid;
+  place-items: center;
+
   width: 88px;
   height: 88px;
-  place-items: center;
+
   flex-shrink: 0;
 
-  border: 4px solid rgba(255, 255, 255, 0.25);
+  border: 4px solid rgba(255, 255, 255, 0.30);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
 
-  font-size: 30px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.25),
+      rgba(255, 255, 255, 0.08)
+    );
+
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+
+  font-size: 28px;
   font-weight: 800;
+
+  backdrop-filter: blur(10px);
 }
 
+/* =========================================================
+   HEADER TEXT
+========================================================= */
+
 .profile-header-text {
+  position: relative;
+  z-index: 1;
+
   min-width: 0;
   flex: 1;
 }
 
 .profile-label {
-  display: inline-block;
-  margin-bottom: 7px;
-  color: #bfdbfe;
-  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+
+  margin-bottom: 8px;
+  padding: 6px 11px;
+
+  color: #dbeafe;
+
+  background: rgba(255, 255, 255, 0.10);
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+
+  font-size: 12px;
   font-weight: 700;
+
+  backdrop-filter: blur(8px);
 }
 
 .profile-header-text h1 {
   margin: 0 0 6px;
+
+  color: #ffffff;
+
   font-size: 32px;
+  font-weight: 800;
+  line-height: 1.15;
+
+  letter-spacing: -0.5px;
 }
 
 .profile-header-text p {
   margin: 0;
+
   color: #dbeafe;
+
+  font-size: 15px;
 }
+
+.profile-company-name {
+  margin-top: 8px !important;
+
+  color: #bfdbfe !important;
+}
+
+.profile-company-name strong {
+  color: #ffffff;
+}
+
+/* =========================================================
+   ROLE BADGE
+========================================================= */
 
 .profile-role {
-  padding: 9px 14px;
+  position: relative;
+  z-index: 1;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 9px 15px;
+
   border-radius: 999px;
-  font-size: 13px;
+
+  font-size: 12px;
   font-weight: 800;
+
+  white-space: nowrap;
+
+  box-shadow:
+    0 5px 15px rgba(0, 0, 0, 0.12);
 }
 
+/* Admin */
+
 .profile-role-admin {
-  color: #78350f;
+  color: #92400e;
   background: #fef3c7;
+  border: 1px solid #fde68a;
 }
+
+/* Company */
+
+.profile-role-company {
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #4f46e5
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Moderator */
+
+.profile-role-moderator {
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ec4899,
+      #e11d48
+    );
+}
+
+/* User */
 
 .profile-role-user {
   color: #166534;
   background: #dcfce7;
+  border: 1px solid #bbf7d0;
 }
 
+/* =========================================================
+   SHARED CARDS
+========================================================= */
+
+.profile-company-card,
+.profile-reputation-card,
 .profile-details-card {
-  padding: 27px;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 22px;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.07);
+  position: relative;
+
+  padding: 28px;
+  margin-bottom: 24px;
+
+  background: var(--profile-card);
+
+  border: 1px solid var(--profile-border);
+  border-radius: var(--profile-radius);
+
+  box-shadow: var(--profile-shadow);
+
+  transition:
+    box-shadow var(--profile-transition),
+    transform var(--profile-transition);
 }
+
+.profile-company-card:hover,
+.profile-reputation-card:hover,
+.profile-details-card:hover {
+  box-shadow: var(--profile-shadow-hover);
+}
+
+/* =========================================================
+   SECTION HEADING
+========================================================= */
 
 .profile-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 18px;
+
   margin-bottom: 22px;
+}
+
+.profile-section-heading > div {
+  min-width: 0;
 }
 
 .profile-section-heading h2 {
   margin: 0;
-  font-size: 23px;
+
+  color: var(--profile-heading);
+
+  font-size: 21px;
+  font-weight: 800;
+
+  line-height: 1.3;
 }
 
 .profile-section-heading p {
-  margin: 5px 0 0;
+  margin: 6px 0 0;
+
+  color: var(--profile-muted);
+
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   FLEET LINK
+========================================================= */
+
+.profile-fleet-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 40px;
+  padding: 0 16px;
+
+  color: #ffffff;
+  background: var(--profile-primary);
+
+  border: 1px solid var(--profile-primary);
+  border-radius: 10px;
+
+  text-decoration: none;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  transition:
+    background var(--profile-transition),
+    transform var(--profile-transition),
+    box-shadow var(--profile-transition);
+}
+
+.profile-fleet-link:hover {
+  color: #ffffff;
+  background: var(--profile-primary-dark);
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 18px rgba(37, 99, 235, 0.25);
+}
+
+/* =========================================================
+   COMPANY STATS
+========================================================= */
+
+.company-stats-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 14px;
+
+  margin-bottom: 20px;
+}
+
+.company-stat {
+  display: flex;
+  align-items: center;
+
+  min-width: 0;
+
+  gap: 13px;
+
+  padding: 16px;
+
+  background: var(--profile-surface);
+
+  border: 1px solid var(--profile-border);
+  border-radius: var(--profile-radius-small);
+
+  transition:
+    transform var(--profile-transition),
+    border-color var(--profile-transition),
+    box-shadow var(--profile-transition);
+}
+
+.company-stat:hover {
+  transform: translateY(-2px);
+
+  border-color: #bfdbfe;
+
+  box-shadow:
+    0 8px 20px rgba(15, 23, 42, 0.07);
+}
+
+.company-stat-icon {
+  display: grid;
+  place-items: center;
+
+  width: 44px;
+  height: 44px;
+
+  flex-shrink: 0;
+
+  background: #eff6ff;
+
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+
+  font-size: 20px;
+}
+
+.company-stat div {
+  display: flex;
+
+  min-width: 0;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.company-stat small {
+  color: var(--profile-muted);
+
+  font-size: 11px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.05em;
+}
+
+.company-stat strong {
+  min-width: 0;
+
+  color: #1e293b;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   COMPANY QUICK ACTIONS
+========================================================= */
+
+.company-quick-actions {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 10px;
+
+  margin-top: 4px;
+}
+
+.quick-action-btn {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 42px;
+
+  padding: 0 14px;
+
+  color: #334155;
+
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+
+  text-decoration: none;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  transition:
+    background var(--profile-transition),
+    color var(--profile-transition),
+    border-color var(--profile-transition),
+    transform var(--profile-transition),
+    box-shadow var(--profile-transition);
+}
+
+.quick-action-btn:hover {
+  color: #ffffff;
+
+  background: var(--profile-primary);
+
+  border-color: var(--profile-primary);
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 18px rgba(37, 99, 235, 0.20);
+}
+
+/* =========================================================
+   REPUTATION LEVEL BADGE
+========================================================= */
+
+.reputation-level {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px 13px;
+
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  white-space: nowrap;
+}
+
+.reputation-score-high {
+  color: #166534;
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+}
+
+.reputation-score-medium {
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+}
+
+.reputation-score-low {
+  color: #991b1b;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+}
+
+/* =========================================================
+   REPUTATION SCORE CONTAINER
+========================================================= */
+
+.reputation-score-container {
+  display: flex;
+
+  align-items: center;
+
+  gap: 28px;
+
+  padding: 22px;
+
+  margin-bottom: 18px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #eff6ff 0%,
+      #f8fafc 100%
+    );
+
+  border: 1px solid #dbeafe;
+
+  border-radius: 18px;
+}
+
+/* =========================================================
+   SCORE CIRCLE
+========================================================= */
+
+.reputation-score-circle {
+  position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 125px;
+  height: 125px;
+
+  flex-shrink: 0;
+
+  border: 8px solid #2563eb;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 10px 25px rgba(37, 99, 235, 0.16);
+}
+
+.reputation-score-circle::before {
+  content: "";
+
+  position: absolute;
+
+  inset: -14px;
+
+  border: 1px solid rgba(37, 99, 235, 0.12);
+
+  border-radius: 50%;
+}
+
+.reputation-score-circle strong {
+  color: #172554;
+
+  font-size: 34px;
+  font-weight: 800;
+
+  line-height: 1;
+}
+
+.reputation-score-circle span {
+  margin-top: 6px;
+
   color: #64748b;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   SCORE INFORMATION
+========================================================= */
+
+.reputation-score-info {
+  min-width: 0;
+
+  flex: 1;
+}
+
+.reputation-score-info h3 {
+  margin: 0 0 7px;
+
+  color: #172554;
+
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.reputation-score-info p {
+  margin: 0 0 15px;
+
+  max-width: 700px;
+
+  color: #64748b;
+
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+.reputation-progress {
+  position: relative;
+
+  width: 100%;
+  height: 10px;
+
+  overflow: hidden;
+
+  background: #dbeafe;
+
+  border-radius: 999px;
+}
+
+.reputation-progress-fill {
+  height: 100%;
+
+  min-width: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      #2563eb,
+      #60a5fa
+    );
+
+  border-radius: inherit;
+
+  transition: width 0.6s ease;
+}
+
+/* =========================================================
+   REPUTATION STATISTICS
+========================================================= */
+
+.reputation-stats-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 14px;
+}
+
+.reputation-stat {
+  display: flex;
+
+  align-items: center;
+
+  min-width: 0;
+
+  gap: 12px;
+
+  padding: 16px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 15px;
+
+  transition:
+    transform var(--profile-transition),
+    border-color var(--profile-transition),
+    box-shadow var(--profile-transition);
+}
+
+.reputation-stat:hover {
+  transform: translateY(-2px);
+
+  border-color: #bfdbfe;
+
+  box-shadow:
+    0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.reputation-stat-icon {
+  display: grid;
+
+  place-items: center;
+
+  width: 44px;
+  height: 44px;
+
+  flex-shrink: 0;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 12px;
+
+  font-size: 19px;
+}
+
+.reputation-stat div {
+  display: flex;
+
+  min-width: 0;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.reputation-stat small {
+  color: #64748b;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.04em;
+}
+
+.reputation-stat strong {
+  color: #0f172a;
+
+  font-size: 20px;
+  font-weight: 800;
+}
+
+/* =========================================================
+   LEVEL INFORMATION
+========================================================= */
+
+.reputation-level-info {
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  margin-top: 16px;
+
+  padding: 15px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 15px;
+}
+
+.reputation-level-info > span {
+  display: grid;
+
+  place-items: center;
+
+  width: 44px;
+  height: 44px;
+
+  flex-shrink: 0;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 12px;
+
+  font-size: 20px;
+}
+
+.reputation-level-info div {
+  min-width: 0;
+}
+
+.reputation-level-info strong {
+  display: block;
+
+  color: #0f172a;
+
+  font-size: 14px;
+}
+
+.reputation-level-info p {
+  margin: 4px 0 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   PERSONAL INFORMATION
+========================================================= */
+
+.profile-details-card {
+  margin-bottom: 0;
 }
 
 .profile-details-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 14px;
 }
 
 .profile-detail {
   display: flex;
+
   align-items: center;
-  gap: 13px;
+
   min-width: 0;
-  padding: 17px;
+
+  gap: 13px;
+
+  padding: 16px;
 
   background: #f8fafc;
+
   border: 1px solid #e2e8f0;
+
   border-radius: 15px;
+
+  transition:
+    transform var(--profile-transition),
+    border-color var(--profile-transition),
+    box-shadow var(--profile-transition);
+}
+
+.profile-detail:hover {
+  transform: translateY(-2px);
+
+  border-color: #bfdbfe;
+
+  box-shadow:
+    0 8px 20px rgba(15, 23, 42, 0.06);
 }
 
 .profile-detail > span {
   display: grid;
-  width: 43px;
-  height: 43px;
+
   place-items: center;
+
+  width: 44px;
+  height: 44px;
+
   flex-shrink: 0;
 
-  background: white;
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+
   border-radius: 12px;
-  font-size: 20px;
+
+  font-size: 19px;
 }
 
 .profile-detail div {
   display: flex;
+
   min-width: 0;
+
   flex-direction: column;
+
   gap: 4px;
 }
 
 .profile-detail small {
   color: #64748b;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.04em;
 }
 
 .profile-detail strong {
+  min-width: 0;
+
+  color: #172033;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  line-height: 1.4;
+
   overflow-wrap: anywhere;
 }
 
+/* =========================================================
+   USER ID
+========================================================= */
+
 .profile-uid {
-  font-size: 12px;
-  font-family: monospace;
+  color: #64748b !important;
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
+
+  font-size: 11px !important;
+
+  word-break: break-all;
 }
 
+/* =========================================================
+   LOADING / ERROR / EMPTY
+========================================================= */
+
 .profile-message {
-  margin: 40px;
-  padding: 35px;
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 250px;
+
+  margin: 30px;
+
+  padding: 30px;
+
   text-align: center;
-  background: white;
+
+  color: #334155;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+
   border-radius: 18px;
+
+  box-shadow: var(--profile-shadow);
+
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .profile-error {
   color: #b91c1c;
+
+  background: #fff7f7;
+
+  border-color: #fecaca;
 }
 
-@media (max-width: 700px) {
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+body.dark-mode .profile-page {
+  --profile-bg: #080f1d;
+  --profile-card: #111c2e;
+  --profile-surface: #162235;
+  --profile-border: #26364d;
+
+  --profile-text: #e5edf8;
+  --profile-heading: #f8fafc;
+  --profile-muted: #94a3b8;
+
+  background:
+    radial-gradient(
+      circle at 85% 0%,
+      rgba(37, 99, 235, 0.13),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 0% 40%,
+      rgba(30, 64, 175, 0.08),
+      transparent 25%
+    ),
+    #080f1d;
+
+  color: #e5edf8;
+}
+
+/* =========================================================
+   DARK - CARDS
+========================================================= */
+
+body.dark-mode .profile-company-card,
+body.dark-mode .profile-reputation-card,
+body.dark-mode .profile-details-card {
+  background: #111c2e;
+
+  border-color: #26364d;
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.22);
+}
+
+body.dark-mode .profile-company-card:hover,
+body.dark-mode .profile-reputation-card:hover,
+body.dark-mode .profile-details-card:hover {
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.30);
+}
+
+/* =========================================================
+   DARK - HEADINGS
+========================================================= */
+
+body.dark-mode .profile-section-heading h2 {
+  color: #f8fafc;
+}
+
+body.dark-mode .profile-section-heading p {
+  color: #94a3b8;
+}
+
+/* =========================================================
+   DARK - COMPANY STATS
+========================================================= */
+
+body.dark-mode .company-stat {
+  background: #162235;
+
+  border-color: #26364d;
+}
+
+body.dark-mode .company-stat:hover {
+  background: #192940;
+
+  border-color: #36537a;
+}
+
+body.dark-mode .company-stat-icon {
+  background: #1b2c46;
+
+  border-color: #304765;
+}
+
+body.dark-mode .company-stat small {
+  color: #94a3b8;
+}
+
+body.dark-mode .company-stat strong {
+  color: #e5edf8;
+}
+
+/* =========================================================
+   DARK - QUICK ACTIONS
+========================================================= */
+
+body.dark-mode .quick-action-btn {
+  color: #dbeafe;
+
+  background: #162235;
+
+  border-color: #30415a;
+}
+
+body.dark-mode .quick-action-btn:hover {
+  color: #ffffff;
+
+  background: #2563eb;
+
+  border-color: #2563eb;
+}
+
+/* =========================================================
+   DARK - REPUTATION SCORE
+========================================================= */
+
+body.dark-mode .reputation-score-container {
+  background:
+    linear-gradient(
+      135deg,
+      #13284a,
+      #111c2e
+    );
+
+  border-color: #29446b;
+}
+
+body.dark-mode .reputation-score-circle {
+  background: #0b1525;
+
+  border-color: #3b82f6;
+
+  box-shadow:
+    0 10px 25px rgba(37, 99, 235, 0.22);
+}
+
+body.dark-mode .reputation-score-circle::before {
+  border-color: rgba(96, 165, 250, 0.16);
+}
+
+body.dark-mode .reputation-score-circle strong {
+  color: #f8fafc;
+}
+
+body.dark-mode .reputation-score-circle span {
+  color: #94a3b8;
+}
+
+body.dark-mode .reputation-score-info h3 {
+  color: #f8fafc;
+}
+
+body.dark-mode .reputation-score-info p {
+  color: #94a3b8;
+}
+
+body.dark-mode .reputation-progress {
+  background: #263b59;
+}
+
+body.dark-mode .reputation-progress-fill {
+  background:
+    linear-gradient(
+      90deg,
+      #2563eb,
+      #60a5fa
+    );
+}
+
+/* =========================================================
+   DARK - REPUTATION STATS
+========================================================= */
+
+body.dark-mode .reputation-stat {
+  background: #162235;
+
+  border-color: #26364d;
+}
+
+body.dark-mode .reputation-stat:hover {
+  background: #192940;
+
+  border-color: #36537a;
+}
+
+body.dark-mode .reputation-stat-icon {
+  background: #1b2c46;
+
+  border-color: #304765;
+}
+
+body.dark-mode .reputation-stat small {
+  color: #94a3b8;
+}
+
+body.dark-mode .reputation-stat strong {
+  color: #f8fafc;
+}
+
+/* =========================================================
+   DARK - LEVEL INFO
+========================================================= */
+
+body.dark-mode .reputation-level-info {
+  background: #162235;
+
+  border-color: #26364d;
+}
+
+body.dark-mode .reputation-level-info > span {
+  background: #1b2c46;
+
+  border-color: #304765;
+}
+
+body.dark-mode .reputation-level-info strong {
+  color: #f8fafc;
+}
+
+body.dark-mode .reputation-level-info p {
+  color: #94a3b8;
+}
+
+/* =========================================================
+   DARK - PERSONAL DETAILS
+========================================================= */
+
+body.dark-mode .profile-detail {
+  background: #162235;
+
+  border-color: #26364d;
+}
+
+body.dark-mode .profile-detail:hover {
+  background: #192940;
+
+  border-color: #36537a;
+}
+
+body.dark-mode .profile-detail > span {
+  background: #1b2c46;
+
+  border-color: #304765;
+}
+
+body.dark-mode .profile-detail small {
+  color: #94a3b8;
+}
+
+body.dark-mode .profile-detail strong {
+  color: #e5edf8;
+}
+
+body.dark-mode .profile-uid {
+  color: #94a3b8 !important;
+}
+
+/* =========================================================
+   DARK - MESSAGE
+========================================================= */
+
+body.dark-mode .profile-message {
+  color: #dbeafe;
+
+  background: #111c2e;
+
+  border-color: #26364d;
+}
+
+body.dark-mode .profile-error {
+  color: #fca5a5;
+
+  background: #29151a;
+
+  border-color: #7f1d1d;
+}
+
+/* =========================================================
+   DARK - BADGES
+========================================================= */
+
+body.dark-mode .profile-role-admin {
+  color: #fde68a;
+
+  background: rgba(120, 53, 15, 0.45);
+
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+body.dark-mode .profile-role-user {
+  color: #86efac;
+
+  background: rgba(22, 101, 52, 0.35);
+
+  border-color: rgba(34, 197, 94, 0.20);
+}
+
+body.dark-mode .profile-role-company {
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #6d28d9,
+      #4338ca
+    );
+}
+
+body.dark-mode .profile-role-moderator {
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #db2777,
+      #be123c
+    );
+}
+
+/* Reputation badges */
+
+body.dark-mode .reputation-score-high {
+  color: #86efac;
+
+  background: rgba(22, 101, 52, 0.35);
+
+  border-color: rgba(34, 197, 94, 0.20);
+}
+
+body.dark-mode .reputation-score-medium {
+  color: #fde68a;
+
+  background: rgba(120, 53, 15, 0.40);
+
+  border-color: rgba(245, 158, 11, 0.20);
+}
+
+body.dark-mode .reputation-score-low {
+  color: #fca5a5;
+
+  background: rgba(127, 29, 29, 0.35);
+
+  border-color: rgba(239, 68, 68, 0.20);
+}
+
+/* =========================================================
+   RESPONSIVE - 1100px
+========================================================= */
+
+@media (max-width: 1100px) {
+
   .profile-page {
-    padding: 18px 12px;
+    padding: 24px;
   }
 
+  .company-quick-actions {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .reputation-stats-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   RESPONSIVE - 850px
+========================================================= */
+
+@media (max-width: 850px) {
+
   .profile-header-card {
-    flex-direction: column;
     align-items: flex-start;
-    padding: 22px;
   }
 
   .profile-role {
     align-self: flex-start;
   }
 
+  .company-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
   .profile-details-grid {
     grid-template-columns: 1fr;
   }
 }
-body.dark-mode .profile-page {
-  background: #0f172a;
-  color: #f8fafc;
+
+/* =========================================================
+   RESPONSIVE - 700px
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .profile-page {
+    padding: 18px 12px;
+  }
+
+  .profile-header-card {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    padding: 22px;
+
+    gap: 16px;
+  }
+
+  .profile-avatar {
+    width: 72px;
+    height: 72px;
+
+    font-size: 23px;
+  }
+
+  .profile-header-text h1 {
+    font-size: 26px;
+  }
+
+  .profile-role {
+    align-self: flex-start;
+  }
+
+  .profile-company-card,
+  .profile-reputation-card,
+  .profile-details-card {
+    padding: 20px;
+
+    border-radius: 17px;
+  }
+
+  .profile-section-heading {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .profile-fleet-link {
+    width: 100%;
+  }
+
+  .reputation-score-container {
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 20px;
+  }
+
+  .reputation-score-circle {
+    align-self: center;
+  }
+
+  .reputation-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .company-quick-actions {
+    grid-template-columns: 1fr;
+  }
 }
 
-body.dark-mode .profile-details-card,
-body.dark-mode .profile-message {
-  background: #1e293b;
-  border-color: #334155;
-  color: #f8fafc;
+/* =========================================================
+   RESPONSIVE - 450px
+========================================================= */
+
+@media (max-width: 450px) {
+
+  .profile-page {
+    padding: 12px 8px;
+  }
+
+  .profile-header-card {
+    padding: 18px;
+  }
+
+  .profile-header-text h1 {
+    font-size: 23px;
+  }
+
+  .profile-header-text p {
+    font-size: 13px;
+  }
+
+  .profile-company-card,
+  .profile-reputation-card,
+  .profile-details-card {
+    padding: 16px;
+  }
+
+  .profile-section-heading h2 {
+    font-size: 18px;
+  }
+
+  .profile-section-heading p {
+    font-size: 13px;
+  }
+
+  .reputation-score-container {
+    padding: 16px;
+  }
+
+  .reputation-score-circle {
+    width: 110px;
+    height: 110px;
+  }
+
+  .reputation-score-circle strong {
+    font-size: 30px;
+  }
+
+  .profile-detail,
+  .reputation-stat,
+  .company-stat {
+    padding: 13px;
+  }
+
+  .profile-detail > span,
+  .reputation-stat-icon,
+  .company-stat-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .profile-message {
+    margin: 15px 5px;
+    padding: 25px 15px;
+  }
 }
 
-body.dark-mode .profile-detail {
-  background: #111827;
-  border-color: #334155;
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .profile-company-card,
+  .profile-reputation-card,
+  .profile-details-card,
+  .company-stat,
+  .quick-action-btn,
+  .reputation-stat,
+  .profile-detail,
+  .profile-fleet-link {
+    transition: none;
+  }
+
+  .reputation-progress-fill {
+    transition: none;
+  }
 }
 
-body.dark-mode .profile-detail > span {
-  background: #1e293b;
-}
+/* =========================================================
+   FOCUS STATES
+========================================================= */
 
-body.dark-mode .profile-detail small,
-body.dark-mode .profile-section-heading p {
-  color: #94a3b8;
-}
-
-body.dark-mode .profile-detail strong,
-body.dark-mode .profile-section-heading h2 {
-  color: #f8fafc;
+.profile-fleet-link:focus-visible,
+.quick-action-btn:focus-visible {
+  outline: 3px solid rgba(96, 165, 250, 0.45);
+  outline-offset: 3px;
 }

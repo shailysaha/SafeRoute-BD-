@@ -504,7 +504,7 @@ function FamilyChat() {
   const deleteMessage = async (messageId) => {
     if (!currentUser || !familyGroup) return;
 
-    if (!window.confirm("Delete this message?")) return;
+   // if (!window.confirm("Delete this message?")) return;
 
     try {
       const messageRef = doc(
@@ -585,7 +585,7 @@ function FamilyChat() {
       return;
     }
 
-    if (!window.confirm("Remove this member from the group?")) return;
+    //if (!window.confirm("Remove this member from the group?")) return;
 
     try {
       await updateDoc(doc(db, "familyGroups", familyGroup.id), {

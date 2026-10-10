@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import { analyzeRouteSafety } from "../utils/routeSafety";
+import { notify } from "../utils/notify";
 
 import "./ExploreRoutes.css";
 
@@ -142,7 +143,7 @@ function ExploreRoutes() {
     }
 
     if (!currentLocation) {
-      alert(
+      notify(
         startMode === "current"
           ? "Please select your current location first."
           : "Please choose a starting location first."

@@ -1,31 +1,21 @@
 import "./ReportSidebar.css";
 import { useEffect, useState } from "react";
 
-import { auth, db } from "../firebase/firebase";
-import {
-  addDoc,
-  collection,
-  serverTimestamp,
-  updateDoc,
-  doc,
-} from "firebase/firestore";
+import { auth } from "../firebase/firebase";
 
 import SearchLocation from "./SearchLocation";
 import VoiceReport from "./VoiceReport";
 import AIReportAssistant from "./ai/AIReportAssistant";
-
-// IMPORTANT:
-// Change this path if your Cloudinary utility is stored elsewhere.
-import { uploadEvidenceFiles } from "../utils/uploadEvidence";
+import { notify } from "../utils/notify";
 
 function ReportSidebar({
   selectedLocation,
   setSelectedLocation,
   onSubmit,
 }) {
-  // =====================================
+  // =====================================================
   // FORM DATA
-  // =====================================
+  // =====================================================
 
   const [formData, setFormData] = useState({
     area: "",
@@ -40,37 +30,42 @@ function ReportSidebar({
     roadStatus: "",
     trafficImpact: "",
 
+    // =====================================
+    // ACCIDENT ANALYTICS FIELDS
+    // =====================================
+
+    accidentTime: "",
+    weather: "",
+    roadType: "",
+    vehicleType: "",
+    reportedFactors: [],
+
     status: "Unverified",
   });
 
-  // =====================================
+  // =====================================================
   // EVIDENCE
-  // =====================================
+  // =====================================================
 
-  const [evidenceFiles, setEvidenceFiles] =
-    useState([]);
+  const [evidenceFiles, setEvidenceFiles] = useState([]);
 
-  // =====================================
+  // =====================================================
   // LOADING
-  // =====================================
+  // =====================================================
 
-  const [submitting, setSubmitting] =
-    useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [gpsLoading, setGpsLoading] = useState(false);
 
-  const [gpsLoading, setGpsLoading] =
-    useState(false);
-
-  // =====================================
+  // =====================================================
   // UPDATE LOCATION
-  // =====================================
+  // =====================================================
 
   useEffect(() => {
-    if (!selectedLocation) return;
+    if (!selectedLocation) {
+      return;
+    }
 
-    console.log(
-      "📍 Selected Location:",
-      selectedLocation
-    );
+    console.log("📍 Selected Location:", selectedLocation);
 
     const lat = Number(
       selectedLocation.lat ??
@@ -106,9 +101,9 @@ function ReportSidebar({
     }));
   }, [selectedLocation]);
 
-  // =====================================
+  // =====================================================
   // REVERSE GEOCODING
-  // =====================================
+  // =====================================================
 
   const reverseGeocode = async (
     lat,
@@ -162,6 +157,7 @@ function ReportSidebar({
         displayName:
           data.display_name || "",
       };
+
     } catch (error) {
       console.error(
         "❌ Reverse geocoding error:",
@@ -176,14 +172,16 @@ function ReportSidebar({
     }
   };
 
-  // =====================================
+  // =====================================================
   // SEARCH LOCATION
-  // =====================================
+  // =====================================================
 
   const handleSearchLocation = async (
     location
   ) => {
-    if (!location) return;
+    if (!location) {
+      return;
+    }
 
     const lat = Number(
       location.lat ??
@@ -200,7 +198,7 @@ function ReportSidebar({
       !Number.isFinite(lat) ||
       !Number.isFinite(lng)
     ) {
-      alert(
+      notify(
         "Unable to get coordinates for this location."
       );
 
@@ -254,13 +252,13 @@ function ReportSidebar({
     }));
   };
 
-  // =====================================
-  // GPS
-  // =====================================
+  // =====================================================
+  // CURRENT GPS
+  // =====================================================
 
   const getCurrentGPS = () => {
     if (!navigator.geolocation) {
-      alert(
+      notify(
         "❌ GPS is not supported by your browser."
       );
 
@@ -277,6 +275,12 @@ function ReportSidebar({
 
           const lng =
             position.coords.longitude;
+
+          console.log(
+            "📍 CURRENT GPS:",
+            lat,
+            lng
+          );
 
           const addressData =
             await reverseGeocode(
@@ -320,15 +324,17 @@ function ReportSidebar({
           setSelectedLocation(
             gpsLocation
           );
+
         } catch (error) {
           console.error(
             "GPS location error:",
             error
           );
 
-          alert(
+          notify(
             "GPS location found, but address could not be determined."
           );
+
         } finally {
           setGpsLoading(false);
         }
@@ -344,25 +350,25 @@ function ReportSidebar({
 
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            alert(
+            notify(
               "❌ Location permission denied. Please allow location access."
             );
             break;
 
           case error.POSITION_UNAVAILABLE:
-            alert(
+            notify(
               "❌ Current location is unavailable."
             );
             break;
 
           case error.TIMEOUT:
-            alert(
+            notify(
               "❌ GPS request timed out. Please try again."
             );
             break;
 
           default:
-            alert(
+            notify(
               "❌ Unable to get your current location."
             );
         }
@@ -376,14 +382,16 @@ function ReportSidebar({
     );
   };
 
-  // =====================================
+  // =====================================================
   // AI SUGGESTION
-  // =====================================
+  // =====================================================
 
   const handleAISuggestion = (
     suggestion
   ) => {
-    if (!suggestion) return;
+    if (!suggestion) {
+      return;
+    }
 
     setFormData((previous) => ({
       ...previous,
@@ -408,17 +416,48 @@ function ReportSidebar({
       trafficImpact:
         suggestion.trafficImpact ||
         previous.trafficImpact,
+
+      // =====================================
+      // ACCIDENT ANALYTICS FIELDS
+      // =====================================
+
+      accidentTime:
+        suggestion.accidentTime ||
+        previous.accidentTime,
+
+      weather:
+        suggestion.weather ||
+        previous.weather,
+
+      roadType:
+        suggestion.roadType ||
+        previous.roadType,
+
+      vehicleType:
+        suggestion.vehicleType ||
+        previous.vehicleType,
+
+      reportedFactors:
+        suggestion.reportedFactors ||
+        previous.reportedFactors,
     }));
   };
 
-  // =====================================
-  // VOICE
-  // =====================================
+  // =====================================================
+  // VOICE RESULT
+  // =====================================================
 
   const handleVoiceResult = (
     voiceData
   ) => {
-    if (!voiceData) return;
+    if (!voiceData) {
+      return;
+    }
+
+    console.log(
+      "🎤 Voice report result:",
+      voiceData
+    );
 
     setFormData((previous) => ({
       ...previous,
@@ -459,12 +498,36 @@ function ReportSidebar({
       trafficImpact:
         voiceData.trafficImpact ||
         previous.trafficImpact,
+
+      // =====================================
+      // ACCIDENT ANALYTICS FIELDS
+      // =====================================
+
+      accidentTime:
+        voiceData.accidentTime ||
+        previous.accidentTime,
+
+      weather:
+        voiceData.weather ||
+        previous.weather,
+
+      roadType:
+        voiceData.roadType ||
+        previous.roadType,
+
+      vehicleType:
+        voiceData.vehicleType ||
+        previous.vehicleType,
+
+      reportedFactors:
+        voiceData.reportedFactors ||
+        previous.reportedFactors,
     }));
   };
 
-  // =====================================
+  // =====================================================
   // EVIDENCE SELECT
-  // =====================================
+  // =====================================================
 
   const handleEvidenceChange = (
     event
@@ -512,7 +575,7 @@ function ReportSidebar({
         );
 
       if (!isImage && !isVideo) {
-        alert(
+        notify(
           `${file.name}: Only JPG, PNG, WEBP, MP4, WEBM and MOV files are allowed.`
         );
 
@@ -523,7 +586,7 @@ function ReportSidebar({
         isImage &&
         file.size > MAX_IMAGE_SIZE
       ) {
-        alert(
+        notify(
           `${file.name}: Image must be smaller than 10 MB.`
         );
 
@@ -534,7 +597,7 @@ function ReportSidebar({
         isVideo &&
         file.size > MAX_VIDEO_SIZE
       ) {
-        alert(
+        notify(
           `${file.name}: Video must be smaller than 50 MB.`
         );
 
@@ -550,7 +613,7 @@ function ReportSidebar({
     ];
 
     if (combinedFiles.length > 5) {
-      alert(
+      notify(
         "⚠️ Maximum 5 evidence files allowed."
       );
 
@@ -566,9 +629,9 @@ function ReportSidebar({
     event.target.value = "";
   };
 
-  // =====================================
+  // =====================================================
   // REMOVE EVIDENCE
-  // =====================================
+  // =====================================================
 
   const removeEvidence = (
     index
@@ -582,9 +645,9 @@ function ReportSidebar({
     );
   };
 
-  // =====================================
+  // =====================================================
   // FILE SIZE
-  // =====================================
+  // =====================================================
 
   const formatFileSize = (
     bytes
@@ -608,29 +671,77 @@ function ReportSidebar({
     ).toFixed(1)} MB`;
   };
 
-  // =====================================
-  // SUBMIT INCIDENT
-  // =====================================
+  // =====================================================
+  // VALIDATE ACCIDENT DETAILS
+  // =====================================================
+
+  const validateAccidentDetails = () => {
+    const isAccident = formData.incidentType
+      ?.toLowerCase()
+      .includes("accident");
+
+    if (!isAccident) {
+      return true;
+    }
+
+    const errors = [];
+
+    if (!formData.accidentTime) {
+      errors.push("Accident Date & Time");
+    }
+
+    if (!formData.weather) {
+      errors.push("Weather Condition");
+    }
+
+    if (!formData.roadType) {
+      errors.push("Road Type");
+    }
+
+    if (!formData.vehicleType) {
+      errors.push("Vehicle Type");
+    }
+
+    if (!formData.reportedFactors || formData.reportedFactors.length === 0) {
+      errors.push("Reported Factors (at least one)");
+    }
+
+    if (errors.length > 0) {
+      notify(
+        `⚠️ Please fill all accident details:\n\n${errors.join("\n")}`
+      );
+      return false;
+    }
+
+    return true;
+  };
+
+  // =====================================================
+  // SUBMIT
+  // IMPORTANT:
+  // This component DOES NOT write to Firestore.
+  // MapPage is responsible for the ONE Firestore write.
+  // =====================================================
 
   const handleSubmit = async () => {
-    // -------------------------------------
-    // AUTH
-    // -------------------------------------
-
     const currentUser =
       auth.currentUser;
 
+    // -----------------------------------------------
+    // AUTH
+    // -----------------------------------------------
+
     if (!currentUser) {
-      alert(
+      notify(
         "Please login before submitting an incident."
       );
 
       return;
     }
 
-    // -------------------------------------
+    // -----------------------------------------------
     // LOCATION
-    // -------------------------------------
+    // -----------------------------------------------
 
     const lat =
       Number(formData.lat);
@@ -642,16 +753,16 @@ function ReportSidebar({
       !Number.isFinite(lat) ||
       !Number.isFinite(lng)
     ) {
-      alert(
+      notify(
         "Please select a location on the map, search for a location, or use GPS."
       );
 
       return;
     }
 
-    // -------------------------------------
+    // -----------------------------------------------
     // REQUIRED FIELDS
-    // -------------------------------------
+    // -----------------------------------------------
 
     if (
       !formData.area ||
@@ -660,201 +771,111 @@ function ReportSidebar({
       !formData.severity ||
       !formData.description.trim()
     ) {
-      alert(
+      notify(
         "Please fill all required fields."
       );
 
       return;
     }
 
+    // -----------------------------------------------
+    // VALIDATE ACCIDENT DETAILS (if accident type)
+    // -----------------------------------------------
+
+    if (!validateAccidentDetails()) {
+      return;
+    }
+
+    // -----------------------------------------------
+    // SUBMIT
+    // -----------------------------------------------
+
     try {
       setSubmitting(true);
 
-      // ===================================
-      // STEP 1
-      // CREATE INCIDENT
-      // ===================================
-
-      const newIncident = {
-        incidentType:
-          formData.incidentType,
-
-        dangerType:
-          formData.incidentType,
-
-        area:
-          formData.area,
-
-        district:
-          formData.district,
-
-        lat,
-        lng,
-
-        severity:
-          formData.severity,
-
-        description:
-          formData.description.trim(),
-
-        roadStatus:
-          formData.roadStatus || "",
-
-        trafficImpact:
-          formData.trafficImpact || "",
-
-        // Owner
-        reporterId:
-          currentUser.uid,
-
-        // Kept for My Reports compatibility
-        userId:
-          currentUser.uid,
-
-        userEmail:
-          currentUser.email || "",
-
-        // Verification
-        status:
-          "Unverified",
-
-        confirmationCount:
-          0,
-
-        rejectionCount:
-          0,
-
-        // Evidence starts empty
-        evidence: [],
-
-        createdAt:
-          serverTimestamp(),
-
-        updatedAt:
-          serverTimestamp(),
-      };
-
-      console.log(
-        "📤 Creating incident:",
-        newIncident
-      );
-
-      const incidentRef =
-        await addDoc(
-          collection(
-            db,
-            "incidents"
-          ),
-          newIncident
-        );
-
-      const incidentId =
-        incidentRef.id;
-
-      console.log(
-        "✅ Incident created:",
-        incidentId
-      );
-
-      // ===================================
-      // STEP 2
-      // UPLOAD EVIDENCE
-      // ===================================
-
-      let uploadedEvidence = [];
-
-      if (
-        evidenceFiles.length > 0
-      ) {
-        console.log(
-          `📷 Uploading ${evidenceFiles.length} evidence file(s)...`
-        );
-
-        try {
-          uploadedEvidence =
-            await uploadEvidenceFiles(
-              evidenceFiles,
-              currentUser.uid,
-              incidentId
-            );
-
-          console.log(
-            "✅ Evidence uploaded:",
-            uploadedEvidence
-          );
-        } catch (uploadError) {
-          console.error(
-            "❌ Evidence upload failed:",
-            uploadError
-          );
-
-          // Keep incident but tell user
-          alert(
-            `Incident was submitted, but evidence upload failed.\n\n${uploadError.message}`
-          );
-        }
-      }
-
-      // ===================================
-      // STEP 3
-      // SAVE EVIDENCE URLS TO INCIDENT
-      // ===================================
-
-      if (
-        uploadedEvidence.length > 0
-      ) {
-        await updateDoc(
-          doc(
-            db,
-            "incidents",
-            incidentId
-          ),
-          {
-            evidence:
-              uploadedEvidence,
-
-            updatedAt:
-              serverTimestamp(),
-          }
-        );
-
-        console.log(
-          "✅ Evidence saved to Firestore."
-        );
-      }
-
-      // ===================================
-      // STEP 4
-      // PARENT CALLBACK
-      // ===================================
-
-      if (
-        typeof onSubmit ===
-        "function"
-      ) {
+      const success =
         await onSubmit({
-          id: incidentId,
+          area:
+            formData.area,
 
-          ...newIncident,
+          district:
+            formData.district,
 
-          evidence:
-            uploadedEvidence,
+          lat,
+
+          lng,
+
+          incidentType:
+            formData.incidentType,
+
+          dangerType:
+            formData.incidentType,
+
+          severity:
+            formData.severity,
+
+          description:
+            formData.description.trim(),
+
+          roadStatus:
+            formData.roadStatus || "",
+
+          trafficImpact:
+            formData.trafficImpact || "",
+
+          // =====================================
+          // ACCIDENT ANALYTICS FIELDS
+          // =====================================
+
+          accidentTime:
+            formData.accidentTime
+              ? new Date(
+                  formData.accidentTime
+                ).toISOString()
+              : null,
+
+          weather:
+            formData.weather || "",
+
+          roadType:
+            formData.roadType || "",
+
+          vehicleType:
+            formData.vehicleType || "",
+
+          reportedFactors:
+            Array.isArray(
+              formData.reportedFactors
+            )
+              ? formData.reportedFactors
+              : [],
+
+          status:
+            "Unverified",
+
+          evidenceFiles:
+            evidenceFiles,
         });
+
+      // IMPORTANT:
+      // If MapPage failed, DO NOT clear form.
+      if (!success) {
+        return;
       }
 
-      // ===================================
-      // SUCCESS
-      // ===================================
+      // -----------------------------------------------
+      // SUCCESS MESSAGE
+      // -----------------------------------------------
 
-      alert(
-        uploadedEvidence.length > 0
+      notify(
+        evidenceFiles.length > 0
           ? "✅ Road Incident and evidence submitted successfully!\n\nStatus: Unverified"
           : "✅ Road Incident submitted successfully!\n\nStatus: Unverified"
       );
 
-      // ===================================
-      // RESET
-      // ===================================
+      // -----------------------------------------------
+      // RESET FORM
+      // -----------------------------------------------
 
       setFormData({
         area: "",
@@ -869,65 +890,63 @@ function ReportSidebar({
         roadStatus: "",
         trafficImpact: "",
 
+        accidentTime: "",
+        weather: "",
+        roadType: "",
+        vehicleType: "",
+        reportedFactors: [],
+
         status:
           "Unverified",
       });
 
       setEvidenceFiles([]);
 
-      setSelectedLocation(
-        null
-      );
+      setSelectedLocation(null);
 
     } catch (error) {
       console.error(
-        "❌ Incident submission error:",
+        "❌ Report sidebar submission error:",
         error
       );
 
-      console.error(
-        "Error code:",
-        error?.code
-      );
-
-      console.error(
-        "Error message:",
-        error?.message
-      );
-
-      alert(
+      notify(
         `❌ Failed to submit incident.\n\n${
           error?.message ||
           "Unknown error"
         }`
       );
+
     } finally {
       setSubmitting(false);
     }
   };
 
-  // =====================================
-  // INPUT CHANGE
-  // =====================================
+  // =====================================================
+  // INPUT HANDLER
+  // =====================================================
 
-  const handleChange = (
-    field,
-    value
-  ) => {
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    
     setFormData(
       (previous) => ({
         ...previous,
-        [field]: value,
+        [name]: value,
       })
     );
   };
 
-  // =====================================
+  // =====================================================
   // RENDER
-  // =====================================
+  // =====================================================
 
   return (
     <div className="report-sidebar">
+
+      {/* =========================================
+          HEADER
+      ========================================= */}
 
       <h2>
         🚧 Report Road Incident
@@ -938,26 +957,28 @@ function ReportSidebar({
         to help other road users.
       </p>
 
-      {/* STATUS */}
+      {/* =========================================
+          STATUS
+      ========================================= */}
 
       <div
         style={{
           padding: "10px",
           marginBottom: "12px",
           borderRadius: "8px",
-          background:
-            "#fff3cd",
+          background: "#fff3cd",
           border:
             "1px solid #ffe69c",
-          color:
-            "#856404",
+          color: "#856404",
           fontWeight: "600",
         }}
       >
         🟡 Status: Unverified
       </div>
 
-      {/* SEARCH */}
+      {/* =========================================
+          SEARCH
+      ========================================= */}
 
       <SearchLocation
         onLocationSelect={
@@ -965,7 +986,9 @@ function ReportSidebar({
         }
       />
 
-      {/* GPS */}
+      {/* =========================================
+          GPS
+      ========================================= */}
 
       <button
         type="button"
@@ -989,7 +1012,9 @@ function ReportSidebar({
           : "📍 Use My Current GPS Location"}
       </button>
 
-      {/* VOICE */}
+      {/* =========================================
+          BANGLA VOICE
+      ========================================= */}
 
       <VoiceReport
         selectedLocation={
@@ -1000,7 +1025,9 @@ function ReportSidebar({
         }
       />
 
-      {/* AI */}
+      {/* =========================================
+          AI
+      ========================================= */}
 
       <AIReportAssistant
         onApplySuggestion={
@@ -1016,7 +1043,9 @@ function ReportSidebar({
         }}
       />
 
-      {/* AREA */}
+      {/* =========================================
+          AREA
+      ========================================= */}
 
       <input
         placeholder="Area Name"
@@ -1024,7 +1053,9 @@ function ReportSidebar({
         disabled
       />
 
-      {/* DISTRICT */}
+      {/* =========================================
+          DISTRICT
+      ========================================= */}
 
       <input
         placeholder="District Name"
@@ -1034,18 +1065,16 @@ function ReportSidebar({
         disabled
       />
 
-      {/* INCIDENT TYPE */}
+      {/* =========================================
+          INCIDENT TYPE
+      ========================================= */}
 
       <select
+        name="incidentType"
         value={
           formData.incidentType
         }
-        onChange={(e) =>
-          handleChange(
-            "incidentType",
-            e.target.value
-          )
-        }
+        onChange={handleChange}
       >
         <option value="">
           Select Incident Type
@@ -1100,18 +1129,16 @@ function ReportSidebar({
         </option>
       </select>
 
-      {/* SEVERITY */}
+      {/* =========================================
+          SEVERITY
+      ========================================= */}
 
       <select
+        name="severity"
         value={
           formData.severity
         }
-        onChange={(e) =>
-          handleChange(
-            "severity",
-            e.target.value
-          )
-        }
+        onChange={handleChange}
       >
         <option value="">
           Select Severity
@@ -1130,22 +1157,236 @@ function ReportSidebar({
         </option>
       </select>
 
-      {/* DESCRIPTION */}
+      {/* =========================================
+          DESCRIPTION
+      ========================================= */}
 
       <textarea
         placeholder="Describe the road incident or hazard..."
+        name="description"
         value={
           formData.description
         }
-        onChange={(e) =>
-          handleChange(
-            "description",
-            e.target.value
-          )
-        }
+        onChange={handleChange}
       />
 
-      {/* EVIDENCE */}
+      {/* =========================================
+          ACCIDENT DETAILS - Only shown when incidentType is Accident
+      ========================================= */}
+
+      {formData.incidentType
+        ?.toLowerCase()
+        .includes("accident") && (
+        <div className="accident-details-section">
+          <div className="form-section-title">
+            🚗 Accident Details
+          </div>
+
+          <div
+            style={{
+              padding: "8px 12px",
+              marginBottom: "12px",
+              borderRadius: "6px",
+              background: "#fff3cd",
+              border: "1px solid #ffe69c",
+              color: "#856404",
+              fontSize: "13px",
+            }}
+          >
+            ⚠️ All accident details are required for accident reports.
+          </div>
+
+          <label>
+            Accident Date & Time <span style={{ color: "red" }}>*</span>
+            <input
+              type="datetime-local"
+              name="accidentTime"
+              value={formData.accidentTime}
+              onChange={handleChange}
+              required
+            />
+          </label>
+
+          <label>
+            Weather Condition <span style={{ color: "red" }}>*</span>
+            <select
+              name="weather"
+              value={formData.weather}
+              onChange={handleChange}
+              required
+            >
+              <option value="">
+                Select weather
+              </option>
+              <option value="Clear">
+                Clear
+              </option>
+              <option value="Rainy">
+                Rainy
+              </option>
+              <option value="Foggy">
+                Foggy
+              </option>
+              <option value="Stormy">
+                Stormy
+              </option>
+              <option value="Cloudy">
+                Cloudy
+              </option>
+              <option value="Other">
+                Other
+              </option>
+            </select>
+          </label>
+
+          <label>
+            Road Type <span style={{ color: "red" }}>*</span>
+            <select
+              name="roadType"
+              value={formData.roadType}
+              onChange={handleChange}
+              required
+            >
+              <option value="">
+                Select road type
+              </option>
+              <option value="Highway">
+                Highway
+              </option>
+              <option value="Urban Road">
+                Urban Road
+              </option>
+              <option value="Residential Road">
+                Residential Road
+              </option>
+              <option value="Intersection">
+                Intersection
+              </option>
+              <option value="Rural Road">
+                Rural Road
+              </option>
+              <option value="Bridge">
+                Bridge
+              </option>
+              <option value="Other">
+                Other
+              </option>
+            </select>
+          </label>
+
+          <label>
+            Vehicle Type <span style={{ color: "red" }}>*</span>
+            <select
+              name="vehicleType"
+              value={formData.vehicleType}
+              onChange={handleChange}
+              required
+            >
+              <option value="">
+                Select vehicle
+              </option>
+              <option value="Motorcycle">
+                Motorcycle
+              </option>
+              <option value="Car">
+                Car
+              </option>
+              <option value="Bus">
+                Bus
+              </option>
+              <option value="Truck">
+                Truck
+              </option>
+              <option value="CNG">
+                CNG
+              </option>
+              <option value="Rickshaw">
+                Rickshaw
+              </option>
+              <option value="Auto Rickshaw">
+                Auto Rickshaw
+              </option>
+              <option value="Bicycle">
+                Bicycle
+              </option>
+              <option value="Multiple Vehicles">
+                Multiple Vehicles
+              </option>
+              <option value="Other">
+                Other
+              </option>
+            </select>
+          </label>
+
+          <label>
+            Reported Factors <span style={{ color: "red" }}>*</span>
+            <select
+              multiple
+              name="reportedFactors"
+              value={formData.reportedFactors}
+              onChange={(event) => {
+                const values =
+                  Array.from(
+                    event.target.selectedOptions
+                  ).map(
+                    (option) =>
+                      option.value
+                  );
+
+                setFormData((previous) => ({
+                  ...previous,
+                  reportedFactors: values,
+                }));
+              }}
+              required
+            >
+              <option value="Speeding">
+                Speeding
+              </option>
+
+              <option value="Reckless Driving">
+                Reckless Driving
+              </option>
+
+              <option value="Wet Road">
+                Wet Road
+              </option>
+
+              <option value="Poor Lighting">
+                Poor Lighting
+              </option>
+
+              <option value="Road Damage">
+                Road Damage
+              </option>
+
+              <option value="Driver Distraction">
+                Driver Distraction
+              </option>
+
+              <option value="Overtaking">
+                Overtaking
+              </option>
+
+              <option value="Mechanical Failure">
+                Mechanical Failure
+              </option>
+
+              <option value="Unknown Cause">
+                Unknown Cause
+              </option>
+            </select>
+
+            <small>
+              Hold Ctrl/Cmd to select multiple factors.
+            </small>
+          </label>
+        </div>
+      )}
+
+      {/* =========================================
+          EVIDENCE
+      ========================================= */}
 
       <div
         style={{
@@ -1185,8 +1426,7 @@ function ReportSidebar({
           10 MB and videos up to 50 MB.
         </small>
 
-        {evidenceFiles.length >
-          0 && (
+        {evidenceFiles.length > 0 && (
           <div
             style={{
               marginTop: "12px",
@@ -1214,25 +1454,25 @@ function ReportSidebar({
                   <div
                     key={`${file.name}-${index}`}
                     style={{
-                      marginTop: "10px",
-                      padding: "8px",
+                      marginTop:
+                        "10px",
+
+                      padding:
+                        "8px",
+
                       border:
                         "1px solid #ddd",
+
                       borderRadius:
                         "8px",
                     }}
                   >
                     {isImage ? (
                       <img
-                        src={
-                          previewURL
-                        }
-                        alt={
-                          file.name
-                        }
+                        src={previewURL}
+                        alt={file.name}
                         style={{
-                          width:
-                            "100%",
+                          width: "100%",
                           maxHeight:
                             "180px",
                           objectFit:
@@ -1243,13 +1483,10 @@ function ReportSidebar({
                       />
                     ) : (
                       <video
-                        src={
-                          previewURL
-                        }
+                        src={previewURL}
                         controls
                         style={{
-                          width:
-                            "100%",
+                          width: "100%",
                           maxHeight:
                             "180px",
                           borderRadius:
@@ -1285,8 +1522,7 @@ function ReportSidebar({
                       style={{
                         padding:
                           "5px 10px",
-                        border:
-                          "none",
+                        border: "none",
                         borderRadius:
                           "5px",
                         cursor:
@@ -1303,7 +1539,9 @@ function ReportSidebar({
         )}
       </div>
 
-      {/* COORDINATES */}
+      {/* =========================================
+          COORDINATES
+      ========================================= */}
 
       <p>
         LAT:{" "}
@@ -1347,16 +1585,14 @@ function ReportSidebar({
         disabled
       />
 
-      {/* SUBMIT */}
+      {/* =========================================
+          SUBMIT
+      ========================================= */}
 
       <button
         type="button"
-        onClick={
-          handleSubmit
-        }
-        disabled={
-          submitting
-        }
+        onClick={handleSubmit}
+        disabled={submitting}
       >
         {submitting
           ? "Uploading & Submitting..."

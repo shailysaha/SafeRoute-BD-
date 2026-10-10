@@ -1,13 +1,9 @@
-/* ================================
-   DESKTOP SIDEBAR
-================================ */
-
 .sidebar {
   width: 280px;
   min-width: 280px;
   min-height: 100vh;
 
-  padding: 28px 22px;
+  padding: 26px 18px;
 
   display: flex;
   flex-direction: column;
@@ -22,40 +18,78 @@
   transition:
     transform 0.28s ease,
     width 0.25s ease,
-    background 0.25s ease;
+    background 0.25s ease,
+    border-color 0.25s ease;
+
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 
-/* Header */
+/* =========================================================
+   CUSTOM SCROLLBAR
+========================================================= */
+
+.sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
 
 .sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  margin-bottom: 30px;
+  min-height: 48px;
+
+  margin-bottom: 24px;
 }
 
 
-/* Logo */
+/* =========================================================
+   LOGO
+========================================================= */
 
 .sidebar .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+
+  gap: 11px;
 
   padding: 0 8px;
 
   color: #10b981;
 
-  font-size: 22px;
+  font-size: 21px;
   font-weight: 800;
+
+  letter-spacing: -0.4px;
 
   white-space: nowrap;
 }
 
 .sidebar .logo svg {
   flex-shrink: 0;
+
+  width: 28px;
+  height: 28px;
 
   font-size: 28px;
 }
@@ -65,7 +99,9 @@
 }
 
 
-/* Close button hidden desktop */
+/* =========================================================
+   CLOSE BUTTON
+========================================================= */
 
 .sidebar-close-btn {
   display: none;
@@ -84,39 +120,60 @@
 
   cursor: pointer;
 
-  font-size: 18px;
+  font-size: 17px;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.sidebar-close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  transform: rotate(90deg);
 }
 
 
-/* Navigation */
+/* =========================================================
+   NAVIGATION
+========================================================= */
 
 .sidebar-nav {
   display: flex;
   flex-direction: column;
 
-  gap: 10px;
+  gap: 6px;
+
+  padding-bottom: 20px;
 }
+
+
+/* =========================================================
+   NORMAL NAVIGATION LINKS
+========================================================= */
 
 .sidebar-nav > a {
   width: 100%;
-  min-height: 52px;
+  min-height: 50px;
 
-  padding: 0 16px;
+  padding: 0 15px;
 
   display: flex;
   align-items: center;
 
-  gap: 14px;
+  gap: 13px;
 
   color: #64748b;
 
   background: transparent;
 
-  border-radius: 13px;
+  border: 1px solid transparent;
+  border-radius: 12px;
 
   text-decoration: none;
 
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
 
   box-sizing: border-box;
@@ -125,17 +182,21 @@
     background 0.2s ease,
     color 0.2s ease,
     transform 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .sidebar-nav > a svg {
-  width: 20px;
+  width: 19px;
+  height: 19px;
 
   flex-shrink: 0;
 
-  font-size: 18px;
-
   color: inherit;
+
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
 }
 
 .sidebar-nav > a span {
@@ -145,18 +206,28 @@
 }
 
 
-/* Hover */
+/* =========================================================
+   NORMAL LINK HOVER
+========================================================= */
 
 .sidebar-nav > a:hover {
   color: #059669;
 
   background: #ecfdf5;
 
+  border-color: #d1fae5;
+
   transform: translateX(3px);
 }
 
+.sidebar-nav > a:hover svg {
+  transform: scale(1.05);
+}
 
-/* Active */
+
+/* =========================================================
+   NORMAL LINK ACTIVE
+========================================================= */
 
 .sidebar-nav > a.active {
   color: #052e22 !important;
@@ -164,13 +235,14 @@
   background:
     linear-gradient(
       135deg,
-      #34d399,
-      #10b981
+      #34d399 0%,
+      #10b981 100%
     );
 
+  border-color: transparent;
+
   box-shadow:
-    0 10px 22px
-    rgba(16, 185, 129, 0.24);
+    0 8px 20px rgba(16, 185, 129, 0.20);
 }
 
 .sidebar-nav > a.active svg,
@@ -178,17 +250,194 @@
   color: #052e22 !important;
 }
 
+.sidebar-nav > a.active svg {
+  transform: scale(1.04);
+}
 
-/* Overlay desktop hidden */
+
+/* =========================================================
+   FLEET / COMPANY SECTION
+========================================================= */
+
+.sidebar-section {
+  position: relative;
+
+  margin-top: 15px;
+  padding-top: 16px;
+
+  border-top: 1px solid #e2e8f0;
+}
+
+
+/* =========================================================
+   FLEET SECTION TITLE
+========================================================= */
+
+.sidebar-section-title {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  margin: 0 8px 8px;
+
+  padding: 7px 9px;
+
+  color: #64748b;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+
+  white-space: nowrap;
+}
+
+.sidebar-section-title svg {
+  width: 14px;
+  height: 14px;
+
+  flex-shrink: 0;
+
+  color: #10b981;
+}
+
+
+/* =========================================================
+   FLEET NAVIGATION
+========================================================= */
+
+.sidebar-section a {
+  width: 100%;
+  min-height: 48px;
+
+  margin-top: 4px;
+
+  padding: 0 15px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  color: #64748b;
+
+  background: transparent;
+
+  border: 1px solid transparent;
+  border-radius: 12px;
+
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  box-sizing: border-box;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.sidebar-section a svg {
+  width: 18px;
+  height: 18px;
+
+  flex-shrink: 0;
+
+  color: inherit;
+
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
+}
+
+.sidebar-section a span {
+  color: inherit;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   FLEET HOVER
+========================================================= */
+
+.sidebar-section a:hover {
+  color: #059669;
+
+  background: #ecfdf5;
+
+  border-color: #d1fae5;
+
+  transform: translateX(3px);
+}
+
+.sidebar-section a:hover svg {
+  transform: scale(1.06);
+}
+
+
+/* =========================================================
+   FLEET ACTIVE
+========================================================= */
+
+.sidebar-section a.active {
+  color: #052e22 !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #6ee7b7 0%,
+      #10b981 100%
+    );
+
+  border-color: transparent;
+
+  box-shadow:
+    0 8px 20px rgba(16, 185, 129, 0.18);
+}
+
+.sidebar-section a.active svg,
+.sidebar-section a.active span {
+  color: #052e22 !important;
+}
+
+
+/* =========================================================
+   FLEET DASHBOARD — SLIGHTLY STRONGER
+========================================================= */
+
+.sidebar-section a[href="/fleet-dashboard"] {
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   ADMIN SECTION
+========================================================= */
+
+.sidebar-section:has(a[href="/admin"]) {
+  margin-top: 18px;
+}
+
+
+/* =========================================================
+   MOBILE OVERLAY — DESKTOP
+========================================================= */
 
 .sidebar-overlay {
   display: none;
 }
 
 
-/* ================================
+/* =========================================================
    DARK MODE
-================================ */
+========================================================= */
 
 body.dark-mode .sidebar {
   background: #111827;
@@ -196,10 +445,24 @@ body.dark-mode .sidebar {
   border-right-color: #273449;
 }
 
+body.dark-mode .sidebar::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+body.dark-mode .sidebar::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+
+/* Logo */
+
 body.dark-mode .sidebar .logo,
 body.dark-mode .sidebar .logo span {
   color: #34d399;
 }
+
+
+/* Normal links */
 
 body.dark-mode .sidebar-nav > a {
   color: #94a3b8;
@@ -209,7 +472,10 @@ body.dark-mode .sidebar-nav > a:hover {
   color: #6ee7b7;
 
   background:
-    rgba(16, 185, 129, 0.1);
+    rgba(16, 185, 129, 0.09);
+
+  border-color:
+    rgba(52, 211, 153, 0.12);
 }
 
 body.dark-mode .sidebar-nav > a.active {
@@ -218,9 +484,13 @@ body.dark-mode .sidebar-nav > a.active {
   background:
     linear-gradient(
       135deg,
-      #34d399,
-      #10b981
+      #34d399 0%,
+      #10b981 100%
     );
+
+  box-shadow:
+    0 8px 20px
+    rgba(16, 185, 129, 0.18);
 }
 
 body.dark-mode
@@ -230,44 +500,147 @@ body.dark-mode
   color: #052e22 !important;
 }
 
+
+/* Fleet section */
+
+body.dark-mode .sidebar-section {
+  border-top-color: #273449;
+}
+
+body.dark-mode .sidebar-section-title {
+  color: #64748b;
+}
+
+body.dark-mode .sidebar-section-title svg {
+  color: #34d399;
+}
+
+body.dark-mode .sidebar-section a {
+  color: #94a3b8;
+}
+
+body.dark-mode .sidebar-section a:hover {
+  color: #6ee7b7;
+
+  background:
+    rgba(16, 185, 129, 0.09);
+
+  border-color:
+    rgba(52, 211, 153, 0.12);
+}
+
+body.dark-mode .sidebar-section a.active {
+  color: #052e22 !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #6ee7b7 0%,
+      #10b981 100%
+    );
+
+  box-shadow:
+    0 8px 20px
+    rgba(16, 185, 129, 0.18);
+}
+
+body.dark-mode
+.sidebar-section a.active svg,
+body.dark-mode
+.sidebar-section a.active span {
+  color: #052e22 !important;
+}
+
+
+/* Close button */
+
 body.dark-mode .sidebar-close-btn {
   color: #f8fafc;
 
   background: #1e293b;
 }
 
+body.dark-mode .sidebar-close-btn:hover {
+  background: #334155;
+  color: #ffffff;
+}
 
-/* ================================
+
+/* =========================================================
    TABLET
-================================ */
+========================================================= */
 
 @media (max-width: 1000px) and (min-width: 769px) {
+
   .sidebar {
     width: 230px;
     min-width: 230px;
 
-    padding: 24px 16px;
+    padding: 22px 14px;
+  }
+
+  .sidebar-header {
+    margin-bottom: 20px;
   }
 
   .sidebar .logo {
-    font-size: 19px;
+    padding: 0 5px;
+
+    font-size: 18px;
   }
 
   .sidebar .logo svg {
-    font-size: 25px;
+    width: 24px;
+    height: 24px;
   }
 
   .sidebar-nav > a {
-    padding: 0 13px;
+    min-height: 48px;
 
-    font-size: 14px;
+    padding: 0 12px;
+
+    gap: 11px;
+
+    font-size: 13px;
+  }
+
+  .sidebar-nav > a svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .sidebar-section {
+    margin-top: 13px;
+    padding-top: 13px;
+  }
+
+  .sidebar-section-title {
+    margin-left: 5px;
+    margin-right: 5px;
+
+    padding-left: 7px;
+  }
+
+  .sidebar-section a {
+    min-height: 46px;
+
+    padding: 0 12px;
+
+    gap: 11px;
+
+    font-size: 13px;
+  }
+
+  .sidebar-section a svg {
+    width: 17px;
+    height: 17px;
   }
 }
 
 
-/* ================================
+/* =========================================================
    MOBILE DRAWER
-================================ */
+========================================================= */
 
 @media (max-width: 768px) {
 
@@ -283,7 +656,7 @@ body.dark-mode .sidebar-close-btn {
     height: 100vh;
     min-height: 100vh;
 
-    padding: 20px 16px;
+    padding: 20px 15px;
 
     transform: translateX(-105%);
 
@@ -292,6 +665,10 @@ body.dark-mode .sidebar-close-btn {
     box-shadow:
       12px 0 35px
       rgba(0, 0, 0, 0.28);
+
+    transition:
+      transform 0.28s ease,
+      background 0.25s ease;
   }
 
   .sidebar.sidebar-open {
@@ -299,10 +676,14 @@ body.dark-mode .sidebar-close-btn {
   }
 
 
+  /* Close */
+
   .sidebar-close-btn {
     display: inline-flex;
   }
 
+
+  /* Logo */
 
   .sidebar .logo {
     padding: 0;
@@ -311,12 +692,50 @@ body.dark-mode .sidebar-close-btn {
   }
 
   .sidebar .logo svg {
-    font-size: 25px;
+    width: 25px;
+    height: 25px;
   }
 
 
+  /* Normal navigation */
+
+  .sidebar-nav {
+    gap: 5px;
+  }
+
   .sidebar-nav > a {
-    min-height: 50px;
+    min-height: 49px;
+
+    padding: 0 13px;
+
+    gap: 12px;
+
+    font-size: 14px;
+  }
+
+
+  /* Fleet */
+
+  .sidebar-section {
+    margin-top: 15px;
+    padding-top: 14px;
+  }
+
+  .sidebar-section-title {
+    margin-left: 2px;
+    margin-right: 2px;
+
+    padding-left: 11px;
+
+    font-size: 10px;
+  }
+
+  .sidebar-section a {
+    min-height: 48px;
+
+    padding: 0 13px;
+
+    gap: 12px;
 
     font-size: 14px;
   }
@@ -353,23 +772,61 @@ body.dark-mode .sidebar-close-btn {
 }
 
 
-/* ================================
+/* =========================================================
    SMALL PHONE
-================================ */
+========================================================= */
 
 @media (max-width: 480px) {
 
   .sidebar {
     width: 84vw;
 
-    padding: 18px 14px;
+    padding: 18px 13px;
+  }
+
+  .sidebar-header {
+    margin-bottom: 18px;
   }
 
   .sidebar-nav > a {
-    min-height: 48px;
+    min-height: 47px;
 
-    padding: 0 13px;
+    padding: 0 12px;
+
+    gap: 11px;
 
     font-size: 13px;
   }
+
+  .sidebar-nav > a svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .sidebar-section {
+    margin-top: 13px;
+    padding-top: 12px;
+  }
+
+  .sidebar-section-title {
+    padding-left: 10px;
+
+    font-size: 9px;
+  }
+
+  .sidebar-section a {
+    min-height: 46px;
+
+    padding: 0 12px;
+
+    gap: 11px;
+
+    font-size: 13px;
+  }
+
+  .sidebar-section a svg {
+    width: 17px;
+    height: 17px;
+  }
 }
+

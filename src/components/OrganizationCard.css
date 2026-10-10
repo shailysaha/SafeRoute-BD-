@@ -1,0 +1,259 @@
+.organization-card {
+  background: #ffffff;
+  border: 1px solid #dbe4ee;
+  border-left: 4px solid #16a34a;
+  border-radius: 15px;
+
+  padding: 18px;
+
+  box-shadow: 0 5px 18px rgba(15, 23, 42, 0.06);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.organization-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.1);
+}
+
+/* HEADER */
+
+.organization-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+}
+
+.organization-card-icon {
+  width: 46px;
+  height: 46px;
+
+  flex-shrink: 0;
+
+  border-radius: 12px;
+
+  background: #ecfdf5;
+  color: #16a34a;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 20px;
+}
+
+.organization-card-title {
+  min-width: 0;
+}
+
+.organization-card-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.organization-card-name-row h3 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.organization-card-type {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #6b7280;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* DESCRIPTION */
+
+.organization-card-description {
+  margin: 14px 0;
+
+  color: #4b5563;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* LOCATION */
+
+.organization-card-location {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+
+  margin-top: 12px;
+
+  color: #6b7280;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.organization-card-location svg {
+  margin-top: 2px;
+
+  flex-shrink: 0;
+
+  color: #16a34a;
+}
+
+/* SERVICES */
+
+.organization-card-services {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 6px;
+
+  margin-top: 13px;
+}
+
+.organization-card-services span {
+  padding: 5px 8px;
+
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+
+  border-radius: 7px;
+
+  color: #15803d;
+
+  font-size: 10px;
+  font-weight: 650;
+}
+
+/* FOOTER */
+
+.organization-card-footer {
+  margin-top: 17px;
+  padding-top: 13px;
+
+  border-top: 1px solid #eef2f7;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+.organization-card-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  color: #15803d;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.organization-card-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.organization-card-actions button {
+  border: none;
+
+  border-radius: 8px;
+
+  padding: 8px 11px;
+
+  cursor: pointer;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.organization-card-call {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.organization-card-call:hover {
+  background: #15803d;
+}
+
+.organization-card-help {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.organization-card-help:hover {
+  background: #1d4ed8;
+}
+
+/* DARK MODE */
+
+.dark .organization-card,
+[data-theme="dark"] .organization-card {
+  background: #111827;
+  border-color: #1f2937;
+  border-left-color: #22c55e;
+}
+
+.dark .organization-card-name-row h3,
+[data-theme="dark"] .organization-card-name-row h3 {
+  color: #f8fafc;
+}
+
+.dark .organization-card-type,
+.dark .organization-card-description,
+.dark .organization-card-location,
+[data-theme="dark"] .organization-card-type,
+[data-theme="dark"] .organization-card-description,
+[data-theme="dark"] .organization-card-location {
+  color: #94a3b8;
+}
+
+.dark .organization-card-footer,
+[data-theme="dark"] .organization-card-footer {
+  border-color: #1f2937;
+}
+
+.dark .organization-card-icon,
+[data-theme="dark"] .organization-card-icon {
+  background: #14532d;
+  color: #86efac;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 600px) {
+  .organization-card {
+    padding: 15px;
+  }
+
+  .organization-card-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .organization-card-actions {
+    width: 100%;
+  }
+
+  .organization-card-actions button {
+    flex: 1;
+    justify-content: center;
+  }
+}

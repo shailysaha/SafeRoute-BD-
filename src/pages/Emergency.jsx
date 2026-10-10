@@ -24,11 +24,13 @@ import DashboardLayout from "../layout/DashboardLayout";
 
 import MyLocationButton from "../components/MyLocationButton";
 import SOSButton from "../components/SOSButton";
+import NeedHelpModal from "../components/NeedHelpModal";
 import Hospitals from "../components/Hospitals";
 import PoliceStations from "../components/PoliceStations";
 import EmergencyContacts from "../components/emergency/EmergencyContacts";
 import { auth, db } from "../firebase/firebase";
 import { blueIcon } from "../utils/markerIcons";
+import { notify } from "../utils/notify";
 
 import "./Emergency.css";
 
@@ -61,6 +63,7 @@ function Emergency() {
   const [sendingSOS, setSendingSOS] = useState(false);
   const [nearestHospital, setNearestHospital] = useState(null);
   const [nearestPolice, setNearestPolice] = useState(null);
+  const [showNeedHelp, setShowNeedHelp] = useState(false);
 
   const getLocationName = async (lat, lng) => {
     try {
@@ -118,7 +121,7 @@ function Emergency() {
     const lng = Number(location.lng);
 
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-      alert("Invalid current location.");
+      notify("Invalid current location.");
       return;
     }
 
@@ -142,13 +145,13 @@ function Emergency() {
     const currentUser = auth.currentUser;
 
     if (!currentUser) {
-      alert("Please login before sending an SOS alert.");
+      notify("Please login before sending an SOS alert.");
       navigate("/login");
       return;
     }
 
     if (!currentLocation) {
-      alert("Please detect your current location first.");
+      notify("Please detect your current location first.");
       return;
     }
 
@@ -222,17 +225,17 @@ function Emergency() {
       await Promise.all(notificationPromises);
 
       if (linkedContacts.length === 0) {
-        alert(
+        notify(
           "🚨 SOS sent, but no registered emergency contacts were found."
         );
       } else {
-        alert(
+        notify(
           `🚨 SOS sent successfully!\n${linkedContacts.length} emergency contact(s) notified.`
         );
       }
     } catch (error) {
       console.error("SOS error:", error);
-      alert("Failed to send SOS alert.");
+      notify("Failed to send SOS alert.");
     } finally {
       setSendingSOS(false);
     }
@@ -300,6 +303,30 @@ function Emergency() {
 
             {sendingSOS && (
               <p className="sending-sos">Sending SOS...</p>
+            )}
+          </div>
+
+          {/* NEED HELP */}
+          <div className="emergency-info-card need-help-card">
+            <h3>🆘 Need Help?</h3>
+
+            <p>
+              Request assistance from a verified emergency service provider
+              near your current location.
+            </p>
+
+            <button
+              type="button"
+              className="emergency-need-help-btn"
+              onClick={() => setShowNeedHelp(true)}
+            >
+              🆘 Request Assistance
+            </button>
+
+            {!currentLocation && (
+              <p className="need-help-location-warning">
+                📍 Detect your location first for location-based assistance.
+              </p>
             )}
           </div>
         </div>
@@ -406,6 +433,14 @@ function Emergency() {
             </div>
           )}
         </div>
+
+        {/* NEED HELP MODAL */}
+        <NeedHelpModal
+          isOpen={showNeedHelp}
+          onClose={() => setShowNeedHelp(false)}
+          accidentId={null}
+          location={currentLocation}
+        />
       </div>
     </DashboardLayout>
   );

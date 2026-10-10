@@ -1,0 +1,859 @@
+/* =========================================================
+   NEED HELP MODAL - COMPLETE CSS
+========================================================= */
+
+.need-help-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.need-help-modal {
+  background: var(--card-bg, #ffffff);
+  color: var(--text-primary, #0f172a);
+  border-radius: 24px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 0;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+  position: relative;
+}
+
+/* Scrollbar styling */
+.need-help-modal::-webkit-scrollbar {
+  width: 6px;
+}
+
+.need-help-modal::-webkit-scrollbar-track {
+  background: var(--bg-secondary, #f1f5f9);
+  border-radius: 10px;
+}
+
+.need-help-modal::-webkit-scrollbar-thumb {
+  background: var(--color-primary, #2563eb);
+  border-radius: 10px;
+}
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.need-help-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid var(--border-color, rgba(148, 163, 184, 0.25));
+  position: sticky;
+  top: 0;
+  background: var(--card-bg, #ffffff);
+  z-index: 10;
+  border-radius: 24px 24px 0 0;
+}
+
+.need-help-modal-header > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.need-help-header-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.need-help-modal-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+}
+
+.need-help-modal-header p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--text-secondary, #64748b);
+}
+
+.need-help-close-btn {
+  background: var(--bg-secondary, #f1f5f9);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary, #64748b);
+  font-size: 18px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.need-help-close-btn:hover {
+  background: var(--color-danger, #dc2626);
+  color: white;
+  transform: rotate(90deg);
+}
+
+.need-help-close-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+
+.need-help-location-status,
+.need-help-auth-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  margin: 0 28px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.need-help-location-status {
+  margin-top: 20px;
+  border: 1px solid var(--border-color, rgba(148, 163, 184, 0.25));
+}
+
+.location-available {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #059669;
+}
+
+.location-missing {
+  background: rgba(220, 38, 38, 0.1);
+  border-color: rgba(220, 38, 38, 0.3);
+  color: #dc2626;
+}
+
+.need-help-location-status svg {
+  flex-shrink: 0;
+  font-size: 20px;
+}
+
+.need-help-location-status strong {
+  display: block;
+  margin-bottom: 2px;
+  font-weight: 600;
+}
+
+.need-help-location-status p {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.need-help-auth-status {
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  color: var(--color-primary, #2563eb);
+  margin-top: 0;
+}
+
+.auth-missing {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.2);
+  color: #dc2626;
+}
+
+/* =========================================================
+   SERVICES SECTION
+========================================================= */
+
+.need-help-services {
+  padding: 0 28px 24px;
+}
+
+.need-help-section-title {
+  margin-bottom: 18px;
+}
+
+.need-help-section-title h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+}
+
+.need-help-section-title p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary, #64748b);
+}
+
+.need-help-service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.need-help-service-option {
+  background: var(--bg-secondary, #f8fafc);
+  border: 2px solid var(--border-color, rgba(148, 163, 184, 0.25));
+  border-radius: 14px;
+  padding: 18px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.need-help-service-option:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-primary, #2563eb);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12);
+}
+
+.need-help-service-option:active {
+  transform: scale(0.97);
+}
+
+.need-help-service-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-bg, #ffffff);
+  border-radius: 12px;
+  font-size: 24px;
+  color: var(--color-primary, #2563eb);
+}
+
+.need-help-service-option strong {
+  font-size: 15px;
+  color: var(--text-primary, #0f172a);
+}
+
+.need-help-service-option small {
+  font-size: 12px;
+  color: var(--text-secondary, #64748b);
+  line-height: 1.4;
+}
+
+/* =========================================================
+   PROVIDER SECTION
+========================================================= */
+
+.need-help-provider-section {
+  padding: 0 28px 24px;
+}
+
+.need-help-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: var(--text-secondary, #64748b);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 0;
+  margin-bottom: 16px;
+  transition: color 0.2s ease;
+}
+
+.need-help-back-btn:hover {
+  color: var(--color-primary, #2563eb);
+}
+
+.need-help-back-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.need-help-provider-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* =========================================================
+   PROVIDER WRAPPER
+========================================================= */
+
+.need-help-provider-wrapper {
+  background: var(--bg-secondary, #f8fafc);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid var(--border-color, rgba(148, 163, 184, 0.25));
+  transition: all 0.25s ease;
+}
+
+.need-help-provider-wrapper:hover {
+  border-color: var(--color-primary, #2563eb);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* =========================================================
+   REQUEST ASSISTANCE BUTTON - POSITIONED ABOVE MAP
+========================================================= */
+
+.request-assistance-btn {
+  width: 100%;
+  padding: 14px 20px;
+  margin-top: 14px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.request-assistance-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+}
+
+.request-assistance-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.request-assistance-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.request-assistance-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.request-assistance-btn .spin {
+  animation: spin 1s linear infinite;
+}
+
+.request-location-warning,
+.request-auth-warning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  font-size: 12px;
+  border-radius: 8px;
+  color: var(--text-secondary, #64748b);
+  background: var(--bg-primary, #f1f5f9);
+}
+
+.request-location-warning svg,
+.request-auth-warning svg {
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   LOADING / EMPTY / ERROR STATES
+========================================================= */
+
+.need-help-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 0;
+  color: var(--text-secondary, #64748b);
+}
+
+.need-help-loading .spin {
+  animation: spin 1s linear infinite;
+  font-size: 24px;
+  color: var(--color-primary, #2563eb);
+}
+
+.need-help-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.need-help-empty h3 {
+  margin: 0 0 8px;
+  color: var(--text-primary, #0f172a);
+}
+
+.need-help-empty p {
+  margin: 0;
+  color: var(--text-secondary, #64748b);
+}
+
+.need-help-error {
+  padding: 14px 18px;
+  margin: 16px 0;
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 12px;
+  color: #dc2626;
+  font-size: 14px;
+}
+
+.need-help-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  margin: 12px 0;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 12px;
+  color: #b45309;
+}
+
+.need-help-warning svg {
+  flex-shrink: 0;
+  font-size: 20px;
+  margin-top: 2px;
+}
+
+.need-help-warning strong {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.need-help-warning p {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/* =========================================================
+   TRUST NOTE
+========================================================= */
+
+.need-help-trust-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 14px 18px;
+  background: rgba(16, 185, 129, 0.06);
+  border-radius: 12px;
+  color: var(--text-secondary, #64748b);
+  font-size: 13px;
+}
+
+.need-help-trust-note svg {
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   ASSISTANCE REQUEST VIEW
+========================================================= */
+
+.assistance-request-content {
+  padding: 20px 28px 24px;
+}
+
+.assistance-status-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  border-radius: 14px;
+  margin-bottom: 18px;
+}
+
+.assistance-status-card .assistance-status-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.assistance-status-card strong {
+  display: block;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.assistance-status-card p {
+  margin: 2px 0 0;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.request-id-display {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.6;
+  font-family: monospace;
+}
+
+.status-requested {
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  color: var(--color-primary, #2563eb);
+}
+
+.status-searching {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  color: #b45309;
+}
+
+.status-accepted {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #059669;
+}
+
+.status-en-route {
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  color: var(--color-primary, #2563eb);
+}
+
+.status-arrived {
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  color: #7c3aed;
+}
+
+.status-completed {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #059669;
+}
+
+.status-cancelled {
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  color: #dc2626;
+}
+
+.status-failed {
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  color: #dc2626;
+}
+
+.assistance-detail-card {
+  padding: 14px 18px;
+  background: var(--bg-secondary, #f8fafc);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-color, rgba(148, 163, 184, 0.25));
+}
+
+.assistance-detail-card span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary, #64748b);
+  margin-bottom: 4px;
+}
+
+.assistance-detail-card strong {
+  display: block;
+  font-size: 16px;
+  color: var(--text-primary, #0f172a);
+}
+
+.assistance-detail-card small {
+  display: block;
+  font-size: 13px;
+  color: var(--text-secondary, #64748b);
+  margin-top: 2px;
+}
+
+.assistance-request-id {
+  padding: 14px 18px;
+  background: var(--bg-secondary, #f8fafc);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color, rgba(148, 163, 184, 0.25));
+}
+
+.assistance-request-id span {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary, #64748b);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.assistance-request-id code {
+  font-size: 13px;
+  font-family: monospace;
+  color: var(--text-primary, #0f172a);
+  background: var(--bg-primary, #f1f5f9);
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.assistance-request-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.assistance-request-actions button {
+  flex: 1;
+  min-width: 120px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.cancel-assistance-btn {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+}
+
+.cancel-assistance-btn:hover:not(:disabled) {
+  background: #dc2626;
+  color: white;
+}
+
+.cancel-assistance-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.close-assistance-btn {
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--text-secondary, #64748b);
+}
+
+.close-assistance-btn:hover {
+  background: var(--border-color, rgba(148, 163, 184, 0.25));
+}
+
+.assistance-trust-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 12px 16px;
+  background: rgba(16, 185, 129, 0.06);
+  border-radius: 12px;
+  color: var(--text-secondary, #64748b);
+  font-size: 13px;
+}
+
+.assistance-trust-note svg {
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+  .need-help-modal {
+    max-width: 100%;
+    max-height: 95vh;
+    border-radius: 16px;
+    margin: 10px;
+  }
+
+  .need-help-modal-header {
+    padding: 18px 20px 16px;
+    flex-wrap: wrap;
+  }
+
+  .need-help-modal-header > div {
+    flex-wrap: wrap;
+  }
+
+  .need-help-header-icon {
+    font-size: 28px;
+  }
+
+  .need-help-modal-header h2 {
+    font-size: 19px;
+  }
+
+  .need-help-location-status,
+  .need-help-auth-status {
+    margin: 12px 20px 12px;
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+
+  .need-help-services,
+  .need-help-provider-section {
+    padding: 0 20px 18px;
+  }
+
+  .need-help-service-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+
+  .need-help-service-option {
+    padding: 14px 12px;
+  }
+
+  .need-help-service-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .need-help-provider-list {
+    max-height: 300px;
+  }
+
+  .assistance-request-content {
+    padding: 16px 20px 20px;
+  }
+
+  .assistance-request-actions {
+    flex-direction: column;
+  }
+
+  .assistance-request-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .need-help-modal-header {
+    padding: 14px 16px 12px;
+  }
+
+  .need-help-modal-header h2 {
+    font-size: 17px;
+  }
+
+  .need-help-location-status,
+  .need-help-auth-status {
+    margin: 10px 16px 10px;
+    padding: 10px 14px;
+    font-size: 12px;
+    flex-wrap: wrap;
+  }
+
+  .need-help-services,
+  .need-help-provider-section {
+    padding: 0 16px 14px;
+  }
+
+  .need-help-service-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .need-help-service-option {
+    padding: 12px 10px;
+  }
+
+  .need-help-service-option strong {
+    font-size: 13px;
+  }
+
+  .need-help-service-option small {
+    font-size: 11px;
+  }
+
+  .need-help-provider-wrapper {
+    padding: 12px;
+  }
+
+  .request-assistance-btn {
+    font-size: 14px;
+    padding: 12px 16px;
+  }
+
+  .assistance-request-content {
+    padding: 12px 16px 16px;
+  }
+
+  .assistance-status-card {
+    padding: 14px 16px;
+    flex-wrap: wrap;
+  }
+
+  .assistance-detail-card {
+    padding: 12px 14px;
+  }
+}

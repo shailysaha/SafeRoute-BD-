@@ -26,7 +26,7 @@ import {
 
 import { auth, db } from "../firebase/firebase";
 import "./Navbar.css";
-
+import { notify } from "../utils/notify";
 function Navbar() {
   const navigate = useNavigate();
 
@@ -108,7 +108,7 @@ function Navbar() {
       navigate("/");
     } catch (error) {
       console.error("Logout failed:", error);
-      alert("Unable to log out.");
+      notify("Unable to log out.");
     }
   };
 

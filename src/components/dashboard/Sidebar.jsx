@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 
 import {
@@ -17,7 +17,13 @@ import {
   FaChartBar,
   FaUsers,
   FaRobot,
-  FaUsers as FaCommunity,
+  FaBuilding,
+  FaCar,
+  FaUserTie,
+  FaRoad,
+  FaCarCrash,
+  FaChartLine,
+  FaCreditCard,
 } from "react-icons/fa";
 
 import { onAuthStateChanged } from "firebase/auth";
@@ -27,173 +33,388 @@ import { auth, db } from "../../firebase/firebase";
 
 import "./Sidebar.css";
 
-function Sidebar({ isOpen = false, onClose }) {
-  const [isAdmin, setIsAdmin] = useState(false);
+function Sidebar({
+  isOpen = false,
+  onClose,
+}) {
+  const [userRole, setUserRole] = useState(null);
+  const [accountType, setAccountType] = useState(null);
+  const [checkingUser, setCheckingUser] = useState(true);
+
+  // =========================================
+  // LOAD CURRENT USER PROFILE
+  // =========================================
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (!currentUser) {
-        setIsAdmin(false);
-        return;
-      }
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      async (currentUser) => {
+        if (!currentUser) {
+          setUserRole(null);
+          setAccountType(null);
+          setCheckingUser(false);
+          return;
+        }
 
-      try {
-        const userDocRef = doc(db, "users", currentUser.uid);
-        const userSnap = await getDoc(userDocRef);
+        try {
+          const userRef = doc(
+            db,
+            "users",
+            currentUser.uid
+          );
 
-        setIsAdmin(userSnap.exists() && userSnap.data()?.role === "admin");
-      } catch (error) {
-        console.error("Error checking admin status:", error);
-        setIsAdmin(false);
+          const userSnap = await getDoc(userRef);
+
+          if (userSnap.exists()) {
+            const data = userSnap.data();
+
+            setUserRole(data.role || "user");
+
+            setAccountType(
+              data.accountType || "user"
+            );
+          } else {
+            setUserRole("user");
+            setAccountType("user");
+          }
+        } catch (error) {
+          console.error(
+            "Sidebar user profile error:",
+            error
+          );
+
+          setUserRole("user");
+          setAccountType("user");
+        } finally {
+          setCheckingUser(false);
+        }
       }
-    });
+    );
 
     return () => unsubscribe();
   }, []);
 
-  const getLinkClass = ({ isActive }) => (isActive ? "active" : "");
+  // =========================================
+  // ACCESS TYPES
+  // =========================================
+
+  const isAdmin =
+    userRole === "admin";
+
+  const isCompanyAdmin =
+    userRole === "company_admin" &&
+    accountType === "company";
+
+  const getLinkClass = ({
+    isActive,
+  }) => {
+    return isActive ? "active" : "";
+  };
+
+  const closeSidebar = () => {
+    if (typeof onClose === "function") {
+      onClose();
+    }
+  };
 
   return (
     <>
-      {/* Mobile Overlay */}
+      {/* =====================================
+          MOBILE OVERLAY
+      ====================================== */}
+
       <div
-        className={`sidebar-overlay ${isOpen ? "show" : ""}`}
-        onClick={onClose}
+        className={`sidebar-overlay ${
+          isOpen ? "show" : ""
+        }`}
+        onClick={closeSidebar}
       />
 
-      <aside className={`sidebar ${isOpen ? "sidebar-open" : ""}`}>
-        {/* Logo */}
+      {/* =====================================
+          SIDEBAR
+      ====================================== */}
+
+      <aside
+        className={`sidebar ${
+          isOpen
+            ? "sidebar-open"
+            : ""
+        }`}
+      >
+        {/* ===================================
+            HEADER
+        ==================================== */}
+
         <div className="sidebar-header">
+
           <div className="logo">
             <FaShieldAlt />
-            <span>SafeRoute BD</span>
+
+            <span>
+              SafeRoute BD
+            </span>
           </div>
 
           <button
             type="button"
             className="sidebar-close-btn"
-            onClick={onClose}
+            onClick={closeSidebar}
             aria-label="Close navigation"
           >
             <FaTimes />
           </button>
+
         </div>
 
-        {/* Navigation */}
+        {/* ===================================
+            NAVIGATION
+        ==================================== */}
+
         <nav className="sidebar-nav">
+
           {/* HOME */}
-          <NavLink to="/" end className={getLinkClass} onClick={onClose}>
+
+          <NavLink
+            to="/"
+            end
+            className={getLinkClass}
+            onClick={closeSidebar}
+          >
             <FaHome />
             <span>Home</span>
           </NavLink>
 
-          {/* SAFETY MAP */}
-          <NavLink to="/map" className={getLinkClass} onClick={onClose}>
+          {/* MAP */}
+
+          <NavLink
+            to="/map"
+            className={getLinkClass}
+            onClick={closeSidebar}
+          >
             <FaMapMarkedAlt />
             <span>Map</span>
           </NavLink>
 
           {/* PLAN JOURNEY */}
+
           <NavLink
             to="/plan-journey"
             className={getLinkClass}
-            onClick={onClose}
+            onClick={closeSidebar}
           >
             <FaRoute />
             <span>Plan Journey</span>
           </NavLink>
 
           {/* AI ASSISTANT */}
+
           <NavLink
             to="/ai-assistant"
             className={getLinkClass}
-            onClick={onClose}
+            onClick={closeSidebar}
           >
             <FaRobot />
             <span>AI Assistant</span>
           </NavLink>
 
           {/* NOTIFICATIONS */}
+
           <NavLink
             to="/notifications"
             className={getLinkClass}
-            onClick={onClose}
+            onClick={closeSidebar}
           >
             <FaBell />
             <span>Notifications</span>
           </NavLink>
 
           {/* EMERGENCY */}
-          <NavLink to="/emergency" className={getLinkClass} onClick={onClose}>
+
+          <NavLink
+            to="/emergency"
+            className={getLinkClass}
+            onClick={closeSidebar}
+          >
             <FaAmbulance />
             <span>Emergency</span>
           </NavLink>
 
           {/* REPORT INCIDENT */}
+
           <NavLink
             to="/report-area"
             className={getLinkClass}
-            onClick={onClose}
+            onClick={closeSidebar}
           >
             <FaExclamationTriangle />
             <span>Report Incident</span>
           </NavLink>
 
           {/* COMMUNITY REPORTS */}
+
           <NavLink
             to="/community-reports"
             className={getLinkClass}
-            onClick={onClose}
+            onClick={closeSidebar}
           >
-            <FaCommunity />
+            <FaUsers />
             <span>Community Reports</span>
           </NavLink>
 
           {/* MY REPORTS */}
-          <NavLink to="/my-reports" className={getLinkClass} onClick={onClose}>
+
+          <NavLink
+            to="/my-reports"
+            className={getLinkClass}
+            onClick={closeSidebar}
+          >
             <FaFileAlt />
             <span>My Reports</span>
           </NavLink>
 
           {/* PROFILE */}
-          <NavLink to="/profile" className={getLinkClass} onClick={onClose}>
+
+          <NavLink
+            to="/profile"
+            className={getLinkClass}
+            onClick={closeSidebar}
+          >
             <FaUser />
             <span>My Profile</span>
           </NavLink>
 
-          {/* ADMIN & ANALYTICS */}
-          {isAdmin && (
-            <>
-              <NavLink to="/admin" className={getLinkClass} onClick={onClose}>
-                <FaUserShield />
-                <span>Admin</span>
-              </NavLink>
+          {/* FAMILY SAFETY */}
 
-              <NavLink
-                to="/analytics"
-                className={getLinkClass}
-                onClick={onClose}
-              >
-                <FaChartBar />
-                <span>Analytics</span>
-              </NavLink>
+          <NavLink
+            to="/family-safety"
+            className={getLinkClass}
+            onClick={closeSidebar}
+          >
+            <FaUsers />
+            <span>Family Safety</span>
+          </NavLink>
 
-              <NavLink
-                to="/admin/users"
-                className={getLinkClass}
-                onClick={onClose}
-              >
-                <FaUsers />
-                <span>User Management</span>
-              </NavLink>
-            </>
-          )}
+          {/* =================================
+              COMPANY / FLEET SECTION
+          ================================== */}
+
+          {!checkingUser &&
+            isCompanyAdmin && (
+              <div className="sidebar-section">
+
+                <div className="sidebar-section-title">
+                  <FaBuilding />
+
+                  <span>
+                    Company
+                  </span>
+                </div>
+
+                {/* DASHBOARD */}
+
+                <NavLink
+                  to="/fleet-dashboard"
+                  className={getLinkClass}
+                  onClick={closeSidebar}
+                >
+                  <FaBuilding />
+
+                  <span>
+                    Fleet Dashboard
+                  </span>
+                </NavLink>
+
+                
+
+                {/* SUBSCRIPTION */}
+
+                <NavLink
+                  to="/fleet-subscription"
+                  className={getLinkClass}
+                  onClick={closeSidebar}
+                >
+                  <FaCreditCard />
+
+                  <span>
+                    Subscription
+                  </span>
+                </NavLink>
+
+              </div>
+            )}
+
+          {/* =================================
+              ADMIN SECTION
+          ================================== */}
+
+          {!checkingUser &&
+            isAdmin && (
+              <div className="sidebar-section">
+
+                <div className="sidebar-section-title">
+                  <FaUserShield />
+
+                  <span>
+                    Administration
+                  </span>
+                </div>
+
+                {/* ADMIN */}
+
+                <NavLink
+                  to="/admin"
+                  className={getLinkClass}
+                  onClick={closeSidebar}
+                >
+                  <FaUserShield />
+
+                  <span>
+                    Admin Dashboard
+                  </span>
+                </NavLink>
+
+                {/* ANALYTICS */}
+
+                <NavLink
+                  to="/analytics"
+                  className={getLinkClass}
+                  onClick={closeSidebar}
+                >
+                  <FaChartBar />
+
+                  <span>
+                    Analytics
+                  </span>
+                </NavLink>
+
+                {/* USERS */}
+
+                <NavLink
+                  to="/admin/users"
+                  className={getLinkClass}
+                  onClick={closeSidebar}
+                >
+                  <FaUsers />
+
+                  <span>
+                    User Management
+                  </span>
+                </NavLink>
+
+              </div>
+            )}
 
           {/* ABOUT */}
-          <NavLink to="/about" className={getLinkClass} onClick={onClose}>
+
+          <NavLink
+            to="/about"
+            className={getLinkClass}
+            onClick={closeSidebar}
+          >
             <FaCog />
             <span>About</span>
           </NavLink>
+
         </nav>
       </aside>
     </>

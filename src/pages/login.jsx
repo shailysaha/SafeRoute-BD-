@@ -13,7 +13,7 @@ import {
 } from "react-icons/fa";
 
 import "./Login.css";
-
+import { notify } from "../utils/notify";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase/firebase";
 
@@ -28,7 +28,7 @@ function Login() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      alert("Please fill in all fields.");
+      notify("Please fill in all fields.", "error");
       return;
     }
 
@@ -39,12 +39,12 @@ function Login() {
         password
       );
 
-      alert("✅ Login Successful");
+      notify(" Login Successful", "success");
 
       navigate(from, { replace: true });
 
     } catch (error) {
-      alert(error.message);
+      notify(error.message, "error");
     }
   };
 

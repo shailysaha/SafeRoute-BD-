@@ -1,0 +1,40 @@
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  padding: 5px 9px;
+
+  border-radius: 999px;
+
+  background: #dcfce7;
+  color: #15803d;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.3px;
+
+  white-space: nowrap;
+}
+
+.verified-badge svg {
+  font-size: 11px;
+}
+
+.verified-badge-small {
+  padding: 4px 7px;
+  font-size: 9px;
+}
+
+.verified-badge-small svg {
+  font-size: 10px;
+}
+
+/* Dark mode */
+
+.dark .verified-badge,
+[data-theme="dark"] .verified-badge {
+  background: #14532d;
+  color: #86efac;
+}
